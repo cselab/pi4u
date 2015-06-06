@@ -1,0 +1,9 @@
+0.1:	First official release
+
+0.2:	Minor fixes
+
+0.3:	Various fixes
+	Breaking long chains
+	Gaussian prior
+	aux.c to auxil.c
+	... 

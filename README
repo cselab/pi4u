@@ -1,0 +1,126 @@
+I. SOFTWARE COMPONENTS
+
+You will find the following software packages:
+
+- torc_lite: a tasking library that allows us to write platform-independent code
+- pndl: parallel numerical differentiation library, built on top of torc_lite
+- engines: the UQ framework built on top of torc_lite. 
+
+
+II. PREREQUISITES
+- An MPI implementation must be installed on your system (preferably with full thread safety)
+- GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system
+
+
+III. INSTALLATION STEPS
+
+1) First we start with torc_lite:
+	cd torc_lite
+	./configure CC=mpicc --prefix=$HOME/usr/torc
+	make; make install
+	export PATH=$HOME/usr/torc/bin:$PATH
+
+In $HOME/usr/torc/bin there are two files (torc_cflags, torc_libs) that facilitate the development of torc-based programs.
+You must be able to run successfully at least one of the demo examples.
+
+2) This step involves the compilation of PNDL, which is required by the Stochastic Newton TMCMC method
+	cd pndl
+	./configure CC=mpicc F77=mpif90 --prefix=$HOME/usr/torc
+
+3) We then proceed with the compilation of the engines (the UQ/OPT framework):
+	cd engines
+	make 
+
+If there are compilation issues then some directories in Makefile might need to be revised.
+
+4) TESTING
+
+4.1) TMCMC
+
+a) ./engine_tmcmc
+
+	By default, this runs TMCMC for the rosenbrock function in 2D, as defined in fitfun.c 
+	Hopefully this will run and produce some output files (curgen_db_000.txt etc)
+
+	The output files can be displayed with the display_gen tool, using the following command:
+	./display_gen curgen_db 5 2
+	5: number of the last generation (curgen_db_000.txt to curgen_db_005.txt will be displayed)
+	2: problem dimension
+
+	The runtime options for this engine can be set in the configuration file tmcmc.par
+
+b) ./engine_tmcmc_sn
+
+	As before but for the Stochastic Newton TMCMC method.
+
+4.2) CMA-ES
+
+a) ./engine_cmaes
+
+	Optimization of the rosenbrock function in 2D.
+
+4.3) SUBSET SIMULATION
+
+a) ./engine_ss1
+
+	Subset simulation for predefined levels
+	Hopefully this will run and produce some output files (samples_000.txt etc)
+
+	The output files can be displayed with the display_gen tool, using the following command:
+	./display_gen samples 8 2
+	8: number of the last generation (samples_000.txt to samples_008.txt will be displayed)
+	2: problem dimension
+
+	The runtime options for this engine can be set in the configuration file subset.par
+
+b) ./engine_ss2 
+
+	As before but for subset simulation with adaptive levels
+
+4.4) DIFFERENTIATION
+
+a) ./fd_grad
+
+	Calculation of the most suitable differentiation step per dimension using gradients and Romberg extrapolation   
+
+	Configuration file: grad.par
+	
+b) ./fd_deriv
+
+	Calculation of the gradient vector and Hessian matrix using PNDL 
+
+	Configuration file: grad.par
+
+c) ./sa_deriv
+
+	Stochastic approximation of the Hessian matrix
+ 
+	Configuration file: grad.par
+
+
+5) VISUALIZATION
+
+	The display_gen tool can visualize 2D slices of multidimensional data using gnuplot. 
+	It can invoked as follows
+	./display_gen <datafile> <last gen> <dimension> [var1] [var2]
+
+	- The full name of the file is in the form: <datafile>_<gen>.txt, where gen = 000, 001, ..., <last gen>
+	- <dimension> is the number of parameters. This means that the datafile has <dimension>+1 columns, the last containing the result of the function evaluation
+	- [var1] and [var2] are optional arguments that 
+	
+
+
+IV. COUPLING WITH EXTERNAL SOFTWARE
+
+An extra folder (external) demonstrates how external software can be called within a task function.
+Currently the following example is included:
+
+-) rosenbrock: 
+	A simple example; the Rosenbrock function now runs within the external sequential software.
+	Passing of parameters is performed through the automatically created params.dat file
+
+
+V. NOTES
+
+Ask for help, report any problems!: phadjido@mavt.ethz.ch 
+
