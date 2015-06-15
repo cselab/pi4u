@@ -58,6 +58,8 @@ typedef struct data_s {
 	double *auxil_data;
 #endif
 
+	int MinChainLength, MaxChainLength;
+
 	double lb, ub;		/*generic lower and upper bound*/
 
 	double	TolCOV;

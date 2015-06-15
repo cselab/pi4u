@@ -40,6 +40,9 @@ void read_data()
 	data.MaxStages = 20; // Default MAXGENS;
 	data.PopSize = 1024;	// Default DATANUM
 
+	data.MinChainLength = 0;
+	data.MaxChainLength = 1e6;
+
 	data.lb = -6;	// Default LB, same for all
 	data.ub = +6;	// Default UB, same for all
  

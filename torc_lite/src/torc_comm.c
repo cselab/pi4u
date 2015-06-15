@@ -563,6 +563,7 @@ int _torc_mpi2b_type(MPI_Datatype dtype)
 {
 	if	(dtype == MPI_INT)		return T_MPI_INT;
 	else if	(dtype == MPI_LONG)		return T_MPI_LONG;
+	else if	(dtype == MPI_FLOAT)		return T_MPI_FLOAT;
 	else if	(dtype == MPI_DOUBLE)		return T_MPI_DOUBLE;
 	else if	(dtype == MPI_DOUBLE_PRECISION)	return T_MPI_DOUBLE_PRECISION;
 	else if	(dtype == MPI_INTEGER)		return T_MPI_INTEGER;
@@ -577,6 +578,7 @@ MPI_Datatype _torc_b2mpi_type(int btype)
 	{
 	case T_MPI_INT:			return MPI_INT; break;
 	case T_MPI_LONG:		return MPI_LONG; break;
+	case T_MPI_FLOAT:		return MPI_FLOAT; break;
 	case T_MPI_DOUBLE:		return MPI_DOUBLE; break;
 	case T_MPI_DOUBLE_PRECISION:	return MPI_DOUBLE_PRECISION; break;
 	case T_MPI_INTEGER:		return MPI_INTEGER; break;

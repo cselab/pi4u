@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include "engine_tmcmc.h"
-
-#define _RESTART_
+//#define VERBOSE 1
+//#define _RESTART_
 #define _STEALING_
 /*#define _AFFINITY_*/
 
@@ -32,6 +32,9 @@ void read_data()
 	data.Nth = 4; /* Default PROBDIM */
 	data.MaxStages = 20; /* Default MAXGENS; */
 	data.PopSize = 1024;	/* Default DATANUM */
+
+	data.MinChainLength = 0;
+	data.MaxChainLength = 1e6;
 
 	data.lb = -6;	/* Default LB, same for all */
 	data.ub = +6;	/* Default UB, same for all */
@@ -144,6 +147,12 @@ void read_data()
 		}
 		else if (strstr(line, "Bdef")) {
 			sscanf(line, "%*s %lf %lf", &data.lb, &data.ub);
+		}
+		else if (strstr(line, "MinChainLength")) {
+			sscanf(line, "%*s %d", &data.MinChainLength);
+		}
+		else if (strstr(line, "MaxChainLength")) {
+			sscanf(line, "%*s %d", &data.MaxChainLength);
 		}
 	}
 
@@ -892,6 +901,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 		printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
 	}
 #endif
+
 	qsort(list, n, sizeof(sort_t), compar_desc);
 
 #if VERBOSE
@@ -901,16 +911,17 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 	}
 #endif
 
-#if 0   /* peh:check this */
+#if 1   /* UPPER THRESHOLD */
+	/* peh:check this */
 	/* breaking long chains */
 	int initial_newchains = newchains;
-	int threshold = 1e6;	/* peh: configuration file + more balanced lengths */
+	int h_threshold = data.MaxChainLength;	/* peh: configuration file + more balanced lengths */
 	for (i = 0; i < initial_newchains; i++) {
-		if (list[i].nsel > threshold) {
-			while (list[i].nsel > threshold) {
+		if (list[i].nsel > h_threshold) {
+			while (list[i].nsel > h_threshold) {
 				list[newchains] = list[i];
-				list[newchains].nsel = threshold;
-				list[i].nsel = list[i].nsel - threshold;
+				list[newchains].nsel = h_threshold;
+				list[i].nsel = list[i].nsel - h_threshold;
 				newchains++;
 			}
 		}
@@ -926,6 +937,30 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 #endif
 
 #endif
+
+#if 1   /* LOWER THRESHOLD */
+	/* single to double step chains */
+	int l_threshold = data.MinChainLength;	/* peh: configuration file + more balanced lengths */
+	for (i = 0; i < newchains; i++) {
+		if ((list[i].nsel > 0)&&(list[i].nsel < l_threshold)) {
+			list[i].nsel = l_threshold;
+		}
+	}
+
+	qsort(list, n, sizeof(sort_t), compar_desc);
+
+#if VERBOSE
+	printf("Points advanced\n");
+	for (i = 0; i < n; i++) {
+		printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
+	}
+#endif
+
+#endif
+
+
+
+
 
 	int ldi;	/* leader index*/
 	ldi = 0;
