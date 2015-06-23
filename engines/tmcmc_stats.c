@@ -104,7 +104,7 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 
 	/* Set initial step sizes to 1 */
 	ss = gsl_vector_alloc (1);
-	gsl_vector_set_all (ss, 0.001);	/* input?*/
+	gsl_vector_set_all (ss, 0.00001); /* input?*/
 
        /* Initialize method and iterate */
 	minex_func.n = 1;
@@ -290,9 +290,38 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	}
 */
 	/* Compute weights and normalize*/
-	double fjmax = compute_max(flc, n);
 
 	int i;
+#if 1
+	double flcp[n];
+	for (i= 0; i<n; i++)
+		flcp[i] = flc[i]*(p[j]-p[j-1]);
+
+
+	double fjmax= compute_max (flcp,n );
+	double weight[n];
+	/*PA weight[i] = exp((flc[i]-fjmax)*(p[j]-p[j-1])); 23/06 */
+	for (i = 0; i < n; i++)
+		weight[i] = exp( flcp[i] - fjmax );
+
+	if (display)
+		print_matrix("weight", weight, n);
+
+	double sum_weight = compute_sum(weight, n);
+
+	double q[n];
+	for (i = 0; i < n; i++)
+		q[i] = weight[i]/sum_weight;
+
+	if (display)
+		print_matrix("runinfo_q", q, n);
+
+	/*double sum_q = compute_sum(q, n);*/
+
+	/*logselection[gen] = log(sum_weight/currentuniques[gen])+fjmax*(p[gen+1]-p[gen]); PA definition change for all types of resampling 23/06/15*/
+	logselection[gen]= log(sum_weight) + fjmax -log(n);
+#else
+	double fjmax = compute_max(flc, n);
 
 	double weight[n];
 	for (i = 0; i < n; i++)
@@ -313,6 +342,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	/*double sum_q = compute_sum(q, n);*/
 
 	logselection[gen] = log(sum_weight/currentuniques[gen])+fjmax*(p[gen+1]-p[gen]);
+#endif
 
 	if (display)
 		print_matrix("logselection", logselection, gen+1);
@@ -397,7 +427,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 double priorpdf(double *theta, int n)
 {
 	/* peh:check this */
-#if 0	
+#if 0
 	/* log-uniform */
 	/*double res = 0;*/
 	double res = 1;
