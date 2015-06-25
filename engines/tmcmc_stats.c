@@ -429,16 +429,18 @@ double priorpdf(double *theta, int n)
 	/* peh:check this */
 #if 0
 	/* log-uniform */
-	/*double res = 0;*/
-	double res = 1;
+	double res = 0;
+	/*double res = 1;*/
 
 	int i;
 	for (i = 0; i < n; i++) {
-		/*res += log(gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i]));*/
-		res *= gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i]);
+		/*res += log(gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i])); PA EDIT
+		res *= gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i]); */
+		res += -log( data.upperbound[i]- data.lowerbound[i]);
 	}
 	if (res == 0) return 0;
-	return log(res);
+	/*return log(res); PA EDIT*/
+	return res;
 #else
 	/* gaussian */
 	double res = logmvnpdf(n, theta, data.prior_mu, data.prior_sigma);
