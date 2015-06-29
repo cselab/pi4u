@@ -427,7 +427,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 double priorpdf(double *theta, int n)
 {
 	/* peh:check this */
-#if 0
+#if 1
 	/* log-uniform */
 	double res = 0;
 	/*double res = 1;*/
