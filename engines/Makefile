@@ -18,9 +18,11 @@ LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
 # PRIMARY
 LDFLAGS += `torc_libs` -lpthread -lm 
 
-TARGETS = display_gen engine_tmcmc engine_tmcmc_sn engine_cmaes
-TARGETS += sa_deriv fd_deriv fd_grad
-TARGETS += engine_ss1 engine_ss2 
+TARGETS = display_gen engine_tmcmc engine_cmaes
+#TARGETS += engine_tmcmc_sn
+#TARGETS += sa_deriv fd_deriv fd_grad
+#TARGETS += engine_ss1 engine_ss2 
+TARGETS += propagation_tool
 
 all: $(TARGETS)
 
@@ -31,7 +33,7 @@ display_gen: display_gen.c gnuplot_i.c
 	$(CC) $(CFLAGS) -o display_gen display_gen.c gnuplot_i.c $(LDFLAGS)
 
 engine_cmaes: engine_cmaes.c cmaes.c fitfun.c
-	$(CC) $(CFLAGS) -o engine_cmaes engine_cmaes.c cmaes.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o engine_cmaes engine_cmaes.c cmaes.c auxil.c $(LDFLAGS)
 
 engine_ss1: engine_ss1.cpp ss_db.cpp auxil.o fitfun.c
 	$(CPP) $(CFLAGS) -o engine_ss1 engine_ss1.cpp ss_db.cpp auxil.o $(LDFLAGS)
@@ -54,8 +56,11 @@ fd_deriv: fd_deriv.c auxil.o fitfun.c
 fd_grad: fd_grad.c auxil.o fitfun.c
 	$(MPIF90) $(CFLAGS) -o fd_grad fd_grad.c auxil.o ../pndl/src/libpndl.a $(LDFLAGS)
 
+propagation_tool: propagation_tool.c auxil.c fitfun.c
+	$(CC) $(CFLAGS) -o propagation_tool propagation_tool.c auxil.c $(LDFLAGS)
+
 clean:
-	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad *.o
+	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad propagation_tool *.o
 
 clear:
 	rm -rf lsf.o* *.dat curgen_db*.txt curres_db*.txt P*S*T* runinfo.txt samples*.txt seeds*.txt Pc.txt actparcmaes.par

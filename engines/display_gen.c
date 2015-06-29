@@ -213,8 +213,8 @@ int main(int argc, char *argv[])
 #if 1
 	int i;
 
-	for (i = 0; i <= ngen; i++) {
-//	for (i = ngen; i <= ngen; i++) {
+//	for (i = 0; i <= ngen; i++) {
+	for (i = ngen; i <= ngen; i++) {
 //		display_curgen_db(i, ngen);
 		display_curgen_db_single(i, p1, p2, dim, ngen);
 		//sleep(5);
