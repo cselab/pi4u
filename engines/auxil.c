@@ -509,7 +509,7 @@ static double gsl_dmvnorm(int n, double *xv, double *mv, double *vm, int lognorm
 			gsl_vector_set(mean,i,mv[i]);
 	}
 		
-	if (mv != NULL) {
+	if (vm != NULL) {
 		for (i = 0; i < n; i++)
 			for (j = 0; j < n; j++)
 				gsl_matrix_set(var,i,j,vm[i*n+j]);
