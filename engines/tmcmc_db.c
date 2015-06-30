@@ -80,7 +80,7 @@ void init_curgen_db()
 {
 	pthread_mutex_init(&curgen_db.m, NULL);
 	curgen_db.entries = 0;
-	curgen_db.entry = calloc(1, data.PopSize*sizeof(cgdbp_t));
+	curgen_db.entry = calloc(1, (data.MinChainLength+1)*data.PopSize*sizeof(cgdbp_t));
 }
 
 
@@ -106,7 +106,7 @@ void init_curres_db()
 {
 	pthread_mutex_init(&curres_db.m, NULL);
 	curres_db.entries = 0;
-	curres_db.entry = calloc(1, data.PopSize*sizeof(resdbp_t));
+	curgen_db.entry = calloc(1, (data.MinChainLength+1)*data.PopSize*sizeof(cgdbp_t));
 }
 
 
