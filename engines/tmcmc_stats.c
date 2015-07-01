@@ -91,6 +91,7 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	size_t iter = 0, max_iter = data.options.MaxIter;	/* USER input*/
 	double Tol = data.options.Tol;
 	int Display = data.options.Display;
+	double Step = data.options.Step;
 	int status;
 	double size;
 
@@ -104,7 +105,7 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 
 	/* Set initial step sizes to 1 */
 	ss = gsl_vector_alloc (1);
-	gsl_vector_set_all (ss, 0.00001); /* input?*/
+	gsl_vector_set_all (ss, Step); /* input?*/
 
        /* Initialize method and iterate */
 	minex_func.n = 1;
@@ -427,24 +428,29 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 double priorpdf(double *theta, int n)
 {
 	/* peh:check this */
-#if 1
-	/* log-uniform */
-	double res = 0;
-	/*double res = 1;*/
+	double res;
 
-	int i;
-	for (i = 0; i < n; i++) {
-		/*res += log(gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i])); PA EDIT
-		res *= gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i]); */
-		res += -log( data.upperbound[i]- data.lowerbound[i]);
+	if (data.prior_type == 0)
+	{
+		/* log-uniform */
+		res = 0;
+		/*res = 1;*/
+
+		int i;
+		for (i = 0; i < n; i++) {
+			/*res += log(gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i])); PA EDIT
+			res *= gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i]); */
+			res += -log( data.upperbound[i]- data.lowerbound[i]);
+		}
+		if (res == 0) return 0;
+		/*return log(res); PA EDIT*/
+		return res;
 	}
-	if (res == 0) return 0;
-	/*return log(res); PA EDIT*/
-	return res;
-#else
-	/* gaussian */
-	double res = logmvnpdf(n, theta, data.prior_mu, data.prior_sigma);
-#endif
+	else
+	{
+		/* gaussian */
+		res = logmvnpdf(n, theta, data.prior_mu, data.prior_sigma);
+	}
 	return res;
 }
 

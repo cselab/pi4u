@@ -74,8 +74,16 @@ void read_data()
 	data.options.MaxIter = 100;	/**/ 
 	data.options.Tol = 1e-6;
 	data.options.Display = 0;
+	data.options.Step = 1e-5;
+
+#if 1
+	data.sampling_type = 0;	/* uniform > gaussian */
+	data.accept_type = 0;	/* without exp() > with exp() */
+	data.prior_type = 0;	/* lognormal > gaussian */
+#endif
 
 	data.iplot = 0;	/* gnuplot */
+	data.idump = 1;
 
 	data.Num = malloc(data.MaxStages*sizeof(double));
 	for (i = 0; i < data.MaxStages; i++) {
@@ -102,6 +110,7 @@ void read_data()
 	opt.MaxIter     100
 	opt.Tol         1e-6
 	opt.Display     0
+	opt.Step        1e-5
 	iplot           0
 	*/
 
@@ -142,8 +151,23 @@ void read_data()
 		else if (strstr(line, "opt.Display")) {
 			sscanf(line, "%*s %d", &data.options.Display);
 		}
+		else if (strstr(line, "opt.Step")) {
+			sscanf(line, "%*s %lf", &data.options.Step);
+		}
+		else if (strstr(line, "sampling")) {
+			sscanf(line, "%*s %d", &data.sampling_type);
+		}
+		else if (strstr(line, "accept")) {
+			sscanf(line, "%*s %d", &data.accept_type);
+		}
+		else if (strstr(line, "prior")) {
+			sscanf(line, "%*s %d", &data.prior_type);
+		}
 		else if (strstr(line, "iplot")) {
 			sscanf(line, "%*s %d", &data.iplot);
+		}
+		else if (strstr(line, "idump")) {
+			sscanf(line, "%*s %d", &data.idump);
 		}
 		else if (strstr(line, "Bdef")) {
 			sscanf(line, "%*s %lf %lf", &data.lb, &data.ub);
@@ -531,7 +555,7 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
 	torc_create_direct(0, torc_update_full_db_task, 5,		/* message to the database manager (separate process?) or direct execution by server thread */
 		data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 		1, MPI_DOUBLE, CALL_BY_COP,
-		n, MPI_DOUBLE, CALL_BY_COP,	/* check this for CALL_BY_VAL: in the full-version of the library, with n=1 we had segv */
+		n, MPI_DOUBLE, CALL_BY_COP,	/* xxx: for CALL_BY_VAL: in the full-version of the library, with n=1 we had segv */
 		1, MPI_INT, CALL_BY_COP,
 		1, MPI_INT, CALL_BY_COP,
 		point, &F, G, &n, &surrogate);
@@ -743,11 +767,12 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		/* Decide */
 		double prior_candidate = priorpdf(candidate, data.Nth);	/* from PanosA */
 		double prior_leader = priorpdf(leader, data.Nth);
-#if 0	/* peh:check this */
-		double L = exp((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);	/* with exp, without log in priorpdf and fitfun */
-#else
-		double L = ((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);	/* without exp, with log in priorpdf and fitfun */
-#endif
+		double L;
+		if (data.accept_type == 0)
+			L = ((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);	/* without exp, with log in priorpdf and fitfun */
+		else
+			L = exp((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);	/* with exp, without log in priorpdf and fitfun */
+
 		if (L > 1) L = 1;
 		double P = uniformrand(0,1);
 		if (P < L) {
@@ -1177,17 +1202,21 @@ int main(int argc, char *argv[])
 
 		double in_tparam[data.Nth];
 
-#if 1	/* peh:check this for (a) sampling (b) loading points/data from file */
-		/* uniform */
-		int d;
-		for (d = 0; d < data.Nth; d++) {
-			in_tparam[d] = uniformrand(0,1);
-			in_tparam[d] *= (data.upperbound[d]-data.lowerbound[d]);
-			in_tparam[d] += data.lowerbound[d];
+		if (data.sampling_type == 0)
+		{
+			/* peh:check this: add option for loading points/data from file */
+			/* uniform */
+			int d;
+			for (d = 0; d < data.Nth; d++) {
+				in_tparam[d] = uniformrand(0,1);
+				in_tparam[d] *= (data.upperbound[d]-data.lowerbound[d]);
+				in_tparam[d] += data.lowerbound[d];
+			}
 		}
-#else
-		mvnrnd(data.prior_mu, data.prior_sigma, in_tparam, data.Nth);
-#endif
+		else
+		{
+			mvnrnd(data.prior_mu, data.prior_sigma, in_tparam, data.Nth);
+		}
 
 		torc_create(-1, initchaintask, 4,
 			data.Nth, MPI_DOUBLE, CALL_BY_COP,

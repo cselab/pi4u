@@ -16,31 +16,7 @@
 #include <mpi.h>
 #include <torc.h>
 
-/*
-#ifndef MY_GETTIME
-#define MY_GETTIME
-#include <sys/time.h>
-static double my_gettime()
-{
-	struct timeval t;
-	gettimeofday(&t, NULL);
-	return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
-}
-#endif
-*/
-
 #include "gsl_headers.h"
-
-/*
-#define DATANUM		(1024*1)
-#define MAXCHAINS	(2*DATANUM)
-extern int DATANUM;
-extern int MAXCHAINS;  // = 2*1024; //DATANUM;
-
-#define MAXGENS	20
-#define PROBDIM	2
-extern int PROBDIM;
-*/
 
 typedef struct data_s {
 	int	Nth;		/* = PROBDIM*/
@@ -70,9 +46,17 @@ typedef struct data_s {
 		int	MaxIter;
 		double	Tol;
 		int	Display;
+		double  Step;
 	} options;
 
+#if 1
+	int	sampling_type;  /* 0: uniform, 1: gaussian, 2: file */
+	int	accept_type;    /* 0: without exp(), 1: with exp() */
+	int	prior_type;     /* 0: lognormal, 1: gaussian */
+#endif
+
 	int	iplot;
+	int	idump;
 
 	int	*Num;		/*[MAXGENS];*/
 	int	LastNum;

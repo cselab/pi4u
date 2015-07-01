@@ -2,7 +2,7 @@
 
 
 # problem dimension
-Nth		1
+Nth		2
 
 # Max number of generations
 MaxStages	20
@@ -24,8 +24,17 @@ Bdef		-15	15
 TolCOV		1
 bbeta		0.2
 
-#prior_mu	0.0,0.0
-#prior_sigma	0.15,0;0,0.15
+#sampling_type  /* 0: uniform, 1: gaussian, 2: file */
+#accept_type    /* 0: without exp(), 1: with exp() */
+#prior_type     /* 0: lognormal, 1: gaussian */
+
+sampling        0
+accept          1
+prior           0
+
+
+prior_mu	0.0,0.0
+prior_sigma	10,0;0,10
 
 #auxil_size	5
 #auxil_data	0.1,0.2,0.3,0.4,5
@@ -38,6 +47,7 @@ seed		280675
 opt.MaxIter	100
 opt.Tol		1e-6
 opt.Display	0
+opt.step	1e-5
 
 # Online plotting of data, useful for 2D data and debugging
 iplot		0
