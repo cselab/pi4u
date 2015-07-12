@@ -359,8 +359,8 @@ void data_init()
 #endif
 
 	/* RUNINFO: running state */
-	runinfo.CoefVar = calloc(1, data.MaxStages*sizeof(double));
-	runinfo.p = calloc(1, data.MaxStages*sizeof(double));
+	runinfo.CoefVar = calloc(1, (data.MaxStages+1)*sizeof(double));
+	runinfo.p = calloc(1, (data.MaxStages+1)*sizeof(double));
 	runinfo.currentuniques = calloc(1, data.MaxStages*sizeof(double));
 	runinfo.logselection = calloc(1, data.MaxStages*sizeof(double));
 	runinfo.acceptance = calloc(1, data.MaxStages*sizeof(double));
