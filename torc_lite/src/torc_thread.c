@@ -74,7 +74,7 @@ void start_worker(long id)
 
 	pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-/**	res = pthread_attr_setstacksize(&attr, 264*1024*1024) **/
+/**	res = pthread_attr_setstacksize(&attr, 64*1024*1024) **/
 //	printf("res = %d\n", res);
 
 	res = pthread_create(&pth, &attr, _torc_worker, (void *)id);

@@ -32,6 +32,8 @@
 #define A13	 A12,args[12]
 #define A14	 A13,args[13]
 #define A15	 A14,args[14]
+#define A16	 A15,args[15]
+#define A17	 A16,args[16]
 
 #define DO_CASE(x)			\
 	case x:				\
@@ -86,8 +88,10 @@
         DO_CASE(13);
         DO_CASE(14);
         DO_CASE(15);
+        DO_CASE(16);
+        DO_CASE(17);
         default:
-                Error("rte function with more than 15 arguments..!");
+                Error("rte function with more than 17 arguments..!");
                 break;
         }
 

@@ -115,6 +115,10 @@ void torc_task(int queue, void (*work)(), int narg, ...)
 	}
 	
 	for (i=0; i<narg; i++) {
+		if (rte->quantity[i] == 0) {	// peh: 02.07.2015
+			VIRT_ADDR dummy = va_arg (ap, VIRT_ADDR);
+			continue;
+		}
 		if (rte->callway[i] == CALL_BY_COP) {
 			int typesize;
 			MPI_Type_size(rte->dtype[i], &typesize);
@@ -203,6 +207,10 @@ void torc_task_ex(int queue, int invisible, void (*work)(), int narg, ...)
 	}
 	
 	for (i=0; i<narg; i++) {
+		if (rte->quantity[i] == 0) {	// peh: 02.07.2015
+			VIRT_ADDR dummy = va_arg (ap, VIRT_ADDR);
+			continue;
+		}
 		if (rte->callway[i] == CALL_BY_COP) {
 			int typesize;
 			MPI_Type_size(rte->dtype[i], &typesize);
@@ -293,6 +301,10 @@ void torc_task_direct(int queue, void (*work)(), int narg, ...)
 	}
 	
 	for (i=0; i<narg; i++) {
+		if (rte->quantity[i] == 0) {	// peh: 02.07.2015
+			VIRT_ADDR dummy = va_arg (ap, VIRT_ADDR);
+			continue;
+		}
 		if (rte->callway[i] == CALL_BY_COP) {
 			int typesize;
 			MPI_Type_size(rte->dtype[i], &typesize);

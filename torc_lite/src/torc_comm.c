@@ -194,6 +194,7 @@ void send_arguments(int node, int tag, torc_t *desc)
 	
 	for (i = 0; i < desc->narg; i++)	{
 /*		printf("ARG %d: CALL %d, QUANT %d\n", i, desc->callway[i], desc->quantity[i]); fflush(0);*/
+		if (desc->quantity[i] == 0) continue;
 		if ((desc->callway[i] == CALL_BY_COP)|| (desc->callway[i] == CALL_BY_VAD)) {
 			if (desc->quantity[i] == 1) continue;	/* do not send anything - the value is in the descriptor */
 			enter_comm_cs();
@@ -300,6 +301,7 @@ void receive_arguments(torc_t *work, int tag)
 #if DBG
 		printf("reading arg %d (%d - %d)\n", i, work->quantity[i], work->callway[i]); fflush(0);
 #endif
+		if (work->quantity[i] == 0) continue;
 		if ((work->quantity[i] > 1)||((work->callway[i] != CALL_BY_COP)&&(work->callway[i] != CALL_BY_VAD))) {
 
 #if 1
