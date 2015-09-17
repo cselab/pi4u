@@ -1144,6 +1144,7 @@ int main(int argc, char *argv[])
 
 	torc_register_task(initchaintask);
 	torc_register_task(chaintask);
+	torc_register_task(fitfuntask);
 	torc_register_task(torc_update_full_db_task);
 	torc_register_task(torc_update_curgen_db_task);
 	torc_register_task(torc_update_curres_db_task);

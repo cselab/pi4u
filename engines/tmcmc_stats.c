@@ -257,7 +257,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	double *CoefVar = runinfo.CoefVar;
 	double *p = runinfo.p;
 	int *Num = data.Num;
-	int *currentuniques = runinfo.currentuniques;
+/*	int *currentuniques = runinfo.currentuniques; */
 	double *logselection = runinfo.logselection;
 
 	double fmin = 0, xmin = 0;

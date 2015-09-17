@@ -1,28 +1,29 @@
-GSLROOT=${HOME}/usr/gsl
+#GSLROOT=${HOME}/usr/gsl
 #GSLROOT=/opt/local
 
 CC = mpicc
 CPP = mpic++ 
 MPIF90 = mpif90
 
-CFLAGS = -O0 -g -ggdb -I../pndl/src
+CFLAGS = -O0 #-g -ggdb -I../pndl/src
 #CFLAGS = -O3 -std=c99
 CFLAGS += -Wall #-Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result -Wall # -w #-Wall
 
 CFLAGS += `torc_cflags`
 
 # GSL
-CFLAGS  += -I${GSLROOT}/include
-LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
+#CFLAGS  += -I${GSLROOT}/include
+#LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
+LDFLAGS += -lgsl -lgslcblas
 
 # PRIMARY
 LDFLAGS += `torc_libs` -lpthread -lm 
 
-TARGETS = display_gen engine_tmcmc engine_cmaes
+TARGETS = display_gen engine_tmcmc # engine_cmaes
 #TARGETS += engine_tmcmc_sn
 #TARGETS += sa_deriv fd_deriv fd_grad
 #TARGETS += engine_ss1 engine_ss2 
-TARGETS += propagation_tool
+#TARGETS += propagation_tool
 
 all: $(TARGETS)
 
