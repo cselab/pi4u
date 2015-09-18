@@ -60,9 +60,9 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam, int winfo[4])
 
 	if (rf == 0) {
 		strcpy(line, "");
-		strcat(line, "./test_sphere 1 1 1 -tend=100"); /* TODO: check command line options */
+		strcat(line, "./test_sphere 1 1 1 -tend=0.002");
 		strcpy(args, "");
-		sprintf(args, "-aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v); /* TODO: check if we need the '\n'*/
+		sprintf(args, "-aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v);
 		strcat(line, args);
 	
 		parse(line, largv);	/* prepare argv */
@@ -83,7 +83,7 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam, int winfo[4])
 
 double fitfun(double *input, int n, void *output, int *info)
 {
-	double res;
+	double res = 1e8;
 	int i, j;
 	int me = getpid();	/* spanwer_id : worker_id */
 	int rf;
@@ -134,8 +134,11 @@ double fitfun(double *input, int n, void *output, int *info)
 
 		/* 1. PREPROCESSING PHASE - APPLICATION SPECIFIC */
 		/* copy some application specific input files*/
-		copy_file("fitfun_code/mpi-dpd", "test"); /* TODO: test copying */
-		copy_file("fitfun_code/mpi-dpd", "test_sphere");
+		copy_file("/users/lina/UQ/pi4u.git/engines", "drag_vs_re_data.txt");
+		copy_file("/users/lina/UQ/pi4u.git/engines/fitfun_code/mpi-dpd", "test");
+#if 0
+		copy_file("/users/lina/UQ/pi4u.git/engines/fitfun_code/mpi-dpd", "test_sphere");
+#endif
 
 		/* 1a. Write parameters to the file */
 		FILE *finp = fopen("params.dat", "w");
@@ -145,18 +148,34 @@ double fitfun(double *input, int n, void *output, int *info)
 
 		/* 1b. Compute viscosity */
 		strcpy(line, "");
-		strcat(line, "./test 1 1 1 -tend=100"); /* TODO: check command line options */
+		strcat(line, "./test 1 1 1 -tend=0.002"); /* TODO: check command line options */
 		strcpy(args, "");
-		sprintf(args, "-aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v0); /* TODO: check if we need the '\n'*/
+		sprintf(args, " -aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v0);
 		strcat(line, args);
 
+#if 1
+		printf("Running command: %s\n", line);
 		parse(line, largv);	/* prepare argv */
+		printf("execvp command:");
+		for(i=0; ; ++i)
+		{
+			if(largv[i] != '\0')
+				printf(" %s", largv[i]);
+			else
+			{
+				printf("\n", largv[i]);
+				break;
+			}
+		}
+#endif
 
 		int fd = open("output_visc.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 		dup2(fd, 1);	// make stdout go to file
 		dup2(fd, 2);	// make stderr go to file
 		close(fd);		// fd no longer needed - the dup'ed handles are sufficient
 
+/*		char *argm[] = {"ls", "-la", 0}; 
+		execvp(argm[0], argm); */
 		execvp(*largv, largv);
 
 		/* TODO: get the viscosity */
@@ -166,10 +185,11 @@ double fitfun(double *input, int n, void *output, int *info)
 	waitpid(rf, NULL, 0);
 	sync();
 
+#if 0
 	/* 2. EXECUTION OF THE FUNCTION EVALUATION (SIMULATION) SOFTWARE */
 	/* 2a. Read data from file */
 
-	FILE * fdata = fopen("data.txt", "r");
+	FILE * fdata = fopen("drag_vs_re_data.txt", "r");
 	int ndata;
 	fscanf(fdata, "%d\n", &ndata);
 	double * Re = malloc(ndata*sizeof(double));
@@ -213,6 +233,13 @@ double fitfun(double *input, int n, void *output, int *info)
 		printf("spanwer(%d): simcode_time=%lf secs\n", me, t1-t0);fflush(0);
 
 	/* 3. POSTPROCESSING PHASE - APPLICATION SPECIFIC */
+	/* write results to file */
+	FILE * fres = fopen("drag_vs_re_result.txt", "r");
+	fprintf(fres, "%d\n", ndata);
+	for(i=0; i<ndata; ++i)
+		fprintf(fres, "%lf %lf\n", Re[i], Cd_sim[i]);
+	fclose(fres);
+
 	/* compute fitness */
 	gsl_vector * diff = gsl_vector_calloc(ndata);
 	gsl_matrix * cov = gsl_matrix_calloc(ndata, ndata);
@@ -256,6 +283,8 @@ double fitfun(double *input, int n, void *output, int *info)
 	free(Re);
 	free(Cd_exp);
 	free(Cd_sim);
+
+#endif
 
 	return res;
 }
