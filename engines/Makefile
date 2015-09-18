@@ -1,23 +1,20 @@
-#GSLROOT=${HOME}/usr/gsl
-#GSLROOT=/opt/local
-
-CC = mpicc
-CPP = mpic++ 
-MPIF90 = mpif90
+CC = cc
+CPP = cc 
+MPIF90 = ftn
 
 CFLAGS = -O0 #-g -ggdb -I../pndl/src
 #CFLAGS = -O3 -std=c99
 CFLAGS += -Wall #-Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result -Wall # -w #-Wall
 
-CFLAGS += `torc_cflags`
+#CFLAGS += `torc_cflags`
+CFLAGS += -I/users/lina/usr/include
 
 # GSL
-#CFLAGS  += -I${GSLROOT}/include
-#LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
 LDFLAGS += -lgsl -lgslcblas
 
 # PRIMARY
-LDFLAGS += `torc_libs` -lpthread -lm 
+#LDFLAGS += `torc_libs` -lpthread -lm 
+LDFLAGS += -L/users/lina/usr/lib -ltorc -lpthread -lm 
 
 TARGETS = display_gen engine_tmcmc # engine_cmaes
 #TARGETS += engine_tmcmc_sn
