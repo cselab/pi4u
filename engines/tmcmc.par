@@ -2,24 +2,22 @@
 
 
 # problem dimension
-Nth		2
+Nth		4 # aij, gammadpd, sigma, len
 
 # Max number of generations
-MaxStages	20
+MaxStages	2
 
 # Population size
-PopSize		1024
+PopSize		8
 
 # Chain Lengths
 #MinChainLength	2
 #MaxChainLength	2
 #MinChainLength 2
-#MaxChainLength 1e6
+MaxChainLength 1
 
 # Boundaries
 Bdef		-15	15
-#B0		-3	3
-#B1		-3	3
 
 TolCOV		1
 bbeta		0.2
@@ -32,9 +30,15 @@ sampling        0
 accept          1
 prior           0
 
+#for Gaussian prior
+#prior_mu	0.0,0.0
+#prior_sigma	10,0;0,10
 
-prior_mu	0.0,0.0
-prior_sigma	10,0;0,10
+# for uniform prior
+B0		0.25	16
+B1		25		50
+B2		0.01	1
+B3		0.001	4
 
 #auxil_size	5
 #auxil_data	0.1,0.2,0.3,0.4,5
