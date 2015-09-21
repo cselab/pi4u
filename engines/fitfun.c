@@ -53,6 +53,8 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam, char taskname
 	char *largv[64];
 	char out_file[1024];
 
+	printf("Generation: %d, chain: %d, task: %d\n", winfo[0], winfo[1], winfo[2]);
+
 	int rf = fork();
 	if (rf < 0) {
 		printf("spanwer(%d): fork failed!!!!\n", me); fflush(0);
@@ -102,7 +104,7 @@ double fitfun(double *input, int n, void *output, int *info)
 	char taskname[256];
 	double t0, t1;
 	double v0 = 1.0;
-	double L = 1.0; /* TODO: check domain length*/
+	double L = 1.0; /* TODO: check cylinder diameter */
 	double nu = 1.0, Re0 = 1.0;
 	int winfo[4];
 	const int pdim = 3;
@@ -258,7 +260,7 @@ double fitfun(double *input, int n, void *output, int *info)
 	gsl_permutation * perm = gsl_permutation_alloc(ndata);
 	gsl_vector * temp = gsl_vector_calloc(ndata);
 	int signum;
-	double res_cov_part;
+	double log_cov_part;
 
 	for(i=0; i<ndata; ++i)
 	{
@@ -277,9 +279,9 @@ double fitfun(double *input, int n, void *output, int *info)
 
 	double log_det_cov = gsl_linalg_LU_lndet(cov);
 	gsl_blas_dgemv(CblasNoTrans, 1.0, cov_inv, diff, 0.0, temp);
-	gsl_blas_ddot(diff, temp, &res_cov_part);
+	gsl_blas_ddot(diff, temp, &log_cov_part);
 
-	res = -0.5*( ndata*log(2*M_PI) + log_det_cov + res_cov_part);
+	res = -0.5*( ndata*log(2*M_PI) + log_det_cov + log_cov_part);
 
 	gsl_vector_free(diff);
 	gsl_matrix_free(cov);
