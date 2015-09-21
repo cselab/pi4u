@@ -171,7 +171,7 @@ int copy_from_dir(char *name)
 	return 0;
 }
 
-int copy_file(char *dirname, char *filename)
+int copy_file(const char *dirname, const char *filename)
 {
 	DIR *dir;
 

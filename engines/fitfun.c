@@ -7,8 +7,8 @@
  *
  */
 
-#define _XOPEN_SOURCE 600
-#define _BSD_SOURCE
+#define _XOPEN_SOURCE 700
+#define _BSD_SOURCE 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
