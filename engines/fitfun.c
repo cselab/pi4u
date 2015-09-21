@@ -40,7 +40,7 @@ void sighandler(int signo)
 	printf("spawner: SIGNAL %d was received!\n", signo); fflush(0);
 }
 
-void fitfuntask(double in_tparam[], int *pdim, double *out_tparam, int winfo[4])
+void fitfuntask(double in_tparam[], int *pdim, double *out_tparam, char taskname[], int winfo[4])
 {
 	int me = getpid();	/* spanwer_id : worker_id */
 
@@ -59,45 +59,54 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam, int winfo[4])
 	}
 
 	if (rf == 0) {
+		chdir(taskname);	/* enter to the new directory */
+
 		strcpy(line, "");
-		strcat(line, "./test_sphere 1 1 1 -tend=0.002");
+		strcat(line, "./test 1 1 1 -tend=0.002"); /* TODO: fix executable */
 		strcpy(args, "");
-		sprintf(args, "-aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v);
+		sprintf(args, " -aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v);
 		strcat(line, args);
-	
-		parse(line, largv);	/* prepare argv */
-	
+
 		sprintf(out_file, "output_v_%.16lf.txt", v);
 		int fd = open(out_file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 		dup2(fd, 1);	// make stdout go to file
 		dup2(fd, 2);	// make stderr go to file
 		close(fd);		// fd no longer needed - the dup'ed handles are sufficient
-	
+#if 1
+		parse(line, largv);	/* prepare argv */
 		execvp(*largv, largv);
-	
-		/* TODO: get the Cd */
+#else
+		printf("Running command for Re vs drag %s\n", line);
+#endif
 	}
 	waitpid(rf, NULL, 0);
 	sync();
+	
+	/* TODO: get the Cd */
+	*out_tparam = 3e6;
 }
 
 double fitfun(double *input, int n, void *output, int *info)
 {
+	const char * basedir = "/users/lina/UQ/pi4u.git/engines";
+	const char *data_filename = "drag_vs_re_data.txt";
+	const char *res_filename = "drag_vs_re_result.txt";
 	double res = 1e8;
 	int i, j;
 	int me = getpid();	/* spanwer_id : worker_id */
 	int rf;
+	char buf[1024];
 	char line[1024];
 	char args[1024];
 	char *largv[64];
 	char taskname[256];
 	double t0, t1;
 	double v0 = 1.0;
-	double L = 1.0;
-	double nu, Re0;
+	double L = 1.0; /* TODO: check domain length*/
+	double nu = 1.0, Re0 = 1.0;
 	int winfo[4];
-	double in_tparam[3];
-	int pdim = 3;
+	const int pdim = 3;
+	double in_tparam[pdim];
 
 	double aij = input[0];
 	double gammadpd = input[1];
@@ -106,6 +115,9 @@ double fitfun(double *input, int n, void *output, int *info)
 
 	double sigma2 = sigma*sigma;
 	double len2 = len*len;
+
+	char workdir[1024];
+	getcwd(workdir, sizeof(workdir));
 
 	sprintf(taskname, "tmpdir.%d.%d.%d.%d", info[0], info[1], info[2], info[3]);
 
@@ -124,6 +136,10 @@ double fitfun(double *input, int n, void *output, int *info)
 	mkdir(taskname, S_IRWXU);
 
 	t0 = my_gettime();
+	/* 1. PREPROCESSING PHASE - APPLICATION SPECIFIC */
+	/* copy some application specific input files*/
+	copy_file(basedir, data_filename);
+
 	rf = fork();
 	if (rf < 0) {
 		printf("spanwer(%d): fork failed!!!!\n", me); fflush(0);
@@ -132,10 +148,9 @@ double fitfun(double *input, int n, void *output, int *info)
 	if (rf == 0) {
 		chdir(taskname);	/* enter to the new directory */
 
-		/* 1. PREPROCESSING PHASE - APPLICATION SPECIFIC */
-		/* copy some application specific input files*/
-		copy_file("/users/lina/UQ/pi4u.git/engines", "drag_vs_re_data.txt");
-		copy_file("/users/lina/UQ/pi4u.git/engines/fitfun_code/mpi-dpd", "test");
+		strcpy(buf, "");
+		sprintf(buf, "%s/fitfun_code/mpi-dpd", basedir);
+		copy_file(buf, "test");
 #if 0
 		copy_file("/users/lina/UQ/pi4u.git/engines/fitfun_code/mpi-dpd", "test_sphere");
 #endif
@@ -152,44 +167,35 @@ double fitfun(double *input, int n, void *output, int *info)
 		strcpy(args, "");
 		sprintf(args, " -aij=%lf -gammadpd=%lf -v=%lf", aij, gammadpd, v0);
 		strcat(line, args);
-
-#if 1
-		printf("Running command: %s\n", line);
-		parse(line, largv);	/* prepare argv */
-		printf("execvp command:");
-		for(i=0; ; ++i)
-		{
-			if(largv[i] != '\0')
-				printf(" %s", largv[i]);
-			else
-			{
-				printf("\n", largv[i]);
-				break;
-			}
-		}
-#endif
-
 		int fd = open("output_visc.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 		dup2(fd, 1);	// make stdout go to file
 		dup2(fd, 2);	// make stderr go to file
 		close(fd);		// fd no longer needed - the dup'ed handles are sufficient
-
-/*		char *argm[] = {"ls", "-la", 0}; 
-		execvp(argm[0], argm); */
+#if 1
+		parse(line, largv);	/* prepare argv */
 		execvp(*largv, largv);
-
-		/* TODO: get the viscosity */
-		nu = 1.0;
-		Re0 = v0*L/nu;
+#else
+		printf("Running command for viscosity: %s\n", line);
+#endif
 	}
 	waitpid(rf, NULL, 0);
 	sync();
 
-#if 0
+	/* TODO: get the viscosity */
+	nu = 1.0;
+	Re0 = v0*L/nu;
+
 	/* 2. EXECUTION OF THE FUNCTION EVALUATION (SIMULATION) SOFTWARE */
 	/* 2a. Read data from file */
 
-	FILE * fdata = fopen("drag_vs_re_data.txt", "r");
+	strcpy(buf, "");
+	sprintf(buf, "%s/%s", workdir, data_filename);
+	FILE * fdata = fopen(buf, "r");
+	if(!fdata)
+	{
+		printf("Cannot open file %s\n", buf); fflush(0);
+		return res;
+	}
 	int ndata;
 	fscanf(fdata, "%d\n", &ndata);
 	double * Re = malloc(ndata*sizeof(double));
@@ -205,26 +211,27 @@ double fitfun(double *input, int n, void *output, int *info)
 		/* Run the simulation with current Re */
 		winfo[0] = info[0]; /* generation id */
 		winfo[1] = info[1]; /* chain id */
-		winfo[2] = info[2]; /* task in chain id */
-		winfo[3] = i;       /* subtask id */
+		winfo[2] = i;		/* task id */
+		winfo[3] = 0;       /* unused */
 
 		in_tparam[0] = aij;
 		in_tparam[1] = gammadpd;
 		in_tparam[2] = Re[i]/(Re0*v0); /* v */
-		torc_create(-1, fitfuntask, 4,
-			pdim,	MPI_DOUBLE, CALL_BY_COP,
-			1,		MPI_INT,	CALL_BY_COP,
-			1,		MPI_DOUBLE, CALL_BY_RES,
-			4,		MPI_INT,	CALL_BY_COP,
-			in_tparam, &pdim, &Cd_sim[i], winfo);
+		torc_create(-1, fitfuntask, 5,
+			pdim,				MPI_DOUBLE, CALL_BY_COP,
+			1,					MPI_INT,	CALL_BY_COP,
+			1,					MPI_DOUBLE, CALL_BY_RES,
+			strlen(taskname),	MPI_INT,	CALL_BY_COP, /* TODO: check with Panos if MPI_CHAR is supported*/
+			4,					MPI_INT,	CALL_BY_COP,
+			in_tparam, &pdim, &Cd_sim[i], taskname, winfo);
 	}
-	/* wait for all chain tasks to finish */
 #ifdef _STEALING_
-		torc_enable_stealing();
+	torc_enable_stealing();
 #endif
-		torc_waitall();
+	/* wait for all chain tasks to finish */
+	torc_waitall();
 #ifdef _STEALING_
-		torc_disable_stealing();
+	torc_disable_stealing();
 #endif
 
 	t1 = my_gettime();
@@ -234,7 +241,11 @@ double fitfun(double *input, int n, void *output, int *info)
 
 	/* 3. POSTPROCESSING PHASE - APPLICATION SPECIFIC */
 	/* write results to file */
-	FILE * fres = fopen("drag_vs_re_result.txt", "r");
+	strcpy(buf, "");
+	sprintf(buf, "%s/%s", taskname, res_filename);
+	FILE * fres = fopen(buf, "w");
+	if(!fres)
+		printf("Cannot open file %s\n", buf); fflush(0);
 	fprintf(fres, "%d\n", ndata);
 	for(i=0; i<ndata; ++i)
 		fprintf(fres, "%lf %lf\n", Re[i], Cd_sim[i]);
@@ -283,8 +294,6 @@ double fitfun(double *input, int n, void *output, int *info)
 	free(Re);
 	free(Cd_exp);
 	free(Cd_sim);
-
-#endif
 
 	return res;
 }
