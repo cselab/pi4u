@@ -16,7 +16,7 @@
 #define VERBOSE 1
 #define _STEALING_
 //#define _RESTART
-
+#define IODUMP 1
 #include "fitfun.c" 
 
 /* the objective (fitness) function to be minimized */
@@ -143,6 +143,21 @@ int main(int argn, char **args)
 		}
 		printf("Step %4d: time = %.3lf seconds\n", step, tt1-tt0);
 #endif
+
+#if IODUMP
+		{
+		char filename[256];
+		sprintf(filename, "curgen_db_%03d.txt", step);
+		FILE *fp = fopen(filename, "w");
+		for (i = 0; i < lambda; i++) {
+			int j;
+			for (j = 0; j < dim; j++) fprintf(fp, "%f ", pop[i][j]);
+			fprintf(fp, "%f\n", arFunvals[i]);
+		}
+		fclose(fp);
+		}
+#endif
+
 
 #if defined(_RESTART_)
 		cmaes_WriteToFile(&evo, "resume", "allresumes.dat");         /* write final results */
