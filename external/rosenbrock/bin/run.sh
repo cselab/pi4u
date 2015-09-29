@@ -2,6 +2,6 @@
 # e.g. module load matlab/7.14;
 
 # run the simulation
-./simcode $1 $2
+./simcode
 
 
