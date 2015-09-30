@@ -437,8 +437,10 @@ double priorpdf(double *theta, int n)
 			/* uniform */
 			res = 0;
 			for (i = 0; i < n; i++)
-				if( theta[i] >= data.lowerbound[i] && theta[i] <= data.upperbound[i]) /* Lina: added this check */
-					res += -log(data.upperbound[i] - data.lowerbound[i]);
+			{
+				/* here we only get samples which are guaranteed to be inside the prior region */
+				res += -log(data.upperbound[i] - data.lowerbound[i]);
+			}
 			break;
 
 		case 1:
@@ -454,14 +456,14 @@ double priorpdf(double *theta, int n)
 				/* uniform */
 				if(data.compositeprior_distr[i] == 0)
 				{
-					/* Lina: added this check */
-					if( theta[i] >= data.lowerbound[i] && theta[i] <= data.upperbound[i])
-						res += -log(data.upperbound[i] - data.lowerbound[i]);
+					/* here we only get samples which are guaranteed to be inside the prior region */
+					res += -log(data.upperbound[i] - data.lowerbound[i]);
 				}
 				/* normal */
 				else if(data.compositeprior_distr[i] == 1) 
 				{
-					res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) + pow( theta[i]-data.prior_mu[i]/data.prior_sigma[i], 2 ) );
+					res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) +
+								pow( theta[i]-data.prior_mu[i]/data.prior_sigma[i], 2 ) );
 				}
 			}
 			break;
