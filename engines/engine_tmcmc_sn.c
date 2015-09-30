@@ -964,8 +964,8 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	double bare_gradient[data.Nth];
 	double bare_hessian[data.Nth*data.Nth];
 
-	double leader[data.Nth], fleader, fpc_leader;			// fold
-	double candidate[data.Nth], fcandidate, fpc_candidate;		// fnew
+	double leader[data.Nth], loglik_leaderr;			// old
+	double candidate[data.Nth], loglik_candidate;		// new
 	double q_xk_y, q_y_xk;
 	double rand_sigma = data.bbeta; // = 0.2;
 	
@@ -975,10 +975,9 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	memset(deterministic_part, 0, data.Nth*sizeof(double));
 
 	for (i = 0; i < data.Nth; i++) leader[i] = in_tparam[i]; //chainwork->in_tparam[i];	// get initial leader
-	fleader = *out_tparam;									// and its value
+	loglik_leader = *out_tparam;									// and its value
 	for (i = 0; i < data.Nth; i++) bare_gradient[i] = grad[i];					// and its gradient
 	for (i = 0; i < data.Nth*data.Nth; i++) bare_hessian[i] = hes[i];				// and its hessian
-	fpc_leader = fleader;
 	
 	double pj = runinfo.p[runinfo.Gen];
 	for (step = 0; step < nsteps; step++) {
@@ -989,31 +988,29 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		if (!good) { not_good++;
 			compute_candidate(candidate, leader, rand_sigma);
 
-			evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);
-			fpc_candidate = fcandidate;
+			evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);
 
 			double logprior_candidate = logpriorpdf(candidate, data.Nth); // from PanosA
 			double logprior_leader = logpriorpdf(leader, data.Nth);
-			double L = exp((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj);
-			//double L = exp((fpc_candidate-fpc_leader)*pj);
+			double L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);
+			//double L = exp((loglik_candidate-loglik_leader)*pj);
 
 			double P = uniformrand(0,1);
 			if (L > 1) L = 1;
 			if (P < L) {
 				for (i = 0; i < data.Nth; i++) leader[i] = candidate[i]; // new leader!
-				fleader = fcandidate;
-				fpc_leader = fpc_candidate;
+				loglik_leader = loglik_candidate;
 				compute_gradient_and_hessian(leader, bare_gradient, bare_hessian);
-				torc_update_curgen_db_der(leader, fleader, bare_gradient, bare_hessian);
+				torc_update_curgen_db_der(leader, loglik_leader, bare_gradient, bare_hessian);
 			}
 			else {
-				torc_update_curgen_db_der(leader, fleader, bare_gradient, bare_hessian);
+				torc_update_curgen_db_der(leader, loglik_leader, bare_gradient, bare_hessian);
 			}
 		}
 		else {
 
-			evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);
-			fpc_candidate = fcandidate;
+			evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);
+			loglik_candidate = loglik_candidate;
 
 			/* Decide */
 			{
@@ -1021,28 +1018,27 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 			//compute the probability of moving from the current sample to the proposed and from the proposed to the current
 			compute_moving_probab(candidate, leader, current_gradient, current_hessian, inv_current_hessian, rand_sigma, pj, &q_xk_y, &q_y_xk);
 
-//			double log_target_product_moving_xk_y =  pj*fpc_leader + log(q_xk_y );
-//			double log_target_product_moving_y_xk =  pj*fpc_candidate + log(q_y_xk );
+//			double log_target_product_moving_xk_y =  pj*loglik_leader + log(q_xk_y );
+//			double log_target_product_moving_y_xk =  pj*loglik_candidate + log(q_y_xk );
 //			double L = exp( (log_target_product_moving_y_xk - log_target_product_moving_xk_y) );
-//			double L = exp((fpc_candidate-fpc_leader)*pj - log(q_xk_y) + log(q_y_xk)); 
+//			double L = exp((loglik_candidate-loglik_leader)*pj - log(q_xk_y) + log(q_y_xk)); 
 
-//			double L = exp((fpc_candidate-fpc_leader)*pj - q_xk_y + q_y_xk); 
+//			double L = exp((loglik_candidate-loglik_leader)*pj - q_xk_y + q_y_xk); 
 			double logprior_candidate = logpriorpdf(candidate, data.Nth); // from PanosA
 			double logprior_leader = logpriorpdf(leader, data.Nth);
-			double L = exp((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj - q_xk_y + q_y_xk);
+			double L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj - q_xk_y + q_y_xk);
 
 			double P = uniformrand(0,1);
 			if (L > 1) L = 1;
 			if (P < L) {
 				for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];	// new leader! 
-				fleader = fcandidate;
-				fpc_leader = fpc_candidate;
+				loglik_leader = loglik_candidate;
 
 				compute_gradient_and_hessian(leader, bare_gradient, bare_hessian);
-				torc_update_curgen_db_der(leader, fleader, bare_gradient, bare_hessian);
+				torc_update_curgen_db_der(leader, loglik_leader, bare_gradient, bare_hessian);
 			}
 			else {
-				torc_update_curgen_db_der(leader, fleader, bare_gradient, bare_hessian);
+				torc_update_curgen_db_der(leader, loglik_leader, bare_gradient, bare_hessian);
 			
 			}
 			} // decide
@@ -1509,7 +1505,7 @@ next:
 				in_tparam[p] = leaders[i].point[p];
 			nsteps = leaders[i].nsel;
 
-			out_tparam[i] = leaders[i].F;	// fleader...
+			out_tparam[i] = leaders[i].F;	// loglik_leader...
 
 			torc_create(leaders[i].queue, chaintask, 7,
 				data.Nth, MPI_DOUBLE, CALL_BY_COP,
