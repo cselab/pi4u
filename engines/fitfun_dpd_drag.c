@@ -7,8 +7,6 @@
  *
  */
 
-#define _XOPEN_SOURCE 700
-#define _BSD_SOURCE 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,8 +23,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <torc.h>
-#include "spawner.c"
 #include "gsl_headers.h"
+#include "spawner.h"
 
 int dbg_display = 1;
 

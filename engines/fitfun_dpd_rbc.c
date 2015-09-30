@@ -7,8 +7,6 @@
  *
  */
 
-#define _XOPEN_SOURCE 700
-#define _BSD_SOURCE 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,8 +23,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <torc.h>
-#include "spawner.c"
 #include "gsl_headers.h"
+#include "spawner.h"
 
 int dbg_display = 1;
 
@@ -58,7 +56,10 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam1, double *out_
 	char line[1024];
 	char args[1024];
 	char *largv[64];
+	char buf[1024];
+
 	char out_file[1024];
+	sprintf(out_file, "%s/%s/output_force_%.16lf.txt", workdir, taskname, force);
 
 	int rf = fork();
 	if (rf < 0) {
@@ -74,7 +75,6 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam1, double *out_
 		sprintf(args, " -aij=%lf -gammadpd=%lf -lmax=%lf -p=%lf -kb=%lf -ka=%lf -kv=%lf -gammaC=%lf -force=%lf", aij, gammadpd, lmax, p, kb, ka, kv, gammaC, force);
 		strcat(line, args);
 
-		sprintf(out_file, "output_force_%.16lf.txt", force);
 		int fd = open(out_file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 		dup2(fd, 1);	// make stdout go to file
 		dup2(fd, 2);	// make stderr go to file
@@ -91,9 +91,47 @@ void fitfuntask(double in_tparam[], int *pdim, double *out_tparam1, double *out_
 
 	chdir(workdir);
 	
-	/* TODO: get the AD, TD */
-	*out_tparam1 = 4e6;
-	*out_tparam2 = 2e6;
+	/* get the AD, TD */
+	double diam[2][1024];
+	int count = 0;
+
+	FILE * fp = fopen(out_file, "r");
+	if(!fp)
+		printf("Cannot open file %s\n", out_file);
+	else
+	{
+		while(fgets(buf, 1024, fp) != NULL)
+		{
+			if((strstr(buf, "diameters: ")) != NULL) /* TODO: check which string should be looking for */
+			{
+				sscanf(buf, "%*s %lf %lf\n", &diam[0][count], &diam[1][count]);
+				printf("A match found with diameters: %lf %lf\n", diam[0][count], diam[1][count]);
+				count++;
+			}
+		}
+		fclose(fp);
+	}
+
+	/* average over the last 10% of the data */
+	if(count>0)
+	{
+		int i, num = 0;
+		*out_tparam1 = 0;
+		*out_tparam2 = 0;
+		for(i=floor(0.9*count); i<count; ++i)
+		{
+			*out_tparam1 += diam[0][i];
+			*out_tparam2 += diam[1][i];
+			num++;
+		}
+		*out_tparam1 /= num;
+		*out_tparam2 /= num;
+	}
+	else
+	{
+		*out_tparam1 = 4e6;
+		*out_tparam2 = 2e6;
+	}
 }
 
 double fitfun(double *input, int n, void *output, int *info)
