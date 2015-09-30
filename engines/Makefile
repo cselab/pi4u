@@ -24,8 +24,8 @@ TARGETS = display_gen engine_tmcmc # engine_cmaes
 
 all: $(TARGETS)
 
-engine_tmcmc: engine_tmcmc.c engine_tmcmc.h tmcmc_stats.c tmcmc_db.c gnuplot_i.c auxil.c fitfun.c
-	$(CC) $(CFLAGS) -o engine_tmcmc engine_tmcmc.c tmcmc_stats.c tmcmc_db.c gnuplot_i.c auxil.c $(LDFLAGS)
+engine_tmcmc: engine_tmcmc.c engine_tmcmc.h tmcmc_stats.c tmcmc_db.c gnuplot_i.c auxil.c fitfun.c spawner.h
+	$(CC) $(CFLAGS) -o engine_tmcmc engine_tmcmc.c tmcmc_stats.c tmcmc_db.c gnuplot_i.c auxil.c spawner.c $(LDFLAGS)
 
 display_gen: display_gen.c gnuplot_i.c
 	$(CC) $(CFLAGS) -o display_gen display_gen.c gnuplot_i.c $(LDFLAGS)
