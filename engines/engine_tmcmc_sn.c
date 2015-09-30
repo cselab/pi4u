@@ -993,9 +993,9 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 			evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);
 			fpc_candidate = posterior(candidate, data.Nth, fcandidate);
 
-			double prior_candidate = priorpdf(candidate, data.Nth); // from PanosA
-			double prior_leader = priorpdf(leader, data.Nth);
-			double L = exp((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);
+			double logprior_candidate = logpriorpdf(candidate, data.Nth); // from PanosA
+			double logprior_leader = logpriorpdf(leader, data.Nth);
+			double L = exp((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj);
 			//double L = exp((fpc_candidate-fpc_leader)*pj);
 
 			double P = uniformrand(0,1);
@@ -1028,9 +1028,9 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 //			double L = exp((fpc_candidate-fpc_leader)*pj - log(q_xk_y) + log(q_y_xk)); 
 
 //			double L = exp((fpc_candidate-fpc_leader)*pj - q_xk_y + q_y_xk); 
-			double prior_candidate = priorpdf(candidate, data.Nth); // from PanosA
-			double prior_leader = priorpdf(leader, data.Nth);
-			double L = exp((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj - q_xk_y + q_y_xk);
+			double logprior_candidate = logpriorpdf(candidate, data.Nth); // from PanosA
+			double logprior_leader = logpriorpdf(leader, data.Nth);
+			double L = exp((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj - q_xk_y + q_y_xk);
 
 			double P = uniformrand(0,1);
 			if (L > 1) L = 1;

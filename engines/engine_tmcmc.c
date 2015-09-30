@@ -809,13 +809,13 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		fpc_candidate = posterior(candidate, data.Nth, fcandidate);
 
 		/* Decide */
-		double prior_candidate = priorpdf(candidate, data.Nth);	/* from PanosA */
-		double prior_leader = priorpdf(leader, data.Nth);
+		double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
+		double logprior_leader = logpriorpdf(leader, data.Nth);
 		double L;
 		if (data.accept_type == 0)
-			L = ((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);	/* without exp, with log in priorpdf and fitfun */
+			L = ((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj);	/* without exp, with log in logpriorpdf and fitfun */
 		else
-			L = exp((prior_candidate-prior_leader)+(fpc_candidate-fpc_leader)*pj);	/* with exp, without log in priorpdf and fitfun */
+			L = exp((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj);	/* with exp, without log in logpriorpdf and fitfun */
 
 		if (L > 1) L = 1;
 		double P = uniformrand(0,1);

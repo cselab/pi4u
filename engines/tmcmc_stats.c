@@ -425,7 +425,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		print_matrix_2d("runinfo.SS", runinfo.SS, PROBDIM, PROBDIM);
 }
 
-double priorpdf(double *theta, int n)
+double logpriorpdf(double *theta, int n)
 {
 	/* peh:check this */
 	double res;

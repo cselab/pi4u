@@ -185,7 +185,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 /*** PROBLEM FUNCTIONS ***/
 double likelihood(double *x, int N);
 double posterior(double *theta, int n, double LH);
-double priorpdf(double *theta, int n);
+double logpriorpdf(double *theta, int n);
 
 /*** AUX ***/
 void inc_nfc();
