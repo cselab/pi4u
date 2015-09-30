@@ -518,7 +518,6 @@ double F(double *TP, int *pn)	/* for PNDL */
 	double gres;
 
 	taskfun(TP, pn, &gres, NULL);
-//	gres = posterior(TP, PROBDIM, gres);
 
 	return gres;
 }
@@ -979,7 +978,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	fleader = *out_tparam;									// and its value
 	for (i = 0; i < data.Nth; i++) bare_gradient[i] = grad[i];					// and its gradient
 	for (i = 0; i < data.Nth*data.Nth; i++) bare_hessian[i] = hes[i];				// and its hessian
-	fpc_leader = posterior(leader, data.Nth, fleader);
+	fpc_leader = fleader;
 	
 	double pj = runinfo.p[runinfo.Gen];
 	for (step = 0; step < nsteps; step++) {
@@ -991,7 +990,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 			compute_candidate(candidate, leader, rand_sigma);
 
 			evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);
-			fpc_candidate = posterior(candidate, data.Nth, fcandidate);
+			fpc_candidate = fcandidate;
 
 			double logprior_candidate = logpriorpdf(candidate, data.Nth); // from PanosA
 			double logprior_leader = logpriorpdf(leader, data.Nth);
@@ -1014,7 +1013,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		else {
 
 			evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);
-			fpc_candidate = posterior(candidate, data.Nth, fcandidate);
+			fpc_candidate = fcandidate;
 
 			/* Decide */
 			{

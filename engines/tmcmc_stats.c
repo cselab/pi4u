@@ -472,20 +472,3 @@ double logpriorpdf(double *theta, int n)
 	return res;
 }
 
-double posterior(double *theta, int n, double LH)
-{
-	double res;
-/*
-	double Prior = priorpdf(theta, n);
-	printf("Prior = %lf\n", Prior);
-
-	if (Prior > 0)
-		res = LH + log(Prior);	// xxx
-	else
-		res = LH;
-*/
-
-	res = LH;	/* Algorithm fix by PanosA */
-
-	return res;
-}

@@ -691,7 +691,6 @@ double F(double *TP, int *pn)	/* for PNDL */
 	double gres;
 
 	taskfun(TP, pn, &gres, NULL);
-/*	gres = posterior(TP, PROBDIM, gres);*/
 
 	return gres;
 }
@@ -797,7 +796,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
 	for (i = 0; i < data.Nth; i++) leader[i] = in_tparam[i]; /*chainwork->in_tparam[i];*/	/* get initial leader */
 	fleader = *out_tparam; /*chainwork->out_tparam[0];*/					/* and its value */
-	fpc_leader = posterior(leader, data.Nth, fleader);
+	fpc_leader = fleader;
 	double pj = runinfo.p[runinfo.Gen];
 
 	for (step = 0; step < nsteps; step++) {
@@ -806,7 +805,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
 		/* evaluate fcandidate (NAMD: 12 points) */
 		evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
-		fpc_candidate = posterior(candidate, data.Nth, fcandidate);
+		fpc_candidate = fcandidate;
 
 		/* Decide */
 		double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
