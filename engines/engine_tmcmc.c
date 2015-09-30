@@ -791,42 +791,41 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	
 	long me = torc_worker_id();
 
-	double leader[data.Nth], fleader, fpc_leader;		/* fold*/
-	double candidate[data.Nth], fcandidate, fpc_candidate;	/* fnew*/
+	double leader[data.Nth], loglik_leader;			/* old*/
+	double candidate[data.Nth], loglik_candidate;	/* new*/
 
-	for (i = 0; i < data.Nth; i++) leader[i] = in_tparam[i]; /*chainwork->in_tparam[i];*/	/* get initial leader */
-	fleader = *out_tparam; /*chainwork->out_tparam[0];*/					/* and its value */
-	fpc_leader = fleader;
+	for (i = 0; i < data.Nth; i++)
+		leader[i] = in_tparam[i];	/*chainwork->in_tparam[i];*/	/* get initial leader */
+	loglik_leader = *out_tparam;	/*chainwork->out_tparam[0];*/	/* and its value */
+
 	double pj = runinfo.p[runinfo.Gen];
 
 	for (step = 0; step < nsteps; step++) {
 
-		compute_candidate(candidate, leader, 1); /* //bbeta*SS);	// multivariate gaussian(center, var) for each direction*/
+		compute_candidate(candidate, leader, 1); /* multivariate gaussian(center, var) for each direction*/
 
-		/* evaluate fcandidate (NAMD: 12 points) */
-		evaluate_F(candidate, &fcandidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
-		fpc_candidate = fcandidate;
+		/* evaluate loglik_candidate (NAMD: 12 points) */
+		evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
 
 		/* Decide */
 		double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
 		double logprior_leader = logpriorpdf(leader, data.Nth);
 		double L;
 		if (data.accept_type == 0)
-			L = ((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj);	/* without exp, with log in logpriorpdf and fitfun */
+			L = ((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);	/* without exp, with log in logpriorpdf and fitfun */
 		else
-			L = exp((logprior_candidate-logprior_leader)+(fpc_candidate-fpc_leader)*pj);	/* with exp, without log in logpriorpdf and fitfun */
+			L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);	/* with exp, without log in logpriorpdf and fitfun */
 
 		if (L > 1) L = 1;
 		double P = uniformrand(0,1);
 		if (P < L) {
 			for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];	/* new leader! */
-			fleader = fcandidate;
-			fpc_leader = fpc_candidate;
-			torc_update_curgen_db(leader, fleader);
+			loglik_leader = loglik_candidate;
+			torc_update_curgen_db(leader, loglik_leader);
 		}
 		else {
 			/*increase counter or add the leader again in curgen_db*/
-			torc_update_curgen_db(leader, fleader);
+			torc_update_curgen_db(leader, loglik_leader);
 		}
 	}
 
@@ -1338,7 +1337,7 @@ int main(int argc, char *argv[])
 				in_tparam[p] = leaders[i].point[p];
 			nsteps = leaders[i].nsel;
 
-			out_tparam[i] = leaders[i].F;	/* fleader...*/
+			out_tparam[i] = leaders[i].F;	/* loglik_leader...*/
 
 			torc_create(leaders[i].queue, chaintask, 5,
 				data.Nth, MPI_DOUBLE, CALL_BY_COP,
