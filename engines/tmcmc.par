@@ -22,12 +22,13 @@ Bdef		-15	15
 TolCOV		1
 bbeta		0.2
 
-#sampling_type  /* 0: uniform, 1: gaussian, 2: file */
-#accept_type    /* 0: without exp(), 1: with exp() */
-#prior_type     /* 0: lognormal, 1: gaussian */
-
+#sampling_type  /* 0: uniform, 1: gaussian, 2: file, 3: composite (for every parameter its own distribution) */
 sampling        0
+
+#accept_type    /* 0: without exp(), 1: with exp() */
 accept          1
+
+#prior_type     /* 0: lognormal, 1: gaussian, 3: composite (for every parameter its own distribution) */
 prior           0
 
 #for Gaussian prior
@@ -39,6 +40,10 @@ B0		0.25	16
 B1		25		50
 B2		0.01	1
 B3		0.001	4
+
+# for composite prior: <distribution type> <parameter_1> ... <parameter_k>
+C0		0	0.25	16
+C1		1	0		1
 
 #auxil_size	5
 #auxil_data	0.1,0.2,0.3,0.4,5

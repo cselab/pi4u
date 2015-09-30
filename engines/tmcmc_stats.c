@@ -429,28 +429,44 @@ double priorpdf(double *theta, int n)
 {
 	/* peh:check this */
 	double res;
+	int i;
 
-	if (data.prior_type == 0)
+	switch(data.prior_type)
 	{
-		/* log-uniform */
-		res = 0;
-		/*res = 1;*/
+		case 0:
+			/* uniform */
+			res = 0;
+			for (i = 0; i < n; i++)
+				if( theta[i] >= data.lowerbound[i] && theta[i] <= data.upperbound[i]) /* Lina: added this check */
+					res += -log(data.upperbound[i] - data.lowerbound[i]);
+			break;
 
-		int i;
-		for (i = 0; i < n; i++) {
-			/*res += log(gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i])); PA EDIT
-			res *= gsl_ran_flat_pdf(theta[i], data.lowerbound[i], data.upperbound[i]); */
-			res += -log( data.upperbound[i]- data.lowerbound[i]);
-		}
-		if (res == 0) return 0;
-		/*return log(res); PA EDIT*/
-		return res;
+		case 1:
+			/* gaussian */
+			res = logmvnpdf(n, theta, data.prior_mu, data.prior_sigma);
+			break;
+
+		case 3:
+			/* composite */
+			res = 0;
+			for (i = 0; i < n; i++)
+			{
+				/* uniform */
+				if(data.compositeprior_distr[i] == 0)
+				{
+					/* Lina: added this check */
+					if( theta[i] >= data.lowerbound[i] && theta[i] <= data.upperbound[i])
+						res += -log(data.upperbound[i] - data.lowerbound[i]);
+				}
+				/* normal */
+				else if(data.compositeprior_distr[i] == 1) 
+				{
+					res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) + pow( theta[i]-data.prior_mu[i]/data.prior_sigma[i], 2 ) );
+				}
+			}
+			break;
 	}
-	else
-	{
-		/* gaussian */
-		res = logmvnpdf(n, theta, data.prior_mu, data.prior_sigma);
-	}
+
 	return res;
 }
 
