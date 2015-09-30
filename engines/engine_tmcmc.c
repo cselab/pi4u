@@ -26,7 +26,7 @@ resdb_t curres_db;
 
 void read_data()
 {
-	int i;
+	int i, found;
 
 	/* DEFAULT VALUES */
 	data.Nth = 4; /* Default PROBDIM */
@@ -79,7 +79,7 @@ void read_data()
 #if 1
 	data.sampling_type = 0;	/* uniform > gaussian */
 	data.accept_type = 0;	/* without exp() > with exp() */
-	data.prior_type = 0;	/* lognormal > gaussian */
+	data.prior_type = 0;	/* uniform > gaussian */
 #endif
 
 	data.iplot = 0;	/* gnuplot */
@@ -180,106 +180,150 @@ void read_data()
 		}
 	}
 
-	rewind(f);
-	line_no = 0;
+	if(data.prior_type == 0) /* uniform */
+	{
+		rewind(f);
+		line_no = 0;
 
-	free(data.lowerbound);
-	free(data.upperbound);
-	data.lowerbound = malloc(data.Nth*sizeof(double));
-	data.upperbound = malloc(data.Nth*sizeof(double));
+		free(data.lowerbound);
+		free(data.upperbound);
+		data.lowerbound = malloc(data.Nth*sizeof(double));
+		data.upperbound = malloc(data.Nth*sizeof(double));
 
-	for (i = 0; i < data.Nth; i++) {
-		int found = 0;
+		for (i = 0; i < data.Nth; i++) {
+			found = 0;
+			while (fgets(line, 256, f)!= NULL) {
+				line_no++;
+	
+				if ((line[0] == '#')||(strlen(line)==0)) continue;
+	
+				char bound[8];
+				sprintf(bound, "B%d", i);
+				if (strstr(line, bound) != NULL) {
+					sscanf(line, "%*s %lf %lf", &data.lowerbound[i], &data.upperbound[i]);
+					found = 1;
+					break;
+				}
+			}
+			if (!found) {
+				data.lowerbound[i] = data.lb;	/* Bdef value or Default LB */
+				data.upperbound[i] = data.ub;	/* Bdef value of Default UB */
+			}
+			rewind(f);
+			line_no = 0;
+		}
+	}
+
+	if(data.prior_type == 1) /* gaussian */
+	{
+		/* new, parse prior_mu */
+		rewind(f);
+		line_no = 0;
+
+		free(data.prior_mu);
+		data.prior_mu = malloc(data.Nth*sizeof(double));
+	
+		found = 0;
 		while (fgets(line, 256, f)!= NULL) {
 			line_no++;
-
 			if ((line[0] == '#')||(strlen(line)==0)) continue;
-
-			char bound[8];
-			sprintf(bound, "B%d", i);
-			if (strstr(line, bound) != NULL) {
-				sscanf(line, "%*s %lf %lf", &data.lowerbound[i], &data.upperbound[i]);
+	
+			if (strstr(line, "prior_mu") != NULL) {
+				char *tok = strtok(line, " ;,\t");
+				if (tok == NULL) break;
+				int i = 0;
+				tok = strtok(NULL, " ;,\t");
+				while (tok != NULL) {
+	                                data.prior_mu[i] = atof(tok);
+	                                i++;
+	                                tok = strtok(NULL, " ;,\t");
+	                        }
 				found = 1;
 				break;
 			}
 		}
+	
 		if (!found) {
-			data.lowerbound[i] = data.lb;	/* Bdef value or Default LB */
-			data.upperbound[i] = data.ub;	/* Bdef value of Default UB */
+			for (i = 0; i < data.Nth; i++) {
+				data.prior_mu[i] = 0.0;		/* Mudef value of Default Mean */
+			}
 		}
+	
+		/* new, parse prior_sigma */
 		rewind(f);
 		line_no = 0;
-	}
-
-	/* new, parse prior_mu */
-	rewind(f);
-	line_no = 0;
-
-	free(data.prior_mu);
-	data.prior_mu = malloc(data.Nth*sizeof(double));
-
-	int found = 0;
-	while (fgets(line, 256, f)!= NULL) {
-		line_no++;
-		if ((line[0] == '#')||(strlen(line)==0)) continue;
-
-		if (strstr(line, "prior_mu") != NULL) {
-			char *tok = strtok(line, " ;,\t");
-			if (tok == NULL) break;
-			int i = 0;
-			tok = strtok(NULL, " ;,\t");
-			while (tok != NULL) {
-                                data.prior_mu[i] = atof(tok);
-                                i++;
-                                tok = strtok(NULL, " ;,\t");
-                        }
-			found = 1;
-			break;
-		}
-	}
-
-	if (!found) {
-		for (i = 0; i < data.Nth; i++) {
-			data.prior_mu[i] = 0.0;		/* Mudef value of Default Mean */
-		}
-	}
-
-	/* new, parse prior_sigma */
-	rewind(f);
-	line_no = 0;
-
-	free(data.prior_sigma);
-	data.prior_sigma = malloc(data.Nth*data.Nth*sizeof(double));
-
-	found = 0;
-	while (fgets(line, 256, f)!= NULL) {
-		line_no++;
-		if ((line[0] == '#')||(strlen(line)==0)) continue;
-
-		if (strstr(line, "prior_sigma") != NULL) {
-			char *tok = strtok(line, " ;,\t");
-			if (tok == NULL) break;
-			int i = 0;
-			tok = strtok(NULL, " ;,\t");
-			while (tok != NULL) {
-				data.prior_sigma[i] = atof(tok);
-				i++;
+	
+		free(data.prior_sigma);
+		data.prior_sigma = malloc(data.Nth*data.Nth*sizeof(double));
+	
+		found = 0;
+		while (fgets(line, 256, f)!= NULL) {
+			line_no++;
+			if ((line[0] == '#')||(strlen(line)==0)) continue;
+	
+			if (strstr(line, "prior_sigma") != NULL) {
+				char *tok = strtok(line, " ;,\t");
+				if (tok == NULL) break;
+				int i = 0;
 				tok = strtok(NULL, " ;,\t");
-                        }
-			found = 1;
-			break;
+				while (tok != NULL) {
+					data.prior_sigma[i] = atof(tok);
+					i++;
+					tok = strtok(NULL, " ;,\t");
+	                        }
+				found = 1;
+				break;
+			}
+		}
+	
+		if (!found) {
+			for (i = 0; i < data.Nth; i++) {
+				int j;
+				for (j = 0; j < data.Nth; j++) {
+					if (i == j)
+						data.prior_sigma[i*data.Nth+j] = 1.0;	/* Sigmadef value of Default Sigma */
+					else
+						data.prior_sigma[i*data.Nth+j] = 0.0;
+				}
+			}
 		}
 	}
 
-	if (!found) {
+	if(data.prior_type == 3) /* composite */
+	{
+		rewind(f);
+		line_no = 0;
+
+		data.compositeprior_distr = malloc(data.Nth*sizeof(double));
+	
+		free(data.prior_mu);
+		free(data.prior_sigma);
+		data.prior_mu = malloc(data.Nth*sizeof(double));
+		data.prior_sigma = malloc(data.Nth*data.Nth*sizeof(double));
+	
 		for (i = 0; i < data.Nth; i++) {
-			int j;
-			for (j = 0; j < data.Nth; j++) {
-				if (i == j)
-					data.prior_sigma[i*data.Nth+j] = 1.0;	/* Sigmadef value of Default Sigma */
-				else
-					data.prior_sigma[i*data.Nth+j] = 0.0;
+			found = 0;
+			while (fgets(line, 256, f)!= NULL) {
+				line_no++;
+	
+				if ((line[0] == '#')||(strlen(line)==0)) continue;
+	
+				char bound[8];
+				sprintf(bound, "C%d", i);
+				if (strstr(line, bound) != NULL) {
+					sscanf(line, "%*s %lf %lf %lf", &data.compositeprior_distr[i],
+						&data.lowerbound[i], &data.upperbound[i]);
+					found = 1;
+					break;
+				}
 			}
+			if (!found) {
+				data.lowerbound[i] = data.lb;	/* Bdef value or Default LB */
+				data.upperbound[i] = data.ub;	/* Bdef value of Default UB */
+				data.compositeprior_distr[i] = 0;
+			}
+			rewind(f);
+			line_no = 0;
 		}
 	}
 
@@ -330,7 +374,7 @@ void read_data()
 	fclose(f);
 
 
-#if 1
+#if 0
 	print_matrix("prior_mu", data.prior_mu, data.Nth);
 	print_matrix("prior_sigma", data.prior_sigma, data.Nth*data.Nth);
 	print_matrix("auxil_data", data.auxil_data, data.auxil_size);

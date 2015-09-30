@@ -26,6 +26,8 @@ typedef struct data_s {
 	double	*lowerbound;	/*[PROBDIM];*/
 	double	*upperbound;	/*[PROBDIM];*/
 
+	double *compositeprior_distr; /*[PROBDIM]*/
+
 #if 1
 	double *prior_mu;
 	double *prior_sigma;
