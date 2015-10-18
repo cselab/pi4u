@@ -7,7 +7,7 @@
 //#define _USE_CIGTAB_
 //#define _USE_BVNPDF_
 //#define _USE_SUBSETFUN_
-//#define _USE_HIMMELBLAU_
+#define _USE_HIMMELBLAU_
 //#define _USE_PA_DEMO_
 //#define _USE_LOGNORMPDF_
 //#define _USE_MIXED_BVNPDF_
@@ -17,11 +17,11 @@
 #include "gsl_headers.h"
 double mixedbvnpdf(double *x, int n) /* bivariate */
 {
-        double P;
+	double P;
 
-        P = gsl_ran_bivariate_gaussian_pdf(x[0]-(-5), x[1]-(-5), 1, 1, 0);
-        P += gsl_ran_bivariate_gaussian_pdf(x[0]-(+5), x[1]-(+5), 1, 1, 0);
-        return P;
+	P = gsl_ran_bivariate_gaussian_pdf(x[0]-(-5), x[1]-(-5), 1, 1, 0);
+	P += gsl_ran_bivariate_gaussian_pdf(x[0]-(+5), x[1]-(+5), 1, 1, 0);
+	return P;
 }
 #endif
 
@@ -29,7 +29,7 @@ double mixedbvnpdf(double *x, int n) /* bivariate */
 #include "gsl_headers.h"
 double mixedmvnpdf(double *x, int n) /* multivariate */
 {
-        double P = 0;
+	double P = 0;
 	double m1[n];
 	double m2[n];
 
@@ -39,7 +39,7 @@ double mixedmvnpdf(double *x, int n) /* multivariate */
 
 	P =  mvnpdf(n, x, m1, NULL);
 	P += mvnpdf(n, x, m2, NULL);
-        return log(P);
+	return log(P);
 }
 #endif
 
@@ -48,10 +48,10 @@ double mixedmvnpdf(double *x, int n) /* multivariate */
 #include "gsl_headers.h"
 double bvnpdf(double *x, int n) /* bivariate */
 {
-        double P;
+	double P;
 
-        P = gsl_ran_bivariate_gaussian_pdf(x[0], x[1], 1, 1, 0);
-        return P;
+	P = gsl_ran_bivariate_gaussian_pdf(x[0], x[1], 1, 1, 0);
+	return P;
 }
 
 #endif
@@ -117,8 +117,8 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 	//evaluate Himmel-blau function at given point x
 	f = 0.0;
 	for(i=0; i<N-1; i++) {
-		//f(x,y) =       (x^2 + y - 11)^2      +           (x + y^2 - 7.0)^2
-		// /                  |                                  |
+		//f(x,y) =       (x^2 + y - 11)^2      +   (x + y^2 - 7.0)^2
+		// /  |  |
 		f = f + pow((x[i]*x[i]+x[i+1]-11.0),2) + pow((x[i]+x[i+1]*x[i+1]-7.0),2);
 	}
 	f = (-0.1) * f; //exp((-0.1)*f); //do not use exp as you assumed that finally you used log(exp(f)) = f
