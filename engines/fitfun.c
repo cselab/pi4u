@@ -11,7 +11,7 @@
 //#define _USE_PA_DEMO_
 //#define _USE_LOGNORMPDF_
 //#define _USE_MIXED_BVNPDF_
-#define _USE_MIXED_MVNPDF_
+//#define _USE_MIXED_MVNPDF_
 
 #if defined(_USE_MIXED_BVNPDF_)
 #include "gsl_headers.h"

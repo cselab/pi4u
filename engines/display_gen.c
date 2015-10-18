@@ -180,8 +180,8 @@ void display_curgen_db_single(int Gen, int p1, int p2, int Dim, int NGens)
 
 //	gnuplot_cmd(g, "splot [1e2:1e6][1e-6:1e-3]\"%s\" %s with points pt 7 palette", fname, using_str);
 
-	gnuplot_cmd(g, "splot \"%s\" %s with points pt 7 palette", fname, using_str);
-//	gnuplot_cmd(g, "splot [-6:6][-6:6]\"%s\" %s with points pt 7 palette", fname, using_str);
+//	gnuplot_cmd(g, "splot \"%s\" %s with points pt 7 palette", fname, using_str);
+	gnuplot_cmd(g, "splot [-6:6][-6:6]\"%s\" %s with points pt 7 palette", fname, using_str);
 
 	}
 
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 #if 1
 	int i;
 
-//	for (i = 0; i <= ngen; i++) {
+//	for (i = 0; i <= ngen; i+=1) {
 	for (i = ngen; i <= ngen; i++) {
 //		display_curgen_db(i, ngen);
 		display_curgen_db_single(i, p1, p2, dim, ngen);

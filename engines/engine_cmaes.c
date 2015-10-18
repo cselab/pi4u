@@ -151,8 +151,8 @@ int main(int argn, char **args)
 		FILE *fp = fopen(filename, "w");
 		for (i = 0; i < lambda; i++) {
 			int j;
-			for (j = 0; j < dim; j++) fprintf(fp, "%f ", pop[i][j]);
-			fprintf(fp, "%f\n", arFunvals[i]);
+			for (j = 0; j < dim; j++) fprintf(fp, "%.6e ", pop[i][j]);
+			fprintf(fp, "%.6e\n", arFunvals[i]);
 		}
 		fclose(fp);
 		}

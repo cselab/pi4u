@@ -17,7 +17,7 @@ restarts 0                    # read by example2.c, remark that restarts
  typicalX 2:   # Typical search point (useful for restarts, cave: boundaries), overwritten by initialX 
     0.0 0.0        #    these are the read value(s)
  initialStandardDeviations 2:    #  1==read only one number for all coordinates
-   1.0 1.0                       #  numbers should not differ by orders of magnitude
+   3.0 3.0                       #  numbers should not differ by orders of magnitude
                                  #  should be roughly 1/4 of the search interval
                                  #  this number essentially influences the global 
                                  #  search ability (ie. the horizon where to search
@@ -69,7 +69,7 @@ maxTimeFractionForEigendecompostion 1  # maximal CPU-time fraction for eigensyst
 ## --- Strategy internal parameter ---
 ##     default values are set in readpara_SupplementDefaults()
 ## -- Selection related parameters
-lambda 32        # number of offspring == samplesize
+lambda 1024        # number of offspring == samplesize
 # mu  
 # weights      log # possible values: log (==default), 
                    #   lin (==linearely decreasing), or equal 
