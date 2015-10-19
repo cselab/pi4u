@@ -867,8 +867,8 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 
 	int n = curgen_db.entries;
 
-	double fj[n];
-	unsigned int sel[n];
+	double *fj = (double *) malloc(n*sizeof(double));  //fj[n];
+	unsigned int *sel = (unsigned int *) malloc(n*sizeof(sel));	// sel[n];
 
 	double **g_x;
 	g_x = (double **)malloc(data.Nth*sizeof(double *));
@@ -895,6 +895,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 	print_matrix("std", stdx, data.Nth);
 	}/*end block*/
 
+	if (1)
 	{/*start block*/
 	double **x = g_x;
 	int un = 0, unflag, j;
@@ -1073,6 +1074,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 	}
 #endif
 
+	if (1)
 	{/*start block*/
 /*	double x[data.Nth][n];*/
 	double **x = g_x;
@@ -1099,6 +1101,9 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 	for (i = 0; i < data.Nth; i++) free(g_x[i]);
 	free(g_x);
 
+	free(fj);
+	free(sel);
+	
 	return newchains;
 }
 

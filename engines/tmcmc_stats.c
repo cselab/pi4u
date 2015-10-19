@@ -262,7 +262,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	double *CoefVar = runinfo.CoefVar;
 	double *p = runinfo.p;
 	int *Num = data.Num;
-	int *currentuniques = runinfo.currentuniques;
+/*	int *currentuniques = runinfo.currentuniques;*/
 	double *logselection = runinfo.logselection;
 
 	double fmin = 0, xmin = 0;
@@ -373,10 +373,9 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	for (i = 0; i < samples; i++) sel[i] = 0;
 
-	int k;
-
 	if (nselections == 0) nselections = samples; /* n;*/
 #if 0
+	int k;
 	for (k = 0; k < nselections; k++) {
 		/*gsl_ran_multinomial (r, K, N, q, nn);*/
 		multinomialrand (K, N, q, nn);
