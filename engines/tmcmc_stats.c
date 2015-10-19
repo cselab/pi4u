@@ -20,13 +20,16 @@ double Objlogp(double x, double *fj, int fn, double pj, double tol)
 	int i;
 	double fjmax = compute_max(fj, fn);
 
-	double weight[fn];
+//	double weight[fn];
+	double *weight = (double *)malloc(fn*sizeof(double));
 	for (i = 0; i < fn; i++)
 		weight[i] = exp((fj[i]-fjmax)*(x-pj));
 
 	double sum_weight = compute_sum(weight, fn);
 
-	double q[fn];
+//	double q[fn];
+	double *q = (double *)malloc(fn*sizeof(double));
+	
 	for (i = 0; i < fn; i++)
 		q[i] = weight[i]/sum_weight;
 
@@ -35,6 +38,8 @@ double Objlogp(double x, double *fj, int fn, double pj, double tol)
 
 	double CoefVar = pow(std_q/mean_q-tol, 2);	/* result */
 
+	free(weight);
+	free(q);
 	return CoefVar;
 }
 
@@ -294,13 +299,15 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	int i;
 #if 1
-	double flcp[n];
+//	double flcp[n];
+	double *flcp = (double *)malloc(n*sizeof(double));
 	for (i= 0; i<n; i++)
 		flcp[i] = flc[i]*(p[j]-p[j-1]);
 
 
 	double fjmax= compute_max (flcp,n );
-	double weight[n];
+//	double weight[n];
+	double *weight = (double *)malloc(n*sizeof(double));
 	/*PA weight[i] = exp((flc[i]-fjmax)*(p[j]-p[j-1])); 23/06 */
 	for (i = 0; i < n; i++)
 		weight[i] = exp( flcp[i] - fjmax );
@@ -310,7 +317,8 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	double sum_weight = compute_sum(weight, n);
 
-	double q[n];
+//	double q[n];
+	double *q = (double *)malloc(n*sizeof(double));
 	for (i = 0; i < n; i++)
 		q[i] = weight[i]/sum_weight;
 
@@ -360,19 +368,26 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	unsigned int N = 1;
 
 	unsigned int samples = n; /*1000;*/
-	unsigned int nn[samples];
+//	unsigned int nn[samples];
+	unsigned int *nn = (unsigned int *)malloc(samples*sizeof(unsigned int));
 
 	for (i = 0; i < samples; i++) sel[i] = 0;
 
 	int k;
 
 	if (nselections == 0) nselections = samples; /* n;*/
+#if 0
 	for (k = 0; k < nselections; k++) {
-
 		/*gsl_ran_multinomial (r, K, N, q, nn);*/
 		multinomialrand (K, N, q, nn);
 		for (i = 0; i < K; i++) sel[i]+=nn[i];
 	}
+#else
+	N = nselections;
+	/*gsl_ran_multinomial (r, K, N, q, nn);*/
+	multinomialrand (K, N, q, nn);
+	for (i = 0; i < K; i++) sel[i]+=nn[i];
+#endif
 
 	if (display) {
 		printf("\n s = [");
@@ -423,6 +438,11 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	if (display)
 		print_matrix_2d("runinfo.SS", runinfo.SS, PROBDIM, PROBDIM);
+
+	free(flcp);
+	free(weight);
+	free(q);
+	free(nn);
 }
 
 double logpriorpdf(double *theta, int n)
