@@ -18,7 +18,7 @@
 #include <time.h>
 
 typedef struct 
-/* random_t 
+/* cmaes_random_t 
  * sets up a pseudo random number generator instance 
  */
 {
@@ -31,15 +31,15 @@ typedef struct
   /* Variables for Gauss() */
   short flgstored;
   double hold;
-} random_t;
+} cmaes_random_t;
 
 typedef struct 
-/* timings_t 
+/* cmaes_timings_t 
  * time measurement, used to time eigendecomposition 
  */
 {
   /* for outside use */
-  double totaltime; /* zeroed by calling re-calling timings_start */
+  double totaltime; /* zeroed by calling re-calling cmaes_timings_start */
   double totaltotaltime;
   double tictoctime; 
   double lasttictoctime;
@@ -54,16 +54,19 @@ typedef struct
 
   double lastdiff;
   double tictoczwischensumme;
-} timings_t;
+} cmaes_timings_t;
 
 typedef struct 
-/* readpara_t
+/* cmaes_readpara_t
  * collects all parameters, in particular those that are read from 
  * a file before to start. This should split in future? 
  */
 {
-  /* input parameter */
-  int N; /* problem dimension, must stay constant */
+  char * filename;  /* keep record of the file that was taken to read parameters */
+  short flgsupplemented; 
+  
+  /* input parameters */
+  int N; /* problem dimension, must stay constant, should be unsigned or long? */
   unsigned int seed; 
   double * xstart; 
   double * typicalX; 
@@ -98,22 +101,23 @@ typedef struct
 
   char *weigkey; 
   char resumefile[99];
-  char **rgsformat;
+  const char **rgsformat;
   void **rgpadr;
-  char **rgskeyar;
+  const char **rgskeyar;
   double ***rgp2adr;
   int n1para, n1outpara;
   int n2para;
-} readpara_t;
+} cmaes_readpara_t;
 
 typedef struct 
 /* cmaes_t 
  * CMA-ES "object" 
  */
 {
-  char *version;
-  readpara_t sp;
-  random_t rand; /* random number generator */
+  const char *version;
+  /* char *signalsFilename; */
+  cmaes_readpara_t sp;
+  cmaes_random_t rand; /* random number generator */
 
   double sigma;  /* step size */
 
@@ -152,9 +156,9 @@ typedef struct
   char sOutString[330]; /* 4x80 */
 
   short flgEigensysIsUptodate;
-  short flgCheckEigen; /* control via signals.par */
+  short flgCheckEigen; /* control via cmaes_signals.par */
   double genOfEigensysUpdate; 
-  timings_t eigenTimings;
+  cmaes_timings_t eigenTimings;
  
   double dMaxSignifKond; 				     
   double dLastMinEWgroesserNull;

@@ -72,9 +72,9 @@ int main(int argn, char **args)
 	torc_init(argn, args, MODE_MS);
 
 	gt0 = torc_gettime();
-	arFunvals = cmaes_init(&evo, 0, NULL, NULL, 0, 0, "initials.par"); 
+	arFunvals = cmaes_init(&evo, 0, NULL, NULL, 0, 0, "cmaes_initials.par"); 
 	printf("%s\n", cmaes_SayHello(&evo));
-	cmaes_ReadSignals(&evo, "signals.par");  /* write header and initial values */
+	cmaes_ReadSignals(&evo, "cmaes_signals.par");  /* write header and initial values */
 
 	/* Iterate until stop criterion holds */
 	gt1 = torc_gettime();
@@ -83,9 +83,8 @@ int main(int argn, char **args)
 		/* generate lambda new search points, sample population */
 		pop = cmaes_SamplePopulation(&evo); /* do not change content of pop */
 
-		/* Here you may resample each solution point pop[i] until it
-		   becomes feasible, e.g. for box constraints (variable
-		   boundaries). function is_feasible(...) needs to be
+		/* Here we may resample each solution point pop[i] until it
+		   becomes feasible. function is_feasible(...) needs to be
 		   user-defined.  
 		   Assumptions: the feasible domain is convex, the optimum is
 		   not on (or very close to) the domain boundary, initialX is
@@ -100,7 +99,7 @@ int main(int argn, char **args)
 			while (!is_feasible(pop[i], dim)) 
 				cmaes_ReSampleSingle(&evo, i); 
 
-		/* evaluate the new search points using fitfun from above */ 
+		/* evaluate the new search points using fitfun */ 
 		tt0 = torc_gettime();
 		for (i = 0; i < lambda; ++i) {
 #if 0
@@ -128,7 +127,7 @@ int main(int argn, char **args)
 		cmaes_UpdateDistribution(&evo, arFunvals);  
 
 		/* read instructions for printing output or changing termination conditions */ 
-		cmaes_ReadSignals(&evo, "signals.par");   
+		cmaes_ReadSignals(&evo, "cmaes_signals.par");   
 		fflush(stdout); /* useful in MinGW */
 
 #if VERBOSE
@@ -168,7 +167,6 @@ int main(int argn, char **args)
 	gt2 = torc_gettime();
 	printf("Stop:\n%s\n",  cmaes_TestForTermination(&evo)); /* print termination reason */
 	cmaes_WriteToFile(&evo, "all", "allcmaes.dat");         /* write final results */
-//	cmaes_WriteToFile(&evo, "resume", "allresumes.dat");         /* write final results */
 
 	/* get best estimator for the optimum, xmean */
 	xfinal = cmaes_GetNew(&evo, "xmean"); /* "xbestever" might be used as well */
