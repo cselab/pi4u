@@ -20,7 +20,7 @@
 # checkeigen  1        # number > 0 switches checking on, Check_Eigen() is O(n^3)!
 # maxTimeFractionForEigendecompostion 0.2
 
-# write resume allcmaes.dat  # write data for restart
+# write resume allresumes.dat  # write data for restart
 
 ## --- print data to stdout
 ##   syntax (in one row): 

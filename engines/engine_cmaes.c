@@ -159,7 +159,7 @@ int main(int argn, char **args)
 
 
 #if defined(_RESTART_)
-		cmaes_WriteToFile(&evo, "resume", "allresumes.dat");         /* write final results */
+		cmaes_WriteToFile(&evo, "resume", "allresumes.dat");         /* write resume data */
 #endif
 		step++;
 	}
