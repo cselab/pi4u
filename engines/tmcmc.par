@@ -2,7 +2,7 @@
 
 
 # problem dimension
-Nth		4 # aij, gammadpd, sigma, len
+probdim		4 # aij, gammadpd, sigma, len
 
 # Max number of generations
 MaxStages	2

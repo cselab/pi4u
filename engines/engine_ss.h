@@ -36,7 +36,7 @@ typedef struct data_s {
 	int	N_seeds;	// = 100*10;
 	int	N_steps;	// = 10;
 
-	int	Nth;	// = 2;
+	int	probdim;	// = 2;
 
 	double	*lowerbound;	//[PROBDIM] = {-6.0, -6.0};
 	double	*upperbound;	//[PROBDIM] = {+6.0, +6.0};
