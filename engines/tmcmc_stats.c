@@ -85,9 +85,94 @@ double Objlogp_gsl2(const gsl_vector *v, void *param)
 }
 
 /*** OPTIMIZATION ***/
+int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
+{
+	size_t iter = 0;
+	//size_t max_iter = data.options.MaxIter;	/* USER input - not used here */
+	double Tol = data.options.Tol;
+	int Display = data.options.Display;
+	double Step = data.options.Step;
+	double x_lo = 0, x_hi = 2;
+	int conv = 0;
+
+	size_t niters = (unsigned long) ((x_hi-x_lo) / Step);
+
+	double m = 0;
+	double fm = DBL_MAX;
+	double t0 = torc_gettime();
+#if !defined(_OPENMP)
+	for (iter = 0; iter < niters; iter++)
+	{
+		double x = x_lo + iter*Step;
+		double fx = Objlogp(x, fj, fn, pj, tol);
+		if (fx < fm)
+		{
+			fm = fx;
+			m = x;
+		}
+		if (fabs(fx) < Tol) {
+			break;
+			conv = 1;
+		} 
+	}
+#else
+	int found = 0;
+	#pragma omp parallel
+	{
+	double lm = 0;
+	double lfm = DBL_MAX; 
+	
+	#pragma omp for
+	for (iter = 0; iter < niters; iter++)
+	{
+		double x, fx;
+
+		if (found == 0)
+		{
+			x  = x_lo + iter*Step;
+			fx = Objlogp(x, fj, fn, pj, tol);
+			if (fx < lfm)
+			{
+				lfm = fx;
+				lm = x;
+			}
+			if (fabs(fx) < Tol) {
+				found = 1;
+				#pragma omp flush(found)
+			}
+		} // cancellation
+	}
+
+	#pragma omp critical
+	{
+		if (lfm < fm)
+		{
+			fm = lfm;
+			m = lm;
+		}
+	}
+
+	}
+
+	if (found) conv = 1;
+
+#endif
+	double t1 = torc_gettime();
+
+	// If fm is not within Tolerance, we can go back and retry with better refinement (more iterations)
+
+	if (Display)
+		printf("fzerofind: m=%.16f fm=%.16f iter=%ld, time=%lf s\n", m, fm, niters, t1-t0);
+
+	*xmin = m;
+	*fmin = fm;
+
+	return conv;
+}
+
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
 {
-	const gsl_multimin_fminimizer_type *T = gsl_multimin_fminimizer_nmsimplex2;
+	const gsl_multimin_fminimizer_type *T; 
 	gsl_multimin_fminimizer *s = NULL;
 	gsl_vector *ss, *x;
 	gsl_multimin_function minex_func;
@@ -101,7 +186,6 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	double size;
 
 	fparam_t fp;
-
 	fp.fj = fj; fp.fn = fn; fp.pj = pj; fp.tol = tol;
 
 	/* Starting point */
@@ -117,8 +201,15 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	minex_func.f = Objlogp_gsl2;
 	minex_func.params = &fp;
 
-       s = gsl_multimin_fminimizer_alloc (T, 1);
-       gsl_multimin_fminimizer_set (s, &minex_func, x, ss);
+//	T = gsl_multimin_fminimizer_nmsimplex;
+	T = gsl_multimin_fminimizer_nmsimplex2;
+//	T = gsl_multimin_fminimizer_nmsimplex2rand;
+	s = gsl_multimin_fminimizer_alloc (T, 1);
+	gsl_multimin_fminimizer_set (s, &minex_func, x, ss);
+
+	if (Display) {
+		printf ("using %s method\n", gsl_multimin_fminimizer_name (s));
+	}
 
 	do {
 		iter++;
@@ -135,9 +226,15 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 			if (Display)
 				printf ("converged to minimum at\n");
 		}
+		else if (fabs(s->fval) < Tol) {
+			conv = 1;
+			status = GSL_SUCCESS;
+			if (Display)
+				printf ("found minimum at\n");
+		}
 
 		if (Display)
-			printf ("%3ld %.16lf f() = %.16f size = %.16f\n",
+			printf ("%3ld x =  %.16lf f() = %.16f size = %.16f\n",
 				iter, gsl_vector_get (s->x, 0), s->fval, size);
 
 	} while (status == GSL_CONTINUE && iter < max_iter);
@@ -165,8 +262,8 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	int Display = data.options.Display;
 	const gsl_min_fminimizer_type *T;
 	gsl_min_fminimizer *s;
-	double m = 0.5;     /* input */
- 	double a = 0.0, b = 2.0;    /* input */
+	double x_lo = 0.0, x_hi = 2.0;    /* input */
+	double m = 0.5, fm = 0.0;
 	gsl_function F;
 	int conv = 0;
 	gsl_vector *x;
@@ -181,18 +278,20 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	F.function = Objlogp_gsl;
 	F.params = &fp;
 
-	T = gsl_min_fminimizer_goldensection; /*brent;*/
+//	T = gsl_min_fminimizer_brent; 
+	T = gsl_min_fminimizer_goldensection;
+//	T = gsl_min_fminimizer_quad_golden
 	s = gsl_min_fminimizer_alloc (T);
 
 /*	printf("f(a)=%lf\n", Objlogp_gsl(a, &fp));*/
 /*	printf("f(b)=%lf\n", Objlogp_gsl(b, &fp));*/
 /*	printf("f(m)=%lf\n", Objlogp_gsl(m, &fp));*/
-	double fa = Objlogp_gsl(a, &fp);
-	double fb = Objlogp_gsl(b, &fp);
+	double f_lo = Objlogp_gsl(x_lo, &fp);
+	double f_hi = Objlogp_gsl(x_hi, &fp);
 	for (i = 0; i < max_iter; i++) {
-		m = a + i*(b-a)/max_iter;
-		double fm = Objlogp_gsl(m, &fp);
-		if ((fm < fa) && (fm < fb)) break;
+		m = x_lo + i*(x_hi-x_lo)/max_iter;
+		fm = Objlogp_gsl(m, &fp);
+		if ((fm < f_lo) && (fm < f_hi)) break;
 	}
 
 	if (i == max_iter) {
@@ -202,36 +301,41 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	}
 	else {
 		if (Display)
-			printf("inited with %d tries\n", i);
+			printf("inited with %d tries and m = %f (fm = %f)\n", i, m, fm);
 	}
 
-	gsl_min_fminimizer_set (s, &F, m, a, b);
-/*	printf("bbb\n");*/
+	gsl_min_fminimizer_set (s, &F, m, x_lo, x_hi);
 
 	if (Display) {
 		printf ("using %s method\n", gsl_min_fminimizer_name (s));
 		printf ("%5s [%18s, %18s] %18s %18s\n", "iter", "lower", "upper", "min", "err(est)");
-		printf ("%5d [%.16f, %.16f] %.16f %.16f\n", iter, a, b, m, b - a);
+		printf ("%5d [%.16f, %.16f] %.16f %.16f\n", iter, x_lo, x_hi, m, x_hi - x_lo);
 	}
 
 	do {
 		iter++;
 		status = gsl_min_fminimizer_iterate (s);
 
-		m = gsl_min_fminimizer_x_minimum (s);
-		a = gsl_min_fminimizer_x_lower (s);
-		b = gsl_min_fminimizer_x_upper (s);
+		m  = gsl_min_fminimizer_x_minimum (s);
+		x_lo = gsl_min_fminimizer_x_lower (s);
+		x_hi = gsl_min_fminimizer_x_upper (s);
 
-		status = gsl_min_test_interval (a, b, Tol, 0.0);
+		status = gsl_min_test_interval (x_lo, x_hi, Tol, Tol);
 		if (status == GSL_SUCCESS) {
 			if (Display)
 				printf ("Converged:\n");
 			conv = 1;
 		}
+		else if (fabs(gsl_min_fminimizer_f_minimum(s)) < Tol) {
+			conv = 1;
+			status = GSL_SUCCESS;
+			if (Display)
+				printf ("found minimum at\n");
+		}
 
 		if (Display)
 			printf ("%5d [%.16f, %.16f]  %.16f %.16f\n",
-				iter, a, b, m, b - a);
+				iter, x_lo, x_hi, m, x_hi - x_lo);
 
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
@@ -248,7 +352,6 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	gsl_min_fminimizer_free (s);
 
 	return conv;
-
 }
 
 
@@ -267,7 +370,8 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	double fmin = 0, xmin = 0;
 	int conv = 0;
-/*	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);*/
+#if 1
+	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	if (display)
 		printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
 	if (!conv) {
@@ -275,12 +379,36 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		if (display)
 			printf("fminsearch: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
 	}
-
+	if (!conv)
+		conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
+		if (display)
+			printf("fzerofind: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
+#else
+	// testing
+	double t0, t1;
+	t0 = torc_gettime();
+	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	t1 = torc_gettime();
+	printf("statopt - fmincon: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv, xmin, fmin, t1-t0);
+	t0 = torc_gettime();
+	conv = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	t1 = torc_gettime();
+	printf("statopt - fminsearch: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv, xmin, fmin, t1-t0);
+	t0 = torc_gettime();
+	conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	t1 = torc_gettime();
+	printf("statopt - fzerofind: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv, xmin, fmin, t1-t0);
+#endif
 	/* gen: next generation number */
 	int j = gen+1;
 
-	p[j] = xmin;
-	CoefVar[j] = fmin;
+	if (conv) {
+		p[j] = xmin;
+		CoefVar[j] = fmin;
+	} else {
+		p[j] = p[gen] + 0.01;		// 
+		CoefVar[j] = CoefVar[gen];	//
+	}
 
 	if (p[j]>1) {
 		/*pflag=p[j-1];*/
@@ -447,7 +575,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 double logpriorpdf(double *theta, int n)
 {
 	/* peh:check this */
-	double res;
+	double res = 0;
 	int i;
 
 	switch(data.prior_type)
@@ -465,6 +593,10 @@ double logpriorpdf(double *theta, int n)
 		case 1:
 			/* gaussian */
 			res = logmvnpdf(n, theta, data.prior_mu, data.prior_sigma);
+			break;
+
+		case 2:
+			/* file -  nothing to do*/
 			break;
 
 		case 3:

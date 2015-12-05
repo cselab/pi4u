@@ -5,8 +5,8 @@ CC = mpicc
 CPP = mpic++ 
 MPIF90 = mpif90
 
-CFLAGS = -O0 -g -ggdb -I../pndl/src
-#CFLAGS = -O3 -std=c99
+#CFLAGS = -O0 -g -ggdb -I../pndl/src
+CFLAGS = -O3 #-fopenmp #-std=c99
 CFLAGS += -Wall #-Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result -Wall # -w #-Wall
 
 CFLAGS += `torc_cflags`
