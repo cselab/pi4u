@@ -49,10 +49,10 @@ C1		1	0		1
 seed		280675
 
 # Internal options
-opt.MaxIter	10000
+opt.MaxIter	1000
 opt.Tol		1e-12
 opt.Display	1
-opt.step	1e-6
+opt.step	1e-5
 
 # Online plotting of data, useful for 2D data and debugging
 iplot		0

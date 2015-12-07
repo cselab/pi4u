@@ -13,22 +13,28 @@
 #include <time.h>
 
 int display = 0;
-
+#define LARGE_SCALE_POPS
 /** OBJLOGP FUNCTION **/
 double Objlogp(double x, double *fj, int fn, double pj, double tol)
 {
 	int i;
 	double fjmax = compute_max(fj, fn);
 
-//	double weight[fn];
+#ifdef LARGE_SCALE_POPS
 	double *weight = (double *)malloc(fn*sizeof(double));
+#else
+	double weight[fn];
+#endif
 	for (i = 0; i < fn; i++)
 		weight[i] = exp((fj[i]-fjmax)*(x-pj));
 
 	double sum_weight = compute_sum(weight, fn);
 
-//	double q[fn];
+#ifdef LARGE_SCALE_POPS
 	double *q = (double *)malloc(fn*sizeof(double));
+#else
+	double q[fn];
+#endif
 	
 	for (i = 0; i < fn; i++)
 		q[i] = weight[i]/sum_weight;
@@ -38,8 +44,10 @@ double Objlogp(double x, double *fj, int fn, double pj, double tol)
 
 	double CoefVar = pow(std_q/mean_q-tol, 2);	/* result */
 
+#ifndef LARGE_SCALE_POPS
 	free(weight);
 	free(q);
+#endif
 	return CoefVar;
 }
 
@@ -88,11 +96,11 @@ double Objlogp_gsl2(const gsl_vector *v, void *param)
 int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
 {
 	size_t iter = 0;
-	//size_t max_iter = data.options.MaxIter;	/* USER input - not used here */
+	/*size_t max_iter = data.options.MaxIter;*/	/* USER input - not used here */
 	double Tol = data.options.Tol;
 	int Display = data.options.Display;
 	double Step = data.options.Step;
-	double x_lo = 0, x_hi = 2;
+	double x_lo = 0, x_hi = 4.0;
 	int conv = 0;
 
 	size_t niters = (unsigned long) ((x_hi-x_lo) / Step);
@@ -110,7 +118,7 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 			fm = fx;
 			m = x;
 		}
-		if (fabs(fx) < Tol) {
+		if (fabs(fx) <= Tol) {
 			break;
 			conv = 1;
 		} 
@@ -136,7 +144,7 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 				lfm = fx;
 				lm = x;
 			}
-			if (fabs(fx) < Tol) {
+			if (fabs(fx) <= Tol) {
 				found = 1;
 				#pragma omp flush(found)
 			}
@@ -167,7 +175,7 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 	*xmin = m;
 	*fmin = fm;
 
-	return conv;
+	return (conv);
 }
 
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
@@ -192,9 +200,9 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	x = gsl_vector_alloc (1);
 	gsl_vector_set (x, 0, pj);
 
-	/* Set initial step sizes to 1 */
+	/* Set initial step sizes to Step */
 	ss = gsl_vector_alloc (1);
-	gsl_vector_set_all (ss, Step); /* input?*/
+	gsl_vector_set_all (ss, Step); /* input */
 
        /* Initialize method and iterate */
 	minex_func.n = 1;
@@ -226,20 +234,31 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 			if (Display)
 				printf ("converged to minimum at\n");
 		}
-		else if (fabs(s->fval) < Tol) {
+#if 1
+		else if (fabs(s->fval) <= Tol) {
 			conv = 1;
 			status = GSL_SUCCESS;
 			if (Display)
 				printf ("found minimum at\n");
 		}
-
+#endif
 		if (Display)
 			printf ("%3ld x =  %.16lf f() = %.16f size = %.16f\n",
 				iter, gsl_vector_get (s->x, 0), s->fval, size);
 
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
+#if 1
+	// double-check
+	if ((conv == 1) && (fabs(s->fval) > Tol)) {
+		conv = 0;
+		if (Display)
+			printf ("fminsearch: converged but not found minimum.\n");
+	}
+#endif
+
 	if (conv) {
+		conv = 1;
 		*fmin = s->fval;
 		*xmin = gsl_vector_get(s->x, 0);
 	} else {
@@ -262,7 +281,7 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	int Display = data.options.Display;
 	const gsl_min_fminimizer_type *T;
 	gsl_min_fminimizer *s;
-	double x_lo = 0.0, x_hi = 2.0;    /* input */
+	double x_lo = 0.0, x_hi = 4.0;    /* input */
 	double m = 0.5, fm = 0.0;
 	gsl_function F;
 	int conv = 0;
@@ -278,38 +297,57 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	F.function = Objlogp_gsl;
 	F.params = &fp;
 
-//	T = gsl_min_fminimizer_brent; 
-	T = gsl_min_fminimizer_goldensection;
+	T = gsl_min_fminimizer_brent; 
+//	T = gsl_min_fminimizer_goldensection;
 //	T = gsl_min_fminimizer_quad_golden
 	s = gsl_min_fminimizer_alloc (T);
 
-/*	printf("f(a)=%lf\n", Objlogp_gsl(a, &fp));*/
-/*	printf("f(b)=%lf\n", Objlogp_gsl(b, &fp));*/
-/*	printf("f(m)=%lf\n", Objlogp_gsl(m, &fp));*/
 	double f_lo = Objlogp_gsl(x_lo, &fp);
 	double f_hi = Objlogp_gsl(x_hi, &fp);
-	for (i = 0; i < max_iter; i++) {
-		m = x_lo + i*(x_hi-x_lo)/max_iter;
-		fm = Objlogp_gsl(m, &fp);
-		if ((fm < f_lo) && (fm < f_hi)) break;
+	if (f_lo < f_hi) {
+		m = x_lo;
+		fm = f_lo;
+	} else {
+		m = x_hi;
+		fm = f_hi;
 	}
 
-	if (i == max_iter) {
+	for (i = 0; i < max_iter; i++) {
+		double x = x_lo + i*(x_hi-x_lo)/max_iter;
+		double fx = Objlogp_gsl(x, &fp);
+		if (fx < fm) {
+			m = x;
+			fm = fx;
+		}
+	}
+
+#if 1
+	if (fabs(fm <= Tol)) {
+		conv = 1;
+		gsl_vector_free(x);
+		gsl_min_fminimizer_free (s);
 		if (Display)
-			printf("failed to initialize fmincon!\n");
+			printf("fmincon: early return with m = %.16f fm = %.16f\n", m, fm);
+		return conv;
+	}
+#endif
+
+	if ((fm < f_lo) && (fm < f_hi)) {
+		if (Display)
+			printf("fmincon: initialized with %d tries and m = %f (fm = %f)\n", i, m, fm);
+	} else {
+		if (Display)
+			printf("failed to initialize fmincon (%.16f, %.16f)!\n", f_lo, f_hi);
 		return 0;
 	}
-	else {
-		if (Display)
-			printf("inited with %d tries and m = %f (fm = %f)\n", i, m, fm);
-	}
+
 
 	gsl_min_fminimizer_set (s, &F, m, x_lo, x_hi);
 
 	if (Display) {
 		printf ("using %s method\n", gsl_min_fminimizer_name (s));
-		printf ("%5s [%18s, %18s] %18s %18s\n", "iter", "lower", "upper", "min", "err(est)");
-		printf ("%5d [%.16f, %.16f] %.16f %.16f\n", iter, x_lo, x_hi, m, x_hi - x_lo);
+		printf ("%5s [%18s, %18s] %18s %18s %18s\n", "iter", "lower", "upper", "min", "fmin", "err(est)");
+		printf ("%5d [%.16f, %.16f] %.16f %.16f %.16f\n", iter, x_lo, x_hi, m, fm, x_hi - x_lo);
 	}
 
 	do {
@@ -326,20 +364,32 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 				printf ("Converged:\n");
 			conv = 1;
 		}
-		else if (fabs(gsl_min_fminimizer_f_minimum(s)) < Tol) {
+#if 1
+		else if (fabs(gsl_min_fminimizer_f_minimum(s)) <= Tol) {
 			conv = 1;
 			status = GSL_SUCCESS;
 			if (Display)
 				printf ("found minimum at\n");
 		}
+#endif
 
 		if (Display)
-			printf ("%5d [%.16f, %.16f]  %.16f %.16f\n",
-				iter, x_lo, x_hi, m, x_hi - x_lo);
+			printf ("%5d [%.16f, %.16f] %.16f f()=%.16f %.16f\n",
+				iter, x_lo, x_hi, m, gsl_min_fminimizer_f_minimum(s), x_hi - x_lo);
 
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
+#if 1
+	// double-check
+	if ((conv == 1) && (fabs(gsl_min_fminimizer_f_minimum(s)) > Tol)) {
+		conv = 0;
+		if (Display)
+			printf ("converged but not found minimum.\n");
+	}
+#endif
+
 	if (conv) {
+		conv = 1;
 		gsl_vector_set (x, 0, m);
 		*fmin = Objlogp_gsl(m, &fp);
 		*xmin = m;
@@ -360,6 +410,7 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 
 void calculate_statistics(double flc[], int n, int nselections, int gen, unsigned int sel[])
 {
+	int Display = data.options.Display;
 	/*double pflag = 0;*/
 	double tolCOV = data.TolCOV;
 	double *CoefVar = runinfo.CoefVar;
@@ -367,37 +418,49 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	int *Num = data.Num;
 /*	int *currentuniques = runinfo.currentuniques;*/
 	double *logselection = runinfo.logselection;
-
+	double Step = data.options.Step;
 	double fmin = 0, xmin = 0;
 	int conv = 0;
 #if 1
+
+#if 1
 	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
-	if (display)
+	if (Display)
 		printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
+#endif
+#if 1
 	if (!conv) {
 		conv = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
-		if (display)
+		if (Display)
 			printf("fminsearch: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
 	}
-	if (!conv)
+#endif
+#if 1
+	if (!conv) {
 		conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
-		if (display)
+		if (Display)
 			printf("fzerofind: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
+	}
+#endif
+
 #else
 	// testing
+	if (Display) printf("\n");
 	double t0, t1;
 	t0 = torc_gettime();
-	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	int conv_con = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	t1 = torc_gettime();
-	printf("statopt - fmincon: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv, xmin, fmin, t1-t0);
+	printf("statopt - fmincon: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_con, xmin, fmin, t1-t0);
 	t0 = torc_gettime();
-	conv = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	int conv_search = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	t1 = torc_gettime();
-	printf("statopt - fminsearch: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv, xmin, fmin, t1-t0);
+	printf("statopt - fminsearch: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_search, xmin, fmin, t1-t0);
 	t0 = torc_gettime();
-	conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	int conv_zero = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	t1 = torc_gettime();
-	printf("statopt - fzerofind: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv, xmin, fmin, t1-t0);
+	printf("statopt - fzerofind: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_zero, xmin, fmin, t1-t0);
+//	conv = conv_search;
+	conv = conv_zero;
 #endif
 	/* gen: next generation number */
 	int j = gen+1;
@@ -406,7 +469,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		p[j] = xmin;
 		CoefVar[j] = fmin;
 	} else {
-		p[j] = p[gen] + 0.01;		// 
+		p[j] = p[gen] + 0.1*Step;	//
 		CoefVar[j] = CoefVar[gen];	//
 	}
 
