@@ -100,6 +100,108 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 	double Tol = data.options.Tol;
 	int Display = data.options.Display;
 	double Step = data.options.Step;
+	double x_lo = 0.0, x_hi = 4.0;
+	int conv = 0;
+
+	size_t niters;
+
+retry:
+	if (Display) printf("fminzero: x_lo = %e x_hi = %e Step = %e\n", x_lo, x_hi, Step);
+	niters = (unsigned long) ((x_hi-x_lo) / Step);
+
+	double m = 0;
+	double fm = DBL_MAX;
+	double t0 = torc_gettime();
+	int found = 0;
+#if !defined(_OPENMP)
+	for (iter = 0; iter < niters; iter++)
+	{
+		double x = x_lo + iter*Step;
+		double fx = Objlogp(x, fj, fn, pj, tol);
+		if (fx < fm)
+		{
+			fm = fx;
+			m = x;
+		}
+		if (fabs(fx) <= Tol) {
+			found = 1;
+			break;
+		} 
+	}
+#else
+	#pragma omp parallel
+	{
+	double lm = 0;
+	double lfm = DBL_MAX; 
+	
+	#pragma omp for
+	for (iter = 0; iter < niters; iter++)
+	{
+		double x, fx;
+
+		if (found == 0)
+		{
+			x  = x_lo + iter*Step;
+			fx = Objlogp(x, fj, fn, pj, tol);
+			if (fx < lfm)
+			{
+				lfm = fx;
+				lm = x;
+			}
+			if (fabs(fx) <= Tol) {
+				found = 1;
+				#pragma omp flush(found)
+			}
+		} // cancellation
+	}
+
+	#pragma omp critical
+	{
+		if (lfm < fm)
+		{
+			fm = lfm;
+			m = lm;
+		}
+	}
+
+	}
+#endif
+	double t1 = torc_gettime();
+
+	if (found) conv = 1;
+
+	// If fm is not within Tolerance, we can go back and retry with better refinement (more iterations)
+	if (!found) {
+		x_lo = m - 10*Step;
+		if (x_lo < 0) x_lo = 0;
+		x_hi = m + 10*Step;
+		if (x_hi > 4) x_hi = 4;
+		Step = 0.1*Step; 
+		if (Step < 1e-16) {
+			return 1;
+		} else {
+			if (Display)
+				printf("fzerofind (%e): m=%.16f fm=%.16f iter=%ld, time=%lf s\n", Step, m, fm, niters, t1-t0);
+			goto retry;
+		}
+	}
+
+	if (Display)
+		printf("fzerofind: m=%.16f fm=%.16f iter=%ld, time=%lf s\n", m, fm, niters, t1-t0);
+
+	*xmin = m;
+	*fmin = fm;
+
+	return (conv = 1);
+}
+
+int fzerofind1(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
+{
+	size_t iter = 0;
+	/*size_t max_iter = data.options.MaxIter;*/	/* USER input - not used here */
+	double Tol = data.options.Tol;
+	int Display = data.options.Display;
+	double Step = data.options.Step;
 	double x_lo = 0, x_hi = 4.0;
 	int conv = 0;
 
@@ -173,9 +275,11 @@ retry:
 	// If fm is not within Tolerance, we can go back and retry with better refinement (more iterations)
 	if (!found) {
 		Step = 0.1*Step; 
-		if (Step < 1e-8) {
-			return 0;
+		if (Step < 1e-6) {
+			return 1;
 		} else {
+			if (Display)
+				printf("fzerofind (%e): m=%.16f fm=%.16f iter=%ld, time=%lf s\n", Step, m, fm, niters, t1-t0);
 			goto retry;
 		}
 	}
@@ -186,7 +290,7 @@ retry:
 	*xmin = m;
 	*fmin = fm;
 
-	return (conv);
+	return (conv = 1);
 }
 
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
@@ -476,7 +580,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	/* gen: next generation number */
 	int j = gen+1;
 
-	if (conv) {
+	if ((conv)&&(xmin > p[gen])) {
 		p[j] = xmin;
 		CoefVar[j] = fmin;
 	} else {

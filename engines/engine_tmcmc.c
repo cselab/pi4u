@@ -153,6 +153,7 @@ void read_data()
 		}
 		else if (strstr(line, "opt.Step")) {
 			sscanf(line, "%*s %lf", &data.options.Step);
+			printf("setting step = %f\n", data.options.Step);
 		}
 		else if (strstr(line, "sampling")) {
 			sscanf(line, "%*s %d", &data.sampling_type);
