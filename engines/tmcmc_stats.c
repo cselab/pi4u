@@ -103,11 +103,16 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 	double x_lo = 0, x_hi = 4.0;
 	int conv = 0;
 
-	size_t niters = (unsigned long) ((x_hi-x_lo) / Step);
+	size_t niters;
+
+retry:
+	if (Display) printf("fminzero: Step = %e\n", Step);
+	niters = (unsigned long) ((x_hi-x_lo) / Step);
 
 	double m = 0;
 	double fm = DBL_MAX;
 	double t0 = torc_gettime();
+	int found = 0;
 #if !defined(_OPENMP)
 	for (iter = 0; iter < niters; iter++)
 	{
@@ -119,12 +124,11 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 			m = x;
 		}
 		if (fabs(fx) <= Tol) {
+			found = 1;
 			break;
-			conv = 1;
 		} 
 	}
 #else
-	int found = 0;
 	#pragma omp parallel
 	{
 	double lm = 0;
@@ -161,13 +165,20 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 	}
 
 	}
-
-	if (found) conv = 1;
-
 #endif
 	double t1 = torc_gettime();
 
+	if (found) conv = 1;
+
 	// If fm is not within Tolerance, we can go back and retry with better refinement (more iterations)
+	if (!found) {
+		Step = 0.1*Step; 
+		if (Step < 1e-8) {
+			return 0;
+		} else {
+			goto retry;
+		}
+	}
 
 	if (Display)
 		printf("fzerofind: m=%.16f fm=%.16f iter=%ld, time=%lf s\n", m, fm, niters, t1-t0);
@@ -175,7 +186,7 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 	*xmin = m;
 	*fmin = fm;
 
-	return (conv = 1);
+	return (conv);
 }
 
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
