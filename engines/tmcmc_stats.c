@@ -44,7 +44,7 @@ double Objlogp(double x, double *fj, int fn, double pj, double tol)
 
 	double CoefVar = pow(std_q/mean_q-tol, 2);	/* result */
 
-#ifndef LARGE_SCALE_POPS
+#ifdef LARGE_SCALE_POPS
 	free(weight);
 	free(q);
 #endif
@@ -175,7 +175,7 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 	*xmin = m;
 	*fmin = fm;
 
-	return (conv);
+	return (conv = 1);
 }
 
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
