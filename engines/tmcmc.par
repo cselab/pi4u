@@ -17,9 +17,9 @@ PopSize		1024
 #MaxChainLength 1e6
 
 # Boundaries
-Bdef		-15	15
-#B0		-3	3
-#B1		-3	3
+#Bdef		-15	15
+B0		-3	3
+B1		-3	3
 
 TolCOV		1
 bbeta		0.2
@@ -31,7 +31,7 @@ sampling        0
 accept          1
 
 #prior_type     /* 0: uniform, 1: gaussian, 3: composite (for every parameter its own distribution) */
-prior           0
+prior_type      0
 
 
 prior_mu	0.0,0.0

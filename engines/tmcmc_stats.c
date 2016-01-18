@@ -105,9 +105,24 @@ int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *f
 
 	size_t niters;
 
+	static int counter = -1;
+	int first_try = 0;
+	int dump = 0;
+	FILE *fp = NULL;
+	char fname[64];
+	counter++;
 retry:
 	if (Display) printf("fminzero: x_lo = %e x_hi = %e Step = %e\n", x_lo, x_hi, Step);
 	niters = (unsigned long) ((x_hi-x_lo) / Step);
+
+	first_try++;
+	if (first_try) dump=1;
+
+	if (dump) {
+		sprintf(fname, "fzero_%03d.txt", counter); 
+		fp = fopen(fname, "w");
+	}
+
 
 	double m = 0;
 	double fm = DBL_MAX;
@@ -118,6 +133,8 @@ retry:
 	{
 		double x = x_lo + iter*Step;
 		double fx = Objlogp(x, fj, fn, pj, tol);
+		if (dump) fprintf(fp, "%.16f %.16f\n", x, fx);
+
 		if (fx < fm)
 		{
 			fm = fx;
@@ -191,6 +208,8 @@ retry:
 
 	*xmin = m;
 	*fmin = fm;
+
+	if (dump) fclose(fp);
 
 	return (conv = 1);
 }
@@ -538,7 +557,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	int conv = 0;
 #if 1
 
-#if 1
+#if 0
 	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	if (Display)
 		printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);

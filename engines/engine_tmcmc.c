@@ -161,7 +161,7 @@ void read_data()
 		else if (strstr(line, "accept")) {
 			sscanf(line, "%*s %d", &data.accept_type);
 		}
-		else if (strstr(line, "prior")) {
+		else if (strstr(line, "prior_type")) {
 			sscanf(line, "%*s %d", &data.prior_type);
 		}
 		else if (strstr(line, "iplot")) {
