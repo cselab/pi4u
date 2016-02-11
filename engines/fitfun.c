@@ -39,7 +39,7 @@ double mixedmvnpdf(double *x, int n) /* multivariate */
 
 	P =  mvnpdf(n, x, m1, NULL);
 	P += mvnpdf(n, x, m2, NULL);
-	return log(P);
+	return P;
 }
 #endif
 
@@ -162,7 +162,7 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 #endif
 
 #if defined(_USE_MIXED_MVNPDF_)
-	f = mixedmvnpdf(x, N);
+	f = log(mixedmvnpdf(x, N));
 #endif
 	return f;
 }

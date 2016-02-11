@@ -58,7 +58,8 @@ typedef struct data_s {
 #endif
 
 	int	iplot;
-	int	idump;
+	int	icdump;
+	int	ifdump;
 
 	int	*Num;		/*[MAXGENS];*/
 	int	LastNum;
@@ -94,6 +95,10 @@ typedef struct cgdbp_s {
 	int counter;	/* not used (?)*/
 	int nsel;	/* for selection of leaders only*/
 	int queue;	/* for submission of leaders only*/
+#if 1   // NN
+	int surrogate;
+	double error;
+#endif
 #if defined(_TMCMC_SN_)
 	int valid;
 	double *grad;
@@ -155,6 +160,7 @@ void print_full_db();
 void print_curgen_db();
 void dump_curgen_db(int Gen);
 void dump_curres_db(int Gen);
+void dump_full_db(int Gen);
 void display_curgen_db(int Gen);
 int load_curgen_db(int Gen);
 

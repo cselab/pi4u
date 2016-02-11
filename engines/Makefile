@@ -63,7 +63,7 @@ clean:
 	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad propagation_tool *.o
 
 clear:
-	rm -rf lsf.o* *.dat curgen_db*.txt curres_db*.txt P*S*T* runinfo.txt samples*.txt seeds*.txt Pc.txt actparcmaes.par
+	rm -rf lsf.o* *.dat curgen_db*.txt curres_db*.txt P*S*T* runinfo.txt samples*.txt seeds*.txt Pc.txt actparcmaes.par full_db*.txt fitness.txt
 
 backup:
 	scp -r $(PWD) chatzidp@bulldozer.ethz.ch:

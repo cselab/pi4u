@@ -83,7 +83,8 @@ void read_data()
 #endif
 
 	data.iplot = 0;	/* gnuplot */
-	data.idump = 1;
+	data.icdump = 1;	/* dump current dataset of accepted points */
+	data.ifdump = 0;	/* dump complete dataset of points */
 
 	data.Num = malloc(data.MaxStages*sizeof(double));
 	for (i = 0; i < data.MaxStages; i++) {
@@ -112,6 +113,8 @@ void read_data()
 	opt.Display     0
 	opt.Step        1e-5
 	iplot           0
+	icdump		1
+	ifdump		0
 	*/
 
 	char line[256];
@@ -167,8 +170,11 @@ void read_data()
 		else if (strstr(line, "iplot")) {
 			sscanf(line, "%*s %d", &data.iplot);
 		}
-		else if (strstr(line, "idump")) {
-			sscanf(line, "%*s %d", &data.idump);
+		else if (strstr(line, "icdump")) {
+			sscanf(line, "%*s %d", &data.icdump);
+		}
+		else if (strstr(line, "ifdump")) {
+			sscanf(line, "%*s %d", &data.ifdump);
 		}
 		else if (strstr(line, "Bdef")) {
 			sscanf(line, "%*s %lf %lf", &data.lb, &data.ub);
@@ -756,6 +762,7 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
 
 	/* update current db entry */
 	torc_update_curgen_db(point, fpoint);
+	if (data.ifdump) torc_update_full_db(point, fpoint, NULL, 0, 0);
 	*out_tparam = fpoint;	/* currently not required, the result is already in the db*/
 
 	return;
@@ -807,6 +814,8 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
 		/* evaluate loglik_candidate (NAMD: 12 points) */
 		evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
+
+		if (data.ifdump) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   // last argument should be 1 if it is a surrogate
 
 		/* Decide */
 		double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
@@ -1287,8 +1296,9 @@ int main(int argc, char *argv[])
 	reset_nfc();
 
 	print_curgen_db();
-	dump_curgen_db(runinfo.Gen);
+	if (data.icdump) dump_curgen_db(runinfo.Gen);
 	display_curgen_db(runinfo.Gen);
+	if (data.ifdump) dump_full_db(runinfo.Gen);
 
 	/* save here */
 #if defined(_RESTART_)
@@ -1368,9 +1378,9 @@ int main(int argc, char *argv[])
 		reset_nfc();
 
 		print_curgen_db();
-		dump_curgen_db(runinfo.Gen);
+		if (data.icdump) dump_curgen_db(runinfo.Gen);
 		display_curgen_db(runinfo.Gen);
-
+		if (data.ifdump) dump_full_db(runinfo.Gen);
 
 		/* save here*/
 #if defined(_RESTART_)

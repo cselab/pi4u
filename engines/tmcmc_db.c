@@ -32,7 +32,7 @@ void init_full_db()
 {
 	pthread_mutex_init(&full_db.m, NULL);
 	full_db.entries = 0;
-	full_db.entry = calloc(1, data.PopSize*sizeof(dbp_t));	/* this should be something really large or expandable */
+	full_db.entry = calloc(1, data.MaxStages*data.PopSize*sizeof(dbp_t));	
 }
 
 
@@ -126,6 +126,35 @@ void print_full_db()
 	}
 	printf("=======\n");
 }
+
+void dump_full_db(int Gen)
+{
+	int PROBDIM = data.Nth;
+	int pos;
+	FILE *fp;
+	char fname[256];
+
+	sprintf(fname, "full_db_%03d.txt", Gen);
+	fp = fopen(fname, "w");
+	for (pos = 0; pos < full_db.entries; pos++) {
+		if (PROBDIM == 2)
+			fprintf(fp, "%20.16lf %20.16lf %20.16lf\n",
+				full_db.entry[pos].point[0], full_db.entry[pos].point[1], full_db.entry[pos].F);
+		else if (PROBDIM == 3) 
+			fprintf(fp, "%20.16lf %20.16lf %20.16lf %20.16lf\n",
+				full_db.entry[pos].point[0], full_db.entry[pos].point[1], full_db.entry[pos].point[2], full_db.entry[pos].F);
+		else {
+			int i;
+			
+			for (i = 0; i < PROBDIM; i++) {
+				fprintf(fp, "%20.16lf ", full_db.entry[pos].point[i]);
+			}
+			fprintf(fp, "%20.16lf\n", full_db.entry[pos].F);
+		}
+	}
+	fclose(fp);
+}
+
 
 void print_curgen_db()
 {
