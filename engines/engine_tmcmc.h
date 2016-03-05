@@ -42,7 +42,7 @@ typedef struct data_s {
 
 	double	TolCOV;
 	double	bbeta;
-	int	seed;
+	long	seed;
 
 	struct optim_options {
 		int	MaxIter;

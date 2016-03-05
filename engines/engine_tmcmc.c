@@ -143,7 +143,7 @@ void read_data()
 			sscanf(line, "%*s %lf", &data.bbeta);
 		}
 		else if (strstr(line, "seed")) {
-			sscanf(line, "%*s %d", &data.seed);
+			sscanf(line, "%*s %ld", &data.seed);
 		}
 		else if (strstr(line, "opt.MaxIter")) {
 			sscanf(line, "%*s %d", &data.options.MaxIter);
@@ -799,7 +799,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	
 	long me = torc_worker_id();
 
-	double leader[data.Nth], loglik_leader;			/* old*/
+	double leader[data.Nth], loglik_leader;		/* old*/
 	double candidate[data.Nth], loglik_candidate;	/* new*/
 
 	for (i = 0; i < data.Nth; i++)

@@ -607,7 +607,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		CoefVar[j] = CoefVar[gen];	//
 	}
 
-	if (p[j]>1) {
+	if (p[j] > 1) {
 		/*pflag=p[j-1];*/
 		p[j] = 1;
 		Num[j]=data.LastNum;
@@ -616,7 +616,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	/*print_matrix("p", p, j);*/
 
 /*
-	if (p[j]>10) { // data.pstrict
+	if (p[j] > 10) { // data.pstrict
 		 data.Rsq = data.Rsqstrict;
 	}
 */

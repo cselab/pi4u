@@ -227,19 +227,25 @@ double compute_std(double *v, int n, double mean)
 /**********************************************/
 
 const gsl_rng_type *T;
-gsl_rng *r;
-static pthread_mutex_t _rm = PTHREAD_MUTEX_INITIALIZER;
+gsl_rng **r;
 
 void gsl_rand_init(int seed)
 {
-		gsl_rng_env_setup();
+	int i, local_workers = torc_i_num_workers();
+	gsl_rng_env_setup();
 
-		T = gsl_rng_default;
-		r = gsl_rng_alloc (T);
-		if (seed == 0) 
-			gsl_rng_set(r, time(0)+10*torc_node_id());
-		else
-			gsl_rng_set(r, seed);
+	T = gsl_rng_default;
+	r = malloc(local_workers*sizeof(gsl_rng *));
+	for (i = 0; i < local_workers; i++) {
+		r[i] = gsl_rng_alloc (T);
+	}
+		
+	for (i = 0; i < local_workers; i++) {
+#if VERBOSE
+		printf("node %d: initializing rng %d with seed %d\n", torc_node_id(), i, seed+i+local_workers*torc_node_id());
+#endif
+		gsl_rng_set(r[i], seed+i+local_workers*torc_node_id());
+	}
 }
 
 /* normal distribution random number N(mu,rho^2)*/
@@ -247,9 +253,9 @@ double normalrand(double mu, double var)
 {
 	double res;
 
-	pthread_mutex_lock(&_rm);
-	res = mu + gsl_ran_gaussian(r, var);
-	pthread_mutex_unlock(&_rm);
+	int me = torc_i_worker_id();
+	res = mu + gsl_ran_gaussian(r[me], var);
+
 	return res;
 
 /*	return mu + gsl_ran_gaussian(r, var);*/
@@ -260,9 +266,9 @@ double uniformrand(double a, double b)
 {
 	double res;
 
-	pthread_mutex_lock(&_rm);
-	res = gsl_ran_flat(r, a, b);
-	pthread_mutex_unlock(&_rm);
+	int me = torc_i_worker_id();
+	res = gsl_ran_flat(r[me], a, b);
+
 	return res;
 
 /*	return gsl_ran_flat(r, a, b);*/
@@ -271,9 +277,9 @@ double uniformrand(double a, double b)
 
 void multinomialrand(size_t K, unsigned int N, double q[], unsigned int nn[])
 {
-	pthread_mutex_lock(&_rm);
-	gsl_ran_multinomial (r, K, N, q, nn);
-	pthread_mutex_unlock(&_rm);
+	int me = torc_i_worker_id();
+	gsl_ran_multinomial (r[me], K, N, q, nn);
+
 	return;
 }
 
@@ -288,7 +294,8 @@ void shuffle(int *perm, int N)
 	gsl_permutation_fprintf (stdout, p, " %u");
 	printf ("\n");
 #endif
-	gsl_ran_shuffle (r, p->data, N, sizeof(size_t));
+	int me = torc_i_worker_id();
+	gsl_ran_shuffle (r[me], p->data, N, sizeof(size_t));
 #if VERBOSE
 	printf (" random permutation:");
 	gsl_permutation_fprintf (stdout, p, " %u");
@@ -432,9 +439,8 @@ int mvnrnd(double *mean, double *sigma, double *out, int N)
 	gsl_matrix_view sigma_view = gsl_matrix_view_array(sigma, N,N);
 	gsl_vector_view out_view = gsl_vector_view_array(out, N);
 
-	pthread_mutex_lock(&_rm);
-	res = mvnrnd_gsl(r, &mean_view.vector, &sigma_view.matrix, &out_view.vector);
-	pthread_mutex_unlock(&_rm);
+	int me = torc_i_worker_id();
+	res = mvnrnd_gsl(r[me], &mean_view.vector, &sigma_view.matrix, &out_view.vector);
 
 	return res;
 }
@@ -487,7 +493,6 @@ static double dmvnorm(const int n, const gsl_vector *x, const gsl_vector *mean, 
 	if (!lognorm)
 		ay = exp(-0.5*ay)/sqrt( pow((2*M_PI),n)*ax );
 	else
-		//ay = -0.5*ay - 0.5*n*log(2*M_PI) - log(sqrt(ax));
 		ay = 0.5*(-ay - n*log(2*M_PI) - log(ax));	// PA
 
 	return ay;
