@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include "engine_tmcmc.h"
-//#define VERBOSE 1
-//#define _RESTART_
+/*#define VERBOSE 1*/
+/*#define _RESTART_*/
 #define _STEALING_
 /*#define _AFFINITY_*/
 
@@ -739,8 +739,8 @@ void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int cha
 	}
 	F = F/ntasks;
 
-	/*update_full_db(point, F, G, ntasks, 0); // not surrogate */
-	/*...torc_update_full_db(point, F, G, ntasks, 0); // not surrogate */
+	/*update_full_db(point, F, G, ntasks, 0); - not surrogate */
+	/*...torc_update_full_db(point, F, G, ntasks, 0); - not surrogate */
 
 	*Fval = F;
 }
@@ -807,15 +807,15 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	loglik_leader = *out_tparam;	/*chainwork->out_tparam[0];*/	/* and its value */
 
 	double pj = runinfo.p[runinfo.Gen];
-
-	for (step = 0; step < nsteps; step++) {
+#define BURN_IN	0
+	for (step = 0; step < nsteps + BURN_IN; step++) {
 
 		compute_candidate(candidate, leader, 1); /* multivariate gaussian(center, var) for each direction*/
 
 		/* evaluate loglik_candidate (NAMD: 12 points) */
 		evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
 
-		if (data.ifdump) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   // last argument should be 1 if it is a surrogate
+		if (data.ifdump && step >= BURN_IN) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
 
 		/* Decide */
 		double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
@@ -831,11 +831,11 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		if (P < L) {
 			for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];	/* new leader! */
 			loglik_leader = loglik_candidate;
-			torc_update_curgen_db(leader, loglik_leader);
+			if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
 		}
 		else {
 			/*increase counter or add the leader again in curgen_db*/
-			torc_update_curgen_db(leader, loglik_leader);
+			if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
 		}
 	}
 
@@ -877,8 +877,8 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 
 	int n = curgen_db.entries;
 
-	double *fj = (double *) malloc(n*sizeof(double));  //fj[n];
-	unsigned int *sel = (unsigned int *) malloc(n*sizeof(sel));	// sel[n];
+	double *fj = (double *) malloc(n*sizeof(double));
+	unsigned int *sel = (unsigned int *) malloc(n*sizeof(sel));
 
 	double **g_x;
 	g_x = (double **)malloc(data.Nth*sizeof(double *));
@@ -1251,6 +1251,16 @@ int main(int argc, char *argv[])
 	if (goto_next == 0)
 	{
 #endif
+
+	FILE *init_fp = NULL;
+	if (data.sampling_type == 2) {
+		init_fp = fopen("init_db.txt", "r");	/* peh: parametrize this */
+		if (init_fp == NULL) {
+			printf("init_db.txt file not found!\n");
+			exit(1);
+		}
+	}
+
 	for (i = 0; i < nchains; i++) {
 		winfo[0] = runinfo.Gen;
 		winfo[1] = i;
@@ -1259,7 +1269,7 @@ int main(int argc, char *argv[])
 
 		double in_tparam[data.Nth];
 
-		if (data.sampling_type == 0)
+		if (data.sampling_type == 0)	/* uniform */
 		{
 			/* peh:check this: add option for loading points/data from file */
 			/* uniform */
@@ -1270,11 +1280,21 @@ int main(int argc, char *argv[])
 				in_tparam[d] += data.lowerbound[d];
 			}
 		}
-		else
+		else if (data.sampling_type == 1)	/* gaussian */
 		{
 			mvnrnd(data.prior_mu, data.prior_sigma, in_tparam, data.Nth);
 		}
+		else if (data.sampling_type == 2)	/* file */
+		{
+			int j;
+			for (j = 0; j < data.Nth; j++) fscanf(init_fp, "%lf", &in_tparam[j]);
+			fscanf(init_fp, "%lf", &out_tparam[i]);
 
+			/*torc_update_curgen_db(in_tparam, out_tparam[i]);*/	/* peh - eval or not */
+			/*if (data.ifdump) torc_update_full_db(in_tparam, out_tparam[i], NULL, 0, 0);*/
+		}
+
+		if (data.sampling_type <= 2)	/* peh: file without or with function evaluations? */
 		torc_create(-1, initchaintask, 4,
 			data.Nth, MPI_DOUBLE, CALL_BY_COP,
 			1, MPI_INT, CALL_BY_COP,
@@ -1289,6 +1309,10 @@ int main(int argc, char *argv[])
 #ifdef _STEALING_
 	torc_disable_stealing();
 #endif
+
+	if (data.sampling_type == 2) {
+		fclose(init_fp);
+	}
 
 	gt1 = torc_gettime();
 	int g_nfeval = get_nfc();
@@ -1308,7 +1332,7 @@ int main(int argc, char *argv[])
 
 #if defined(_RESTART_)
 	}
-//next1:
+/*next1:*/
 	;
 #endif
 	static cgdbp_t *leaders; /*[MAXCHAINS];*/

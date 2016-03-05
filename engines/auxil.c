@@ -493,7 +493,7 @@ static double dmvnorm(const int n, const gsl_vector *x, const gsl_vector *mean, 
 	if (!lognorm)
 		ay = exp(-0.5*ay)/sqrt( pow((2*M_PI),n)*ax );
 	else
-		ay = 0.5*(-ay - n*log(2*M_PI) - log(ax));	// PA
+		ay = 0.5*(-ay - n*log(2*M_PI) - log(ax));	/* PA */
 
 	return ay;
 }

@@ -169,7 +169,7 @@ retry:
 				found = 1;
 				#pragma omp flush(found)
 			}
-		} // cancellation
+		} /* task cancellation ? */
 	}
 
 	#pragma omp critical
@@ -187,7 +187,7 @@ retry:
 
 	if (found) conv = 1;
 
-	// If fm is not within Tolerance, we can go back and retry with better refinement (more iterations)
+	/* If fm is not within Tolerance, we can go back and retry with better refinement (more iterations) */
 	if (!found) {
 		x_lo = m - 10*Step;
 		if (x_lo < 0) x_lo = 0;
@@ -273,7 +273,7 @@ retry:
 				found = 1;
 				#pragma omp flush(found)
 			}
-		} // cancellation
+		} /* task cancellation ? */
 	}
 
 	#pragma omp critical
@@ -291,7 +291,7 @@ retry:
 
 	if (found) conv = 1;
 
-	// If fm is not within Tolerance, we can go back and retry with better refinement (more iterations)
+	/* If fm is not within Tolerance, we can go back and retry with better refinement (more iterations) */
 	if (!found) {
 		Step = 0.1*Step; 
 		if (Step < 1e-6) {
@@ -343,9 +343,9 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	minex_func.f = Objlogp_gsl2;
 	minex_func.params = &fp;
 
-//	T = gsl_multimin_fminimizer_nmsimplex;
+/*	T = gsl_multimin_fminimizer_nmsimplex;*/
 	T = gsl_multimin_fminimizer_nmsimplex2;
-//	T = gsl_multimin_fminimizer_nmsimplex2rand;
+/*	T = gsl_multimin_fminimizer_nmsimplex2rand;*/
 	s = gsl_multimin_fminimizer_alloc (T, 1);
 	gsl_multimin_fminimizer_set (s, &minex_func, x, ss);
 
@@ -383,7 +383,7 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
 #if 1
-	// double-check
+	/* double-check */
 	if ((conv == 1) && (fabs(s->fval) > Tol)) {
 		conv = 0;
 		if (Display)
@@ -432,8 +432,8 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	F.params = &fp;
 
 	T = gsl_min_fminimizer_brent; 
-//	T = gsl_min_fminimizer_goldensection;
-//	T = gsl_min_fminimizer_quad_golden
+/*	T = gsl_min_fminimizer_goldensection;*/
+/*	T = gsl_min_fminimizer_quad_golden;*/
 	s = gsl_min_fminimizer_alloc (T);
 
 	double f_lo = Objlogp_gsl(x_lo, &fp);
@@ -514,7 +514,7 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
 #if 1
-	// double-check
+	/* double-check */
 	if ((conv == 1) && (fabs(gsl_min_fminimizer_f_minimum(s)) > Tol)) {
 		conv = 0;
 		if (Display)
@@ -540,7 +540,7 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 
 
 /*** STATISTICS ***/
-#include "posdef.c" 	// peh
+#include "posdef.c" 	/* peh */
 
 void calculate_statistics(double flc[], int n, int nselections, int gen, unsigned int sel[])
 {
@@ -578,7 +578,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 #endif
 
 #else
-	// testing
+	/* testing */
 	if (Display) printf("\n");
 	double t0, t1;
 	t0 = torc_gettime();
@@ -593,7 +593,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	int conv_zero = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	t1 = torc_gettime();
 	printf("statopt - fzerofind: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_zero, xmin, fmin, t1-t0);
-//	conv = conv_search;
+/*	conv = conv_search; */
 	conv = conv_zero;
 #endif
 	/* gen: next generation number */
@@ -603,8 +603,8 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		p[j] = xmin;
 		CoefVar[j] = fmin;
 	} else {
-		p[j] = p[gen] + 0.1*Step;	//
-		CoefVar[j] = CoefVar[gen];	//
+		p[j] = p[gen] + 0.1*Step;
+		CoefVar[j] = CoefVar[gen];
 	}
 
 	if (p[j] > 1) {
@@ -616,7 +616,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	/*print_matrix("p", p, j);*/
 
 /*
-	if (p[j] > 10) { // data.pstrict
+	if (p[j] > 10) {
 		 data.Rsq = data.Rsqstrict;
 	}
 */
@@ -624,14 +624,12 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	int i;
 #if 1
-//	double flcp[n];
 	double *flcp = (double *)malloc(n*sizeof(double));
 	for (i= 0; i<n; i++)
 		flcp[i] = flc[i]*(p[j]-p[j-1]);
 
 
 	double fjmax= compute_max (flcp,n );
-//	double weight[n];
 	double *weight = (double *)malloc(n*sizeof(double));
 	/*PA weight[i] = exp((flc[i]-fjmax)*(p[j]-p[j-1])); 23/06 */
 	for (i = 0; i < n; i++)
@@ -642,7 +640,6 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	double sum_weight = compute_sum(weight, n);
 
-//	double q[n];
 	double *q = (double *)malloc(n*sizeof(double));
 	for (i = 0; i < n; i++)
 		q[i] = weight[i]/sum_weight;
@@ -693,7 +690,6 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	unsigned int N = 1;
 
 	unsigned int samples = n; /*1000;*/
-//	unsigned int nn[samples];
 	unsigned int *nn = (unsigned int *)malloc(samples*sizeof(unsigned int));
 
 	for (i = 0; i < samples; i++) sel[i] = 0;

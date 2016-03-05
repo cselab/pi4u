@@ -15,7 +15,7 @@
 
 #define VERBOSE 1
 #define _STEALING_
-//#define _RESTART
+/*#define _RESTART*/
 #define IODUMP 1
 #include "fitfun.c" 
 
@@ -23,10 +23,11 @@
 void taskfun(double *x, int *pn, double *res, int *info)
 {
 	int n = *pn;
-//	int gen, chain, step, task;
-//	gen = info[0]; chain = info[1]; step = info[2]; task = info[3];
-//	printf("executing task (%d,%d,%d,%d)\n", gen, chain, step, task);
-	
+#if 0
+	int gen, chain, step, task;
+	gen = info[0]; chain = info[1]; step = info[2]; task = info[3];
+	printf("executing task (%d,%d,%d,%d)\n", gen, chain, step, task);
+#endif
 	double f = -fitfun(x, n, (void *)NULL, info);	/* CMA-ES needs this minus sign */
 
 	*res = f;
@@ -39,12 +40,9 @@ double upper_bound[] = {+6.0, +6.0};
 int is_feasible(double *pop, int dim)
 {
 	int i, good;
-	// printf("is_feasible %d\n", dim);
 	for (i = 0; i < dim; i++) {
 		good = (lower_bound[i] <= pop[i]) && (pop[i] <= upper_bound[i]);
 		if (!good) {
-			//printf("%d not good\n", i);
-			//usleep(1000);
 			return 0;
 		}
 	}
