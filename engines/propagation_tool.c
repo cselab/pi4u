@@ -10,6 +10,7 @@
 #include "fitfun.c" 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <mpi.h>
 #include <torc.h>
 #include <math.h>
@@ -59,14 +60,22 @@ int main(int argc, char *argv[])
 */
 
 	#define MAXPOINTS 64
-
-	char line[256];
+	char line[2048];
 	double TP[MAXPOINTS][PROBDIM], ref[MAXPOINTS], res[MAXPOINTS];
 	int t = 0;
-	while (fgets(line, 256, fp)!= NULL)
+	while (fgets(line, 2048, fp)!= NULL)
 	{
-		sscanf(line, "%lf %lf %lf", &TP[t][0], &TP[t][1], &ref[t]);
 		printf("line %d: %s", t, line);
+		char *p;
+		p = strtok(line, " \t\n");
+		for (i = 0; i < PROBDIM; i++) {
+			if (!p) break;
+			TP[t][i] = atof(p);
+			p = strtok(NULL, " \t\n");
+		}
+		if (p) p = strtok(NULL, " \t\n");
+		if (p) ref[t] = atof(p);
+
 		t++;
 		if (t == MAXPOINTS) break;
 	}
