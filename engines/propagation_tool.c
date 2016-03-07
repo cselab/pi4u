@@ -22,7 +22,29 @@ void taskfun(double *x, int *pn, double *res, int *info)
 	gen = info[0]; chain = info[1]; step = info[2]; task = info[3];
 	printf("executing task (%d,%d,%d,%d,*)\n", gen, chain, step, task);
 
+#if 1
 	*res = fitfun(x, n, (void *)NULL, info);
+
+#else
+	/* this is a very simple example */
+	static pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+	static FILE *fp = NULL;
+
+	pthread_mutex_lock(&m);
+	if (fp == NULL) fp = fopen("propagation.txt", "w");
+	pthread_mutex_unlock(&m);
+
+        double obs[12]; /* e.g. assuming 12 observations */
+        *res = fitfun(x, n, (void *)obs, info);
+
+	pthread_mutex_lock(&m);
+        int i;
+	for (i = 0; i < 12; i++) fprintf(fp, "%f ", obs[i]);
+        fprintf(fp, "\n");
+	pthread_mutex_unlock(&m);
+
+#endif
+
         return;
 }
 

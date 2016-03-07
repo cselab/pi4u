@@ -23,6 +23,7 @@ TARGETS = display_gen engine_tmcmc engine_cmaes
 #TARGETS += sa_deriv fd_deriv fd_grad
 #TARGETS += engine_ss1 engine_ss2 
 TARGETS += propagation_tool
+TARGETS += display_prop
 
 all: $(TARGETS)
 
@@ -31,6 +32,9 @@ engine_tmcmc: engine_tmcmc.c engine_tmcmc.h tmcmc_stats.c tmcmc_db.c gnuplot_i.c
 
 display_gen: display_gen.c gnuplot_i.c
 	$(CC) $(CFLAGS) -o display_gen display_gen.c gnuplot_i.c $(LDFLAGS)
+
+display_prop: display_prop.c gnuplot_i.c
+	$(CC) $(CFLAGS) -o display_prop display_prop.c gnuplot_i.c $(LDFLAGS)
 
 engine_cmaes: engine_cmaes.c cmaes.c fitfun.c
 	$(CC) $(CFLAGS) -o engine_cmaes engine_cmaes.c cmaes.c auxil.c $(LDFLAGS)
@@ -60,7 +64,7 @@ propagation_tool: propagation_tool.c auxil.c fitfun.c
 	$(CC) $(CFLAGS) -o propagation_tool propagation_tool.c auxil.c $(LDFLAGS)
 
 clean:
-	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad propagation_tool *.o
+	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad propagation_tool display_prop *.o
 
 clear:
 	rm -rf lsf.o* *.dat curgen_db*.txt curres_db*.txt P*S*T* runinfo.txt samples*.txt seeds*.txt Pc.txt actparcmaes.par full_db*.txt fitness.txt
