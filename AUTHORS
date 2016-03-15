@@ -1,13 +1,19 @@
 People that have worked on Pi4U:
 
-Panagiotis Hadjidoukas		Computational Science, ETH Zurich
-Panagiotis Angelikopoulos	Computational Science, ETH Zurich
-Costas Papadimitriou		University of Thessaly
-Petros Koumoutsakos		Computational Science, ETH Zurich
-Lina Kulakova			Computational Science, ETH Zurich
-Stephen Wu			Computational Science, ETH Zurich
+P. Hadjidoukas				Computational Science, ETH Zurich
+P. Angelikopoulos			Computational Science, ETH Zurich
+C. Papadimitriou			University of Thessaly
+P. Koumoutsakos				Computational Science, ETH Zurich
+L. Kulakova				Computational Science, ETH Zurich
 
-Contact: Petros Koumoutsakos
-         petros AT ethz.ch
-         CSE Lab, D-MAVT, ETH Zurich
-         (c) since 2014
+Contributors:
+F. Zeindler				ETH Zurich (Bachelor Thesis)
+D. Melidis				ETH Zurich (Lab Rotation)
+T. Vogels - M. Baranidharan		ETH Zurich (HPCSE II project)
+S. Wu					Computational Science, ETH Zurich
+
+
+Contact:	Petros Koumoutsakos			Panagiotis Hadjidoukas
+		petros AT ethz.ch			phadjido AT mavt.ethz.ch
+				CSE Lab, D-MAVT, ETH Zurich
+        			(c) since 2014
