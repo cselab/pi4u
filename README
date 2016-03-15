@@ -109,6 +109,10 @@ c) ./sa_deriv
 	- [var1] and [var2] are optional arguments that 
 	
 
+6) ABC-SUBSIM
+
+	Please check the README-ABC.txt file in the corresponding folder
+
 
 IV. COUPLING WITH EXTERNAL SOFTWARE
 
@@ -122,5 +126,5 @@ Currently the following example is included:
 
 V. NOTES
 
-Ask for help, report any problems!: phadjido@mavt.ethz.ch 
+Do not hesitate to ask for help and report any problems: phadjido AT mavt.ethz.ch 
 
