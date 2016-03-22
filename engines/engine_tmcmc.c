@@ -603,6 +603,10 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
 		update_full_db(point, F, G, n, surrogate);
 		return;
 	}
+
+	double dummy = 0.0;
+	if (G == NULL) G = &dummy;	/* peh: bug fix, sorry for this - I need to handle this case in TORC */
+
 	torc_create_direct(0, torc_update_full_db_task, 5,		/* message to the database manager (separate process?) or direct execution by server thread */
 		data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 		1, MPI_DOUBLE, CALL_BY_COP,
