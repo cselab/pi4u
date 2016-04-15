@@ -30,7 +30,7 @@ static const double ERROR_THRESHOLD=5;	// set once
 
 static double avg_error=100, p_005= 0, p_095=0;
 
-static void call_update_nn_gdata()
+/*static*/ void call_update_nn_gdata()
 {
         MPI_Bcast(&avg_error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         MPI_Bcast(&p_005, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);

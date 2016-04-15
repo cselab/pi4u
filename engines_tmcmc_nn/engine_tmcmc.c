@@ -583,7 +583,19 @@ void setup_handler()
 }
 
 #if 1	/* TORC-BASED DATA MANAGEMENT */
-void torc_update_full_db_task(double point[], double *pF, double *G, int *pn, int *psurrogate)
+void torc_update_full_db_task(double point[], double *pF, int *psurrogate)
+{
+	double F = *pF;
+	int surrogate = *psurrogate;
+	double *G = NULL;
+	int n = 0;
+
+/*	printf("torc_update_full_db_task: %f %f %f %f %f\n", point[0], point[1], point[2], F, G[0]); fflush(0); */
+
+	update_full_db(point, F, G, n, surrogate);
+}
+
+void torc_update_full_db_task_p5(double point[], double *pF, double *G, int *pn, int *psurrogate)
 {
 	double F = *pF;
 	int n = *pn;
@@ -600,14 +612,23 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
 		update_full_db(point, F, G, n, surrogate);
 		return;
 	}
-	torc_create_direct(0, torc_update_full_db_task, 5,		/* message to the database manager (separate process?) or direct execution by server thread */
+
+	if (n == 0)
+	torc_create_direct(0, torc_update_full_db_task, 3,              /* message to the database manager (separate process?) or direct execution by server thread */
 		data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 		1, MPI_DOUBLE, CALL_BY_COP,
-		n, MPI_DOUBLE, CALL_BY_COP,	/* xxx: for CALL_BY_VAL: in the full-version of the library, with n=1 we had segv */
+		1, MPI_INT, CALL_BY_COP,
+		point, &F, &surrogate);
+	else
+	torc_create_direct(0, torc_update_full_db_task_p5, 5,           /* message to the database manager (separate process?) or direct execution by server thread */
+		data.Nth, MPI_DOUBLE, CALL_BY_VAL,
+		1, MPI_DOUBLE, CALL_BY_COP,
+		n, MPI_DOUBLE, CALL_BY_COP,     /* xxx: for CALL_BY_VAL: in the full-version of the library, with n=1 we had segv */
 		1, MPI_INT, CALL_BY_COP,
 		1, MPI_INT, CALL_BY_COP,
 		point, &F, G, &n, &surrogate);
-	torc_waitall3();
+
+        torc_waitall3();
 }
 
 void torc_update_curgen_db_task(double point[], double *pF, int *psurrogate)
@@ -1242,6 +1263,9 @@ void spmd_setaffinity()
 }
 #endif
 
+#if 1 // NN
+extern void call_update_nn_gdata();
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -1264,7 +1288,9 @@ int main(int argc, char *argv[])
 #if defined(_AFFINITY_)
 	torc_register_task(call_setaffinity);
 #endif
-
+#if 1 //
+	torc_register_task(call_update_nn_gdata);
+#endif
 	data_init();
 	setup_handler();
 
@@ -1337,6 +1363,7 @@ int main(int argc, char *argv[])
 	torc_enable_stealing();
 #endif
 	torc_waitall();
+
 #ifdef _STEALING_
 	torc_disable_stealing();
 #endif
