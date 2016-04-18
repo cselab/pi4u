@@ -1,0 +1,63 @@
+# TMCMC and SN-TMCMC configuration file
+
+
+# problem dimension
+Nth		2
+
+# Max number of generations
+MaxStages	10
+
+# Population size
+#PopSize		4096
+PopSize		1024
+
+# Chain Lengths
+#MinChainLength	2
+#MaxChainLength	2
+#MinChainLength 2
+#MaxChainLength 1e6
+
+# Boundaries
+Bdef		-5	5
+#B0		-3	3
+#B1		-3	3
+
+TolCOV		1
+bbeta		0.2
+
+#sampling_type  /* 0: uniform, 1: gaussian, 2: file, 3: composite (for every parameter its own distribution) */
+sampling        0
+
+#accept_type    /* 0: without exp(), 1: with exp() */
+accept          1
+
+#prior_type     /* 0: uniform, 1: gaussian, 3: composite (for every parameter its own distribution) */
+prior_type      0
+
+# prior parameters
+prior_mu	0.0,0.0
+prior_sigma	10,0;0,10
+
+# for composite prior: <distribution type> <parameter_1> ... <parameter_k>
+C0		0	0.25	16
+C1		1	0		1
+
+#auxil_size	5
+#auxil_data	0.1,0.2,0.3,0.4,5
+
+# RNG seed
+seed		0
+#seed		280675
+
+# Internal options
+opt.MaxIter	1000
+opt.Tol		1e-12
+opt.Display	1
+opt.Step	1e-4
+
+# Online plotting of data, useful for 2D data and debugging
+iplot		0
+
+# SN-TMCMC specific options
+diffstep	1e-4
+posdef		4
