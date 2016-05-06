@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <time.h>
 
 #include "engine_tmcmc.h"
 #include "gsl_headers.h"
@@ -103,123 +104,55 @@ void compute_surrogate_bounds()
 	printf("STAT: v_min = %f v_max = %f\n", v_min, v_max);
 }
 
-// the surrogate is the same for the whole chain
-void surrogate_build(int gen_id, int chain_id, double *x)
+// Build a surrogate each time the function is called (dumping files is more expensive)
+void get_surrogate_estimate(int gen_id, int chain_id, int task_id, double *x,
+	double *pred_y, double *err, double *leader)
 {
+	int i;
+	double t;
+
 	int D = data.Nth;
 
-	char filename1[512], filename2[512];
-	FILE *fp;
-	int i;
+//	t = clock();
 
-	sprintf(filename1, "leader_%03d_%03d.txt", gen_id, chain_id);
-	fp = fopen(filename1, "w");
+	char command[1024];
+	sprintf(command, "python scripts/kriging_doall.py \'%d %d %d %d ", gen_id, chain_id, task_id, D);
 	for (i=0; i<D; i++)
-		fprintf(fp, "%lf ", x[i]);
-	fprintf(fp, "\n");
-	fclose(fp);
+		sprintf(command, "%s %lf", command, leader[i]);
+	for (i=0; i<D; i++)
+		sprintf(command, "%s %lf", command, x[i]);
+	sprintf(command, "%s\' 2>/dev/null\n", command);
 
-	// Call a script to train the kriging model
-	char line[1024];
-	char *largv[64];
+	FILE * pipe = popen(command, "r");
 
-	int rf = fork();
-	if (rf < 0)
+	if (!pipe)
 	{
-		printf("spawner(%d, %d): fork failed!!!!\n", gen_id, chain_id);
-		fflush(0);
-	}
-	if (rf == 0)
-	{
-		strcpy(line, "");
-		sprintf(line, "python scripts/kriging_train.py %d %d\n", gen_id, chain_id);
-
-		sprintf(filename2, "train_output_%03d_%03d.txt", gen_id, chain_id);
-
-		int fd = open(filename2, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-		dup2(fd, 1);	// make stdout go to file
-		dup2(fd, 2);	// make stderr go to file
-		close(fd);		// fd no longer needed - the dup'ed handles are sufficient
-
-		parse(line, largv);	/* prepare argv */
-		execvp(*largv, largv);
-	}
-	waitpid(rf, NULL, 0);
-	sync();
-
-	rmrf(filename1);
-	rmrf(filename2);
-}
-
-void get_surrogate_estimate(int gen_id, int chain_id, int task_id, double *x, int n,
-	double *pred_y, double *err)
-{
-	char filename1[512], filename2[512], filename3[512];
-	FILE * fp;
-	int i;
-	
-	// write x to file
-	sprintf(filename1, "kriging_pred_x_%03d_%03d_%03d.txt", gen_id, chain_id, task_id);
-	fp = fopen(filename1, "w");
-	for(i=0; i<n; i++)
-		fprintf(fp,"%lf ", x[i]);
-	fprintf(fp,"\n");
-	fclose(fp);
-
-	// Obtain the prediction and the error
-	char line[1024];
-	char *largv[64];
-
-	int rf = fork();
-	if (rf < 0)
-	{
-		printf("spawner(%d, %d): fork failed!!!!\n", gen_id, chain_id);
-		fflush(0);
-	}
-	if (rf == 0)
-	{
-		strcpy(line, "");
-		sprintf(line, "python scripts/kriging_pred.py %d %d %d\n", gen_id, chain_id, task_id);
-
-		sprintf(filename2, "pred_output_%03d_%03d_%03d.txt", gen_id, chain_id, task_id);
-
-		int fd = open(filename2, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-		dup2(fd, 1);	// make stdout go to file
-		dup2(fd, 2);	// make stderr go to file
-		close(fd);		// fd no longer needed - the dup'ed handles are sufficient
-
-		parse(line, largv);	/* prepare argv */
-		execvp(*largv, largv);
-	}
-	waitpid(rf, NULL, 0);
-	sync();
-
-	// Read the prediction and the error from the file
-	double krig_pred_y, krig_err;
-	sprintf(filename3, "kriging_pred_y_%03d_%03d_%03d.txt", gen_id, chain_id, task_id);
-	fp = fopen(filename3, "r");
-	if (!fp)
-	{
-		printf("Error in prediction for %s\n", filename3);
-	
-		*pred_y = -1;
-		*err = 1e12;
-	}
-	else
-	{
-		fscanf(fp, "%lf\n%lf\n", &krig_pred_y, &krig_err);
-		fclose(fp);
-	
-		printf("evaluate_surrogate -> %f with error %f\n", krig_pred_y, krig_err);
-	
-		*pred_y = krig_pred_y;
-		*err = krig_err;
-
-		rmrf(filename3);
+	    printf("Cannot popen %s\n", command);
+		return;
 	}
 
-	rmrf(filename1);
-	rmrf(filename2);
+	t = -1;
+	*pred_y = -1;
+	*err = 1e12;
+
+	char buffer[512];
+	while(fgets(buffer, 512, pipe))
+	{
+//		printf("(in C from python) %s\n", buffer);
+		char word[512];
+		sscanf(buffer, "%s ", word);
+		if (strcmp(word, "Prediction:") == 0)
+			sscanf(buffer, "%*s %lf", pred_y);
+		if (strcmp(word, "Error:") == 0)
+			sscanf(buffer, "%*s %lf", err);
+		if (strcmp(word, "Elapsed") == 0)
+			sscanf(buffer, "%*s %*s %lf", &t);
+	}
+
+	pclose(pipe);
+		
+//	t = (clock() - t)/CLOCKS_PER_SEC;
+	printf("Prediction elapsed time: %.2lf sec\n", t);
 }
 
 void destroy_net()

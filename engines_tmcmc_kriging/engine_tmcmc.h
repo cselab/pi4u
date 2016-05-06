@@ -211,7 +211,7 @@ int inv_matrix(double coef, double *current_hessian/*2D*/, double *inv_current_h
 /*** NN ***/
 
 void compute_surrogate_bounds();
-void surrogate_build(int gen_id, int chain_id, double *x);
-void get_surrogate_estimate(int gen_id, int chain_id, int task_id, double *x, int n,
-	double *pred_y, double *err);
+//void surrogate_build(int gen_id, int chain_id, double *x);
+void get_surrogate_estimate(int gen_id, int chain_id, int task_id, double *x,
+	double *pred_y, double *err, double *leader);
 int surrogate_is_good_estimate(double estimate, double error);

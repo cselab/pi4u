@@ -7,9 +7,9 @@
 //#define _USE_CIGTAB_
 //#define _USE_BVNPDF_
 //#define _USE_SUBSETFUN_
-//#define _USE_HIMMELBLAU_
+#define _USE_HIMMELBLAU_
 //#define _USE_PA_DEMO_
-#define _USE_LOGNORMPDF_
+//#define _USE_LOGNORMPDF_
 //#define _USE_MIXED_BVNPDF_
 //#define _USE_MIXED_MVNPDF_
 //#define _USE_MVNPDF_

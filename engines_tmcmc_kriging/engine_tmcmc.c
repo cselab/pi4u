@@ -830,7 +830,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
 	double pj = runinfo.p[runinfo.Gen];
 
-#if 1
+#if 0
 	// one surrogate for the whole chain
 	surrogate_build(gen_id, chain_id, leader);
 #endif
@@ -842,8 +842,8 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		cand_is_surrogate = 0;	// by default it is not
 		double surr_loglik_candidate, surr_err_candidate;
 //		surrogate_estimate = surrogate_estimate(gen_id-1, candidate, data.Nth);
-		get_surrogate_estimate(gen_id, chain_id, step, candidate, data.Nth,
-			&surr_loglik_candidate, &surr_err_candidate);
+		get_surrogate_estimate(gen_id, chain_id, step, candidate,
+			&surr_loglik_candidate, &surr_err_candidate, leader);
 
 		int is_good = surrogate_is_good_estimate(surr_loglik_candidate, surr_err_candidate);
 		if (is_good) {
