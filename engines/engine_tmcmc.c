@@ -187,7 +187,7 @@ void read_data()
 		}
 	}
 
-	if(data.prior_type == 0) /* uniform */
+//	if(data.prior_type == 0) /* uniform */
 	{
 		rewind(f);
 		line_no = 0;
