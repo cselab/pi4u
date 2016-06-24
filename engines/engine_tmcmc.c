@@ -14,7 +14,7 @@
 #include <assert.h>
 #include "engine_tmcmc.h"
 //#define VERBOSE 1
-//#define _RESTART_
+#define _RESTART_
 #define _STEALING_
 /*#define _AFFINITY_*/
 #define _USE_LOCAL_COV_
