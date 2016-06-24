@@ -63,6 +63,8 @@ typedef struct data_s {
 	int	*Num;		/*[MAXGENS];*/
 	int	LastNum;
 
+	double  **local_cov;    /* [DATANUM][PROBDIM*PROBDIM] */
+
 } data_t;
 
 
