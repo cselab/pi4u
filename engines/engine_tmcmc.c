@@ -17,6 +17,7 @@
 #define _RESTART_
 #define _STEALING_
 /*#define _AFFINITY_*/
+#define _USE_LOCAL_COV_
 
 data_t data;
 runinfo_t runinfo;
@@ -393,6 +394,18 @@ void read_data()
 		data.Num[i] = data.PopSize;
 	}
 	data.LastNum = data.PopSize;
+
+#ifdef _USE_LOCAL_COV_
+	double *LCmem = (double *)calloc(1, data.PopSize*data.Nth*data.Nth*sizeof(double));
+	data.local_cov = (double **)malloc(data.PopSize*sizeof(double *));
+	int pos;
+	for (pos = 0; pos < data.PopSize; ++pos)
+	{
+		data.local_cov[pos] = LCmem + pos*data.Nth*data.Nth;
+		for (i=0; i<data.Nth; ++i)
+			data.local_cov[pos][i*data.Nth+i] = 1;
+	}
+#endif
 
 }
 
@@ -789,35 +802,240 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
 	return;
 }
 
-void compute_candidate(double candidate[], double leader[], double var)
+#ifdef _USE_LOCAL_COV_
+void precompute_chain_covariances(const cgdbp_t * leader, double **chain_cov, int newchains)
 {
-	int i, j;
-	double bSS[data.Nth*data.Nth];
+	printf("Precomputing covariances for the current generation...\n");
 
-	for (i = 0; i < data.Nth; i++)
-		for (j = 0; j < data.Nth; j++)
-			bSS[i*data.Nth+j]= data.bbeta*runinfo.SS[i][j];
+	int i, j, pos;
 
-retry:
-	mvnrnd(leader, (double *)bSS, candidate, data.Nth);
+	int D = data.Nth;
+	int N = curgen_db.entries;
+
+	double t = clock();
+
+#if 0 // FLANN
+#include "flann/flann.h"
+
+	// prepare dataset
+	float* dataset = (float*) malloc(D*N*sizeof(float));
+	for (pos=0; pos<N; ++pos)
+		for (i=0; i<D; i++)
+			dataset[pos*D+i] = curgen_db.entry[pos].point[i];
+
+	// prepare testset
+	float* testset = (float*) malloc(D*newchains*sizeof(float));
+	for (pos=0; pos<newchains; ++pos)
+		for (i=0; i<D; i++)
+			testset[pos*D+i] = leader[pos].point[i];
+
+	// number of nearest neighbors
+	int nn = (50>5*D+1) ? 50:5*D+1;
+
+	// allocate space
+	int* nn_ind = (int*) malloc(newchains*nn*sizeof(int));
+	float* dists = (float*) malloc(newchains*nn*sizeof(float));
+
+	struct FLANNParameters p = DEFAULT_FLANN_PARAMETERS;
+	p.algorithm = FLANN_INDEX_AUTOTUNED; // or FLANN_INDEX_KDTREE, FLANN_INDEX_KMEANS, ...
+	p.target_precision = 0.9; // want 90% precision
+
+	int lim = 1;
+	while ( (clock()-t)/CLOCKS_PER_SEC < 60 ) // time limit of 60 sec
+	{
+		//		flann_find_nearest_neighbors(dataset, N, D, (float*)leader, 1, nn_ind, dists, nn, &p);
+		flann_find_nearest_neighbors(dataset, N, D, testset, newchains, nn_ind, dists, nn, &p);
+		lim = 0;
+	}
+
+	if (lim)
+	{
+		printf("Time limit in nearest neighbors reached, using a global covariance.\n");
+		for (i=0; i<newchains*nn; ++i)
+			nn_ind[i] = -1;
+	}
+
+	for (pos=0; pos<newchains; ++pos)
+	{
+		int k;
+
+		// check
+		int OK = 1;
+		for(k=0; k<nn; ++k)
+			if(nn_ind[pos*D+k] < 0 || nn_ind[pos*D+k] > N-1)
+			{
+				OK = 0;
+				break;
+			}
+
+		if(!OK)
+		{
+			for (i=0; i<D; i++)
+				for (j=0; j<D; j++)
+					chain_cov[pos][i*D+j] = data.bbeta*runinfo.SS[i][j];
+		}
+		else
+		{
+			// compute the covariance
+			double mean_of_theta[D];
+
+			for (i=0; i<D; i++) // loop over dimensions
+			{
+				mean_of_theta[i] = 0;
+				for (k=0; k<nn; k++) // loop over nearest neighbors
+					mean_of_theta[i] += dataset[nn_ind[pos*D+k]*D+i];
+				mean_of_theta[i] /= nn;
+			}
+
+			for (i=0; i<D; i++)
+				for (j=0; j<D; j++)
+				{
+					double s = 0;
+
+					for (k=0; k<nn; k++)
+						s += (dataset[nn_ind[pos*D+k]*D+i]-mean_of_theta[i]) *
+							(dataset[nn_ind[pos*D+k]*D+j]-mean_of_theta[j]);
+
+					chain_cov[pos][i*D+j] = s/nn;
+					chain_cov[pos][j*D+i] = s/nn;
+				}
+		}
+	}
+
+	free(dataset);
+	free(testset);
+	free(dists);
+	free(nn_ind);
+
+#else // use python
+
+	FILE * fp;
+	// prepare dataset
+
+	fp = fopen("dataset.txt", "w");
+	for (pos=0; pos<N; ++pos)
+	{
+		for (i=0; i<D; i++)
+			fprintf(fp, "%.16lf ", curgen_db.entry[pos].point[i]);
+		fprintf(fp, "\n");
+	}
+	fclose(fp);
+
+	// prepare testset
+	fp = fopen("testset.txt", "w");
+	for (pos=0; pos<newchains; ++pos)
+	{
+		for (i=0; i<D; i++)
+			fprintf(fp, "%.16lf ", leader[pos].point[i]);
+		fprintf(fp, "\n");
+	}
+	fclose(fp);
+
+	double t_python = 0;
+	char command[1024];
+	sprintf(command, "python scripts/compute_chain_covariance.py 2>/dev/null\n");
+
+	FILE * pipe = popen(command, "r");
+
+	if (!pipe)
+	{
+		printf("Cannot popen %s\n", command);
+		return;
+	}
+
+	char buffer[1024];
+	while(fgets(buffer, 1024, pipe))
+	{
+		char word[512];
+		sscanf(buffer, "%s ", word);
+		if (strcmp(word, "Elapsed")==0)
+		{
+			sscanf(buffer, "%*s %*s %lf", &t_python);
+			// printf("Elasped time in python: %.2lf sec\n", t_python);
+		}
+	}
+
+	pclose(pipe);
+
+	// read result
+	fp = fopen("nn_result.txt", "r");
+	for(pos=0; fgets(buffer, 1024, fp); ++pos)
+	{
+		char *pbuffer = buffer;
+		int offset;
+
+		gsl_matrix *work = gsl_matrix_alloc(D,D);
+		for (i=0; i<D; ++i)
+			for (j=0; j<D; ++j)
+			{
+				double t;
+				sscanf(pbuffer, "%lf%n", &t, &offset);
+				pbuffer += offset;
+				gsl_matrix_set(work, i, j, t);
+				chain_cov[pos][i*D+j] = t;
+			}
+
+		gsl_set_error_handler_off();
+
+		// check if the matrix is singular
+		int status = gsl_linalg_cholesky_decomp(work);
+		int OK = 1;
+		if(status != GSL_SUCCESS)
+		{
+			fprintf(stderr, "Error in Cholesky decomposition in mvnrnd_silva(auxil.c), "
+					"gsl_errno=%d\n", status);
+			OK = 0;
+		}
+		gsl_matrix_free(work);
+
+		if(!OK)
+		{
+			for (i=0; i<D; i++)
+				for (j=0; j<D; j++)
+					chain_cov[pos][i*D+j] = data.bbeta*runinfo.SS[i][j];
+		}
+	}
+
+#endif
+
+
+#if 0
+	for (pos=0; pos<5; ++pos)
+	{
+		printf("Chain %d of %d: ", pos, newchains);
+		print_matrix("chain_covariance", chain_cov[pos], D*D);
+	}
+#endif
+
+	t = (clock() - t) / CLOCKS_PER_SEC + t_python;
+	printf("Elapsed time: %.2lf sec\n", t);
+}
+#endif
+
+int compute_candidate(double candidate[], double leader[], double chain_cov[])
+{
+	int i;
+	//retry:
+	mvnrnd(leader, (double *)chain_cov, candidate, data.Nth);
 	for (i = 0; i < data.Nth; i++) {
 		if (isnan(candidate[i])) {
 			printf("!!!!  isnan in candidate point!\n");
 			exit(1);
 			break;
 		}
-		if ((candidate[i] < data.lowerbound[i])||(candidate[i] > data.upperbound[i])) break;
+		if ((candidate[i] < data.lowerbound[i])||(candidate[i] > data.upperbound[i])) return -1;
 	}
-	if (i < data.Nth) goto retry;
+	//	if (i < data.Nth) goto retry;
+	return 0;
 }
 
-void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, int winfo[4])
+void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, int winfo[4], double *chain_cov)
 {
 	int i,step;
 	int nsteps = *pnsteps;
 	int gen_id = winfo[0];
 	int chain_id = winfo[1];
-	
+
 	long me = torc_worker_id();
 
 	double leader[data.Nth], loglik_leader;		/* old*/
@@ -831,28 +1049,31 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 #define BURN_IN	0
 	for (step = 0; step < nsteps + BURN_IN; step++) {
 
-		compute_candidate(candidate, leader, 1); /* multivariate gaussian(center, var) for each direction*/
+		int fail = compute_candidate(candidate, leader, 1); /* multivariate gaussian(center, var) for each direction*/
 
-		/* evaluate loglik_candidate (NAMD: 12 points) */
-		evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
+		if (!fail)
+		{
+			/* evaluate loglik_candidate (NAMD: 12 points) */
+			evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
 
-		if (data.ifdump && step >= BURN_IN) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
+			if (data.ifdump && step >= BURN_IN) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
 
-		/* Decide */
-		double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
-		double logprior_leader = logpriorpdf(leader, data.Nth);
-		double L;
-		if (data.accept_type == 0)
-			L = ((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);	/* without exp, with log in logpriorpdf and fitfun */
-		else
-			L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);	/* with exp, without log in logpriorpdf and fitfun */
+			/* Decide */
+			double logprior_candidate = logpriorpdf(candidate, data.Nth);	/* from PanosA */
+			double logprior_leader = logpriorpdf(leader, data.Nth);
+			double L;
+			if (data.accept_type == 0)
+				L = ((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);	/* without exp, with log in logpriorpdf and fitfun */
+			else
+				L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);	/* with exp, without log in logpriorpdf and fitfun */
 
-		if (L > 1) L = 1;
-		double P = uniformrand(0,1);
-		if (P < L) {
-			for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];	/* new leader! */
-			loglik_leader = loglik_candidate;
-			if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
+			if (L > 1) L = 1;
+			double P = uniformrand(0,1);
+			if (P < L) {
+				for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];	/* new leader! */
+				loglik_leader = loglik_candidate;
+				if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
+			}
 		}
 		else {
 			/*increase counter or add the leader again in curgen_db*/
@@ -1126,6 +1347,10 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
 	print_matrix("std", stdx, data.Nth);
 	}/*end block*/
 
+#ifdef _USE_LOCAL_COV_
+	precompute_chain_covariances(leaders, data.local_cov, newchains);
+#endif
+
 	curgen_db.entries = 0;	/* reset curgen db*/
 	printf("calculate_statistics: newchains=%d\n", newchains);
 
@@ -1383,9 +1608,10 @@ int main(int argc, char *argv[])
 
 		int winfo[4];
 		double in_tparam[data.Nth];
+		double chain_cov[data.Nth*data.Nth];
 		int nsteps;
 		gt0 = torc_gettime();
-		
+
 		for (i = 0; i < nchains; i++) {
 			winfo[0] = runinfo.Gen;
 			winfo[1] = i;
@@ -1396,17 +1622,26 @@ int main(int argc, char *argv[])
 			for (p = 0; p < data.Nth; p++)
 				in_tparam[p] = leaders[i].point[p];
 			nsteps = leaders[i].nsel;
+#ifdef _USE_LOCAL_COV_
+			for (p = 0; p < data.Nth*data.Nth; p++)
+				chain_cov[p] = data.local_cov[i][p];
+#else
+			int j;
+			for (p = 0; p < data.Nth; p++)
+				for (j = 0; j < data.Nth; j++)
+					chain_cov[p*data.Nth+j]= data.bbeta*runinfo.SS[p][j];
+#endif
 
 			out_tparam[i] = leaders[i].F;	/* loglik_leader...*/
 
-			torc_create(leaders[i].queue, chaintask, 5,
-				data.Nth, MPI_DOUBLE, CALL_BY_COP,
-				1, MPI_INT, CALL_BY_COP,
-				1, MPI_INT, CALL_BY_COP,
-				1, MPI_DOUBLE, CALL_BY_REF,
-				4, MPI_INT, CALL_BY_COP,
-				in_tparam, &data.Nth, &nsteps, &out_tparam[i], winfo);
-
+			torc_create(leaders[i].queue, chaintask, 6,
+					data.Nth, MPI_DOUBLE, CALL_BY_COP,
+					1, MPI_INT, CALL_BY_COP,
+					1, MPI_INT, CALL_BY_COP,
+					1, MPI_DOUBLE, CALL_BY_REF,
+					4, MPI_INT, CALL_BY_COP,
+					data.Nth*data.Nth, MPI_DOUBLE, CALL_BY_COP,
+					in_tparam, &data.Nth, &nsteps, &out_tparam[i], winfo, chain_cov);
 		}
 		/* wait for all chain tasks to finish */
 #ifdef _STEALING_
