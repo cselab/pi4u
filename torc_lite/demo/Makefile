@@ -80,7 +80,8 @@ build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
 target_triplet = x86_64-unknown-linux-gnu
 bin_PROGRAMS = masterslave$(EXEEXT) mbench1$(EXEEXT) fibo$(EXEEXT) \
-	broadcast$(EXEEXT) struct$(EXEEXT) pipe$(EXEEXT)
+	broadcast$(EXEEXT) struct$(EXEEXT) pipe$(EXEEXT) \
+	async$(EXEEXT)
 subdir = demo
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/auxdir/depcomp
@@ -94,10 +95,13 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_broadcast_OBJECTS = broadcast.$(OBJEXT)
-broadcast_OBJECTS = $(am_broadcast_OBJECTS)
+am_async_OBJECTS = async.$(OBJEXT)
+async_OBJECTS = $(am_async_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+async_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_broadcast_OBJECTS = broadcast.$(OBJEXT)
+broadcast_OBJECTS = $(am_broadcast_OBJECTS)
 broadcast_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_fibo_OBJECTS = fibo.$(OBJEXT)
 fibo_OBJECTS = $(am_fibo_OBJECTS)
@@ -142,9 +146,10 @@ AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(broadcast_SOURCES) $(fibo_SOURCES) $(masterslave_SOURCES) \
-	$(mbench1_SOURCES) $(pipe_SOURCES) $(struct_SOURCES)
-DIST_SOURCES = $(broadcast_SOURCES) $(fibo_SOURCES) \
+SOURCES = $(async_SOURCES) $(broadcast_SOURCES) $(fibo_SOURCES) \
+	$(masterslave_SOURCES) $(mbench1_SOURCES) $(pipe_SOURCES) \
+	$(struct_SOURCES)
+DIST_SOURCES = $(async_SOURCES) $(broadcast_SOURCES) $(fibo_SOURCES) \
 	$(masterslave_SOURCES) $(mbench1_SOURCES) $(pipe_SOURCES) \
 	$(struct_SOURCES)
 am__can_run_installinfo = \
@@ -172,12 +177,12 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/chatzidp/pi4u/torc_lite/auxdir/missing aclocal-1.13
+ACLOCAL = ${SHELL} /home/chatzidp/pi4u_master/torc_lite/auxdir/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/chatzidp/pi4u/torc_lite/auxdir/missing autoconf
-AUTOHEADER = ${SHELL} /home/chatzidp/pi4u/torc_lite/auxdir/missing autoheader
-AUTOMAKE = ${SHELL} /home/chatzidp/pi4u/torc_lite/auxdir/missing automake-1.13
+AUTOCONF = ${SHELL} /home/chatzidp/pi4u_master/torc_lite/auxdir/missing autoconf
+AUTOHEADER = ${SHELL} /home/chatzidp/pi4u_master/torc_lite/auxdir/missing autoheader
+AUTOMAKE = ${SHELL} /home/chatzidp/pi4u_master/torc_lite/auxdir/missing automake-1.13
 AWK = gawk
 CC = mpicc
 CCAS = mpicc
@@ -198,7 +203,7 @@ EGREP = /usr/bin/grep -E
 EXEEXT = 
 F77 = mpif90
 FFLAGS = -g -O2
-FLIBS =  -L/opt/mpich/lib -L/usr/lib/gcc/x86_64-redhat-linux/4.8.3 -L/usr/lib/gcc/x86_64-redhat-linux/4.8.3/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.8.3/../../.. -lmpifort -lmpi -lgfortran -lm -lquadmath
+FLIBS =  -L/opt/mpich/lib -L/usr/lib/gcc/x86_64-redhat-linux/4.8.5 -L/usr/lib/gcc/x86_64-redhat-linux/4.8.5/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.8.5/../../.. -lmpifort -lmpi -lgfortran -lm -lquadmath
 GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
@@ -209,7 +214,7 @@ LDFLAGS =   -lpthread
 LIBOBJS = 
 LIBS = -L../src -ltorc $(MPILIB) -lpthread -lm 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/chatzidp/pi4u/torc_lite/auxdir/missing makeinfo
+MAKEINFO = ${SHELL} /home/chatzidp/pi4u_master/torc_lite/auxdir/missing makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 MPICC = 
 MPILIB = 
@@ -229,10 +234,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 0.1a
-abs_builddir = /home/chatzidp/pi4u/torc_lite/demo
-abs_srcdir = /home/chatzidp/pi4u/torc_lite/demo
-abs_top_builddir = /home/chatzidp/pi4u/torc_lite
-abs_top_srcdir = /home/chatzidp/pi4u/torc_lite
+abs_builddir = /home/chatzidp/pi4u_master/torc_lite/demo
+abs_srcdir = /home/chatzidp/pi4u_master/torc_lite/demo
+abs_top_builddir = /home/chatzidp/pi4u_master/torc_lite
+abs_top_srcdir = /home/chatzidp/pi4u_master/torc_lite
 ac_ct_CC = mpicc
 ac_ct_F77 = mpif90
 am__include = include
@@ -260,7 +265,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/chatzidp/pi4u/torc_lite/auxdir/install-sh
+install_sh = ${SHELL} /home/chatzidp/pi4u_master/torc_lite/auxdir/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -297,6 +302,8 @@ struct_SOURCES = struct.c
 struct_LDADD = $(LIBS)
 pipe_SOURCES = pipe.c
 pipe_LDADD = $(LIBS)
+async_SOURCES = async.c
+async_LDADD = $(LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -374,6 +381,10 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
+async$(EXEEXT): $(async_OBJECTS) $(async_DEPENDENCIES) $(EXTRA_async_DEPENDENCIES) 
+	@rm -f async$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(async_OBJECTS) $(async_LDADD) $(LIBS)
+
 broadcast$(EXEEXT): $(broadcast_OBJECTS) $(broadcast_DEPENDENCIES) $(EXTRA_broadcast_DEPENDENCIES) 
 	@rm -f broadcast$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(broadcast_OBJECTS) $(broadcast_LDADD) $(LIBS)
@@ -404,6 +415,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/async.Po
 include ./$(DEPDIR)/broadcast.Po
 include ./$(DEPDIR)/fibo.Po
 include ./$(DEPDIR)/masterslave.Po
