@@ -55,6 +55,7 @@ void torc_tasksync();
 
 //#ifndef __cplusplus
 void torc_task (int queue, void (*f) (), int narg, ...);
+void torc_task_detached (int queue, void (*f) (), int narg, ...);
 void torc_task_ex (int queue, int invisible, void (*f) (), int narg, ...);
 void torc_task_direct (int queue, void (*f) (), int narg, ...);
 //#else
@@ -64,6 +65,7 @@ void torc_task_direct (int queue, void (*f) (), int narg, ...);
 //#endif
 
 #define torc_create		torc_task
+#define torc_create_detached	torc_task_detached
 #define torc_create_ex		torc_task_ex
 #define torc_create_direct	torc_task_direct
 

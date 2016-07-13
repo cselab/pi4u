@@ -65,6 +65,106 @@ void torc_set_invisible(int flag)
 }
 #endif
 
+void torc_task_detached(int queue, void (*work)(), int narg, ...)
+{
+	va_list ap;
+	int i;
+	torc_t * rte;
+//	torc_t *self = _torc_self();
+
+#if 0
+	/* Check if rte_init has been called */
+	_lock_acquire(&self->lock);
+	if (self->ndep == 0) self->ndep = 1;
+	_lock_release(&self->lock);
+
+	_torc_depadd(self, 1);
+#endif
+
+	rte = _torc_get_reused_desc();
+	_initialize(rte);
+
+	_torc_set_work_routine(rte, work);
+    	rte->narg = narg;	
+	rte->rte_type = 1;	/* external */
+	rte->inter_node = 1;
+#if 0
+	rte->parent = self;
+#else
+	rte->parent = NULL;
+#endif
+//	rte->level = self->level + 1;
+//	rte->level = self->level;
+	rte->level = 0;
+
+#if 0 //def TORC_STATS
+	if (!invisible_flag)
+	created[self->vp_id]++;
+
+	if (invisible_flag)
+		rte->rte_type = 2;	/* invisible */
+#endif
+
+	if (narg>MAX_TORC_ARGS) Error("narg > MAX_TORC_ARGS");
+
+	va_start(ap, narg);
+	for (i=0; i<narg; i++) {
+		rte->quantity[i] = va_arg (ap, int);
+		rte->dtype[i] = va_arg (ap, MPI_Datatype);
+#if 1
+		rte->btype[i] = _torc_mpi2b_type(rte->dtype[i]);
+#endif
+		rte->callway[i] = va_arg (ap, int);
+		if ((rte->callway[i] == CALL_BY_COP)&&(rte->quantity[i] > 1))
+			rte->callway[i] = CALL_BY_COP2;
+#if DBG
+		printf("ARG %d : Q = %d, T = %d, C = %x O\n", i, rte->quantity[i], rte->dtype[i], rte->callway[i]); fflush(0);
+#endif
+	}
+	
+	for (i=0; i<narg; i++) {
+		if (rte->quantity[i] == 0) {	// peh: 02.07.2015
+			VIRT_ADDR dummy = va_arg (ap, VIRT_ADDR);
+			continue;
+		}
+		if (rte->callway[i] == CALL_BY_COP) {
+			int typesize;
+			MPI_Type_size(rte->dtype[i], &typesize);
+			switch (typesize) {
+			case 4:
+				rte->localarg[i] = *va_arg (ap, INT32 *);
+				break;
+			case 8:
+				rte->localarg[i] = *va_arg (ap, INT64 *);
+				break;
+			default:
+				Error("typesize not 4 or 8!");
+				break;
+			}
+		}
+		else if (rte->callway[i] == CALL_BY_COP2) {
+			VIRT_ADDR addr = va_arg (ap, VIRT_ADDR);
+			int typesize;         
+			void *pmem;   
+			MPI_Type_size(rte->dtype[i], &typesize);
+			pmem = malloc(rte->quantity[i]*typesize);
+			memcpy(pmem, (void *)addr, rte->quantity[i]*typesize);
+			rte->localarg[i] = (INT64)pmem; //yyyyyy
+                }
+
+		else {
+			rte->localarg[i] = va_arg (ap, VIRT_ADDR);	/* pointer (C: PTR, VAL) */
+		}
+	}
+
+	if (queue == -1) {
+		torc_to_rq_end(rte);
+	}
+	else {
+		torc_to_lrq_end(queue, rte);
+	}
+}
+
 void torc_task(int queue, void (*work)(), int narg, ...)
 {
 	va_list ap;
@@ -156,6 +256,7 @@ void torc_task(int queue, void (*work)(), int narg, ...)
 		torc_to_lrq_end(queue, rte);
 	}
 }
+
 
 void torc_task_ex(int queue, int invisible, void (*work)(), int narg, ...)
 {
