@@ -19,6 +19,7 @@ LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
 LDFLAGS += `torc_libs` -lpthread -lm 
 
 TARGETS = display_gen engine_tmcmc engine_cmaes
+TARGETS += engine_cmaes_async
 #TARGETS += engine_tmcmc_sn
 #TARGETS += sa_deriv fd_deriv fd_grad
 #TARGETS += engine_ss1 engine_ss2 
@@ -38,6 +39,9 @@ display_prop: display_prop.c gnuplot_i.c
 
 engine_cmaes: engine_cmaes.c cmaes.c fitfun.c
 	$(CC) $(CFLAGS) -o engine_cmaes engine_cmaes.c cmaes.c auxil.c $(LDFLAGS)
+
+engine_cmaes_async: engine_cmaes.c cmaes.c fitfun.c
+	$(CC) $(CFLAGS) -o engine_cmaes_async engine_cmaes_async.c cmaes.c auxil.c $(LDFLAGS)
 
 engine_ss1: engine_ss1.cpp ss_db.cpp auxil.o fitfun.c
 	$(CPP) $(CFLAGS) -o engine_ss1 engine_ss1.cpp ss_db.cpp auxil.o $(LDFLAGS)

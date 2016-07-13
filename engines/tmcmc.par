@@ -8,7 +8,7 @@ Nth		2
 MaxStages	20
 
 # Population size
-PopSize		1024
+PopSize		8192
 
 # Chain Lengths
 #MinChainLength	2

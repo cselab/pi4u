@@ -14,10 +14,10 @@
 #include <assert.h>
 #include "engine_tmcmc.h"
 /*#define VERBOSE 1*/
-#define _RESTART_
+/*#define _RESTART_*/
 #define _STEALING_
 /*#define _AFFINITY_*/
-#define _USE_LOCAL_COV_
+/*#define _USE_LOCAL_COV_*/
 
 data_t data;
 runinfo_t runinfo;
@@ -1012,10 +1012,34 @@ void precompute_chain_covariances(const cgdbp_t * leader, double **chain_cov, in
 }
 #endif
 
-int compute_candidate(double candidate[], double leader[], double chain_cov[])
+int compute_candidate(double candidate[], double leader[], double var)
+{
+	int i, j;
+	double bSS[data.Nth*data.Nth];
+
+	for (i = 0; i < data.Nth; i++)
+		for (j = 0; j < data.Nth; j++)
+			bSS[i*data.Nth+j]= data.bbeta*runinfo.SS[i][j];
+
+//retry:
+	mvnrnd(leader, (double *)bSS, candidate, data.Nth);
+	for (i = 0; i < data.Nth; i++) {
+		if (isnan(candidate[i])) {
+			printf("!!!!  isnan in candidate point!\n");
+			exit(1);
+			break;
+		}
+		if ((candidate[i] < data.lowerbound[i])||(candidate[i] > data.upperbound[i])) break;
+	}
+//	if (i < data.Nth) goto retry;
+	if (i < data.Nth) return -1;
+	return 0;	// all good
+}
+
+int compute_candidate_cov(double candidate[], double leader[], double chain_cov[])
 {
 	int i;
-	//retry:
+
 	mvnrnd(leader, (double *)chain_cov, candidate, data.Nth);
 	for (i = 0; i < data.Nth; i++) {
 		if (isnan(candidate[i])) {
@@ -1025,7 +1049,6 @@ int compute_candidate(double candidate[], double leader[], double chain_cov[])
 		}
 		if ((candidate[i] < data.lowerbound[i])||(candidate[i] > data.upperbound[i])) return -1;
 	}
-	//	if (i < data.Nth) goto retry;
 	return 0;
 }
 
@@ -1046,14 +1069,18 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 	loglik_leader = *out_tparam;	/*chainwork->out_tparam[0];*/	/* and its value */
 
 	double pj = runinfo.p[runinfo.Gen];
+
 #define BURN_IN	0
 	for (step = 0; step < nsteps + BURN_IN; step++) {
 
-		int fail = compute_candidate(candidate, leader, 1); /* multivariate gaussian(center, var) for each direction*/
+#if 0
+		int fail = compute_candidate_cov(candidate, leader, chain_cov); 
+#else
+		int fail = compute_candidate(candidate, leader, 1); // I keep this for the moment, for performance reasons
+#endif
 
 		if (!fail)
 		{
-			/* evaluate loglik_candidate (NAMD: 12 points) */
 			evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);	/* this can spawn many tasks*/
 
 			if (data.ifdump && step >= BURN_IN) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
@@ -1072,6 +1099,10 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 			if (P < L) {
 				for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];	/* new leader! */
 				loglik_leader = loglik_candidate;
+				if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
+			}
+			else {
+				/*increase counter or add the leader again in curgen_db*/
 				if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
 			}
 		}

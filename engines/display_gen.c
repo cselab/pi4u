@@ -136,6 +136,12 @@ void display_curgen_db(int Gen, int NGens)
 //	sleep(5);
 }
 
+//double lbnd[]           = { 0.01,  0.01, 0.00, 0.00, 0.00, 0.00, 0.00,  0.00};
+//double ubnd[]           = {20.00, 20.00, 2.50, 0.30, 0.05, 0.60, 1.00, 33.00};
+double lbnd[]	= {-6, -6};
+double ubnd[]	= {+6, +6};
+
+
 void display_curgen_db_single(int Gen, int p1, int p2, int Dim, int NGens)
 {
         FILE *fp;
@@ -180,8 +186,12 @@ void display_curgen_db_single(int Gen, int p1, int p2, int Dim, int NGens)
 
 //	gnuplot_cmd(g, "splot [1e2:1e6][1e-6:1e-3]\"%s\" %s with points pt 7 palette", fname, using_str);
 
+	char gcmd[256];
+	sprintf(gcmd,  "splot [%f:%f][%f:%f] \"%s\" %s with points pt 7 palette", lbnd[i-1], ubnd[i-1], lbnd[j-1], ubnd[j-1], fname, using_str);
+	gnuplot_cmd(g, gcmd);
+
 //	gnuplot_cmd(g, "splot \"%s\" %s with points pt 7 palette", fname, using_str);
-	gnuplot_cmd(g, "splot [-6:6][-6:6]\"%s\" %s with points pt 7 palette", fname, using_str);
+//	gnuplot_cmd(g, "splot [-6:6][-6:6]\"%s\" %s with points pt 7 palette", fname, using_str);
 
 	}
 
