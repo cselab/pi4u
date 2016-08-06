@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+19 February 2014, ETH Zurich, CH and University of Ioannina, GR
+---------------------------------------------------------------------------
+Numerical Differentiation Library Exploiting Parallel Architectures.
+        P. E. Hadjidoukas	Computational Science, ETH Zurich
+        P. Angelikopoulos	Computational Science, ETH Zurich
+        C. Voglis               Dept. of Computer Science
+        D. G. Papageorgiou	Dept. of Materials Science and Engineering
+        I. E. Lagaris           Dept. of Computer Science
+---------------------------------------------------------------------------
+PNDL (MPI version)
+
+Description:
+
+The numerical estimation of derivatives at several accuracy levels
+is a common requirement in many computational tasks, such as optimization,
+solution of nonlinear systems, etc. The parallel implementation
+that exploits systems with multiple CPUs is very important
+for large--scale, computationally expensive problems.
+
+Finite differencing is used with carefully chosen steps
+that minimize the sum of the truncation and cancellation errors. The parallel
+versions employ the OpenMP and MPI platforms.
+
+The software takes in account bound constraints, in
+the sense that only feasible points are used to evaluate the
+derivatives, and given the level of the desired accuracy, the
+proper formula is automatically employed.
+
+
+Installation Instructions:
+	0. The TORC library must have been already compiled and installed
+
+	1. Configure the library
+
+	./configure CC=mpicc F90=mpif90
+
+	2. Build the library:
+
+        make
+
+	3. Install the library:
+
+        make install

@@ -1,0 +1,10 @@
+Two examples:
+./AMaLGaM-Full_torc -w            12 2 -6 6 0 0.35 256 10 0.9 1.0 100000 0 10 0.00001
+or
+./AMaLGaM-Full_torc -w            12 2 -6 6 0 0.35 1024 4 0.9 1.0 100000 0 10 0.00001
+
+And then,
+./display_gen all_populations_generation 10 2 
+or
+./display_gen population_00000_generation  10 2 
+
