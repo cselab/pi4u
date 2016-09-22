@@ -25,6 +25,7 @@ TARGETS += engine_cmaes_async
 #TARGETS += engine_ss1 engine_ss2 
 TARGETS += propagation_tool
 TARGETS += display_prop
+TARGETS += sensitivity_tool
 
 all: $(TARGETS)
 
@@ -67,8 +68,11 @@ fd_grad: fd_grad.c auxil.o fitfun.c
 propagation_tool: propagation_tool.c auxil.c fitfun.c
 	$(CC) $(CFLAGS) -o propagation_tool propagation_tool.c auxil.c $(LDFLAGS)
 
+sensitivity_tool: sensitivity_tool.c auxil.c fitfun.c
+	$(CC) $(CFLAGS) -o sensitivity_tool sensitivity_tool.c auxil.c $(LDFLAGS)
+
 clean:
-	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad propagation_tool display_prop *.o
+	rm -f engine_tmcmc display_gen engine_cmaes engine_ss1 engine_ss2 engine_tmcmc_sn sa_deriv fd_deriv fd_grad propagation_tool display_prop sensitivity_tool *.o
 
 clear:
 	rm -rf lsf.o* *.dat curgen_db*.txt curres_db*.txt P*S*T* runinfo.txt samples*.txt seeds*.txt Pc.txt actparcmaes.par full_db*.txt fitness.txt
