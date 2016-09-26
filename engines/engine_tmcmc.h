@@ -64,7 +64,12 @@ typedef struct data_s {
 	int	*Num;		/*[MAXGENS];*/
 	int	LastNum;
 
+	int use_proposal_cma;
+	double  **init_mean;    /* [DATANUM][PROBDIM] */
+
 	double  **local_cov;    /* [DATANUM][PROBDIM*PROBDIM] */
+	int use_local_cov;
+	double local_scale;
 
 } data_t;
 
