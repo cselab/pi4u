@@ -77,7 +77,6 @@ void read_data()
 	data.options.Step = 1e-5;
 
 #if 1
-	data.sampling_type = 0;	/* uniform > gaussian */
 	data.accept_type = 0;	/* without exp() > with exp() */
 	data.prior_type = 0;	/* uniform > gaussian */
 #endif
@@ -157,9 +156,6 @@ void read_data()
 		else if (strstr(line, "opt.Step")) {
 			sscanf(line, "%*s %lf", &data.options.Step);
 			printf("setting step = %f\n", data.options.Step);
-		}
-		else if (strstr(line, "sampling")) {
-			sscanf(line, "%*s %d", &data.sampling_type);
 		}
 		else if (strstr(line, "accept")) {
 			sscanf(line, "%*s %d", &data.accept_type);
@@ -1628,7 +1624,7 @@ int main(int argc, char *argv[])
 #endif
 
 	FILE *init_fp = NULL;
-	if (data.sampling_type == 2) {
+	if (data.prior_type == 2) {
 		init_fp = fopen("init_db.txt", "r");	/* peh: parametrize this */
 		if (init_fp == NULL) {
 			printf("init_db.txt file not found!\n");
@@ -1644,7 +1640,7 @@ int main(int argc, char *argv[])
 
 		double in_tparam[data.Nth];
 
-		if (data.sampling_type == 0)	/* uniform */
+		if (data.prior_type == 0)	/* uniform */
 		{
 			/* peh:check this: add option for loading points/data from file */
 			/* uniform */
@@ -1655,11 +1651,11 @@ int main(int argc, char *argv[])
 				in_tparam[d] += data.lowerbound[d];
 			}
 		}
-		else if (data.sampling_type == 1)	/* gaussian */
+		else if (data.prior_type == 1)	/* gaussian */
 		{
 			mvnrnd(data.prior_mu, data.prior_sigma, in_tparam, data.Nth);
 		}
-		else if (data.sampling_type == 2)	/* file */
+		else if (data.prior_type == 2)	/* file */
 		{
 			int j;
 			for (j = 0; j < data.Nth; j++) fscanf(init_fp, "%lf", &in_tparam[j]);
@@ -1669,7 +1665,7 @@ int main(int argc, char *argv[])
 			/*if (data.ifdump) torc_update_full_db(in_tparam, out_tparam[i], NULL, 0, 0);*/
 		}
 
-		if (data.sampling_type <= 2)	/* peh: file without or with function evaluations? */
+		if (data.prior_type <= 2)	/* peh: file without or with function evaluations? */
 		torc_create(-1, initchaintask, 4,
 			data.Nth, MPI_DOUBLE, CALL_BY_COP,
 			1, MPI_INT, CALL_BY_COP,
@@ -1685,7 +1681,7 @@ int main(int argc, char *argv[])
 	torc_disable_stealing();
 #endif
 
-	if (data.sampling_type == 2) {
+	if (data.prior_type == 2) {
 		fclose(init_fp);
 	}
 

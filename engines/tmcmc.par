@@ -23,13 +23,6 @@ TolCOV	1
 
 
 #------------------------ PRIOR OPTIONS ---------------------------------------
-# Sampling type:
-# 0 - uniform
-# 1 - gaussian
-# 2 - file
-# 3 - composite (for every parameter its own distribution)
-sampling    0
-
 # Type of the prior:
 # 0 - uniform
 # 1 - gaussian
