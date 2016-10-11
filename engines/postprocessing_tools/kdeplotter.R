@@ -39,6 +39,11 @@ if(discrepancy) data[,d[2]]=-data[,d[2]]
 
 if(truelik) data[,d[2]]=exp(data[,d[2]])
 
-png(paste0(name, ".png"), width=1080, height=1080, units='px', res=150, pointsize=10)
-kdepairs(data,n=200,labels=l)
+#------- this option is for big pictures ---------
+# png(paste0(name, ".png"), width=1080, height=1080, units='px', res=150, pointsize=10)
+# kdepairs(data, n_1d=20, n_2d=200, labels=l)
+#------- this option is for small pictures -------
+png(paste0(name, ".png"), width=380, height=380, units='px', res=100, pointsize=10)
+kdepairs(data, n_1d=15, n_2d=200, labels=l)
+#-------------------------------------------------
 dev.off()

@@ -1,3 +1,1 @@
-kdepairs <-
-function(x, ...) UseMethod("kdepairs")
-
+kdepairs <- function(x, ...) UseMethod("kdepairs")
