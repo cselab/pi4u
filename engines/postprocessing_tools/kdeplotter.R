@@ -18,27 +18,33 @@ truelik <- 0  # use likelihood or log-likelihood for coloring
 
 # ----------------------------------------------------------------------
 
+print_nicely <- function(text, x) {
+  cat(text, formatC(x, digits=6, format='f', width=8), "\n", sep="\t")
+}
+
+
 cat("Reading file", fname,"\n")
 data <- read.table(fname)
 data <- array(data=unlist(data), dim=dim(data))
 nd <- dim(data)[2]  # dimension of the samples
 
 # mean
-md   <- colMeans(data[, 1:nd-1])
-cat("means:\t", md, "\n", sep="\t")
+md <- colMeans(data[, 1:nd-1])
+print_nicely("means:\t", md)
 
 # standard deviation
-m2d  <- colMeans(data[, 1:nd-1]^2)
-sd   <- sqrt(m2d-md^2)
-cat("stds:\t", sd, "\n", sep="\t")
+m2d <- colMeans(data[, 1:nd-1]^2)
+sd <- sqrt(m2d-md^2)
+print_nicely("stds:\t", sd)
 
 # coefficient of variation
 COVd <- 100*abs(sd/md)
-cat("COVs (%):", COVd, "\n", sep="\t")
+print_nicely("COVs (%):", COVd)
 
 # most probable parameters
 best_id <- which.max(data[, nd])
-cat("MPVs:\t", data[best_id, 1:nd-1], "\n", sep="\t")
+best <- data[best_id, 1:nd-1]
+print_nicely("MPVs:\t", best)
 
 if(discrepancy) data[ ,nd] <-    -data[ ,nd]
 if(truelik)     data[ ,nd] <- exp(data[ ,nd])
