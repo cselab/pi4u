@@ -456,7 +456,7 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	}
 
 #if 1
-	if (fabs(fm <= Tol)) {
+	if (fabs(fm) <= Tol) {
 		conv = 1;
 		gsl_vector_free(x);
 		gsl_min_fminimizer_free (s);

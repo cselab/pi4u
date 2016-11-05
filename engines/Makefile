@@ -1,5 +1,6 @@
-GSLROOT=${HOME}/usr/gsl
+#GSLROOT=${HOME}/usr/gsl
 #GSLROOT=/opt/local
+GSLROOT=/usr/local
 
 CC = mpicc
 CPP = mpic++ 
