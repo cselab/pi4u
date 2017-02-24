@@ -50,6 +50,7 @@ int process_a_received_descriptor(torc_t *work/*, int tag1*/)
 		printf("Server %d accepted from %d, narg = %d [ANSWER]\n", torc_node_id(), work->sourcenode, work->narg);fflush(stdout);
 #endif
 		for (i = 0; i < work->narg; i++) { /* receive the results, if any */
+			if (work->quantity[i] == 0) continue;
 			if ((work->callway[i] == CALL_BY_RES) || (work->callway[i] == CALL_BY_REF)) {
 				enter_comm_cs();
 #if 1
@@ -64,6 +65,7 @@ int process_a_received_descriptor(torc_t *work/*, int tag1*/)
 #endif
 		}
 		for (i = 0; i < work->narg; i++) {
+			if (work->quantity[i] == 0) continue;
 			if (work->callway[i] == CALL_BY_COP2) {
 				free((void *)work->localarg[i]);
 				work->localarg[i] = 0;

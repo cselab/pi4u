@@ -1,4 +1,4 @@
-bin_PROGRAMS= masterslave mbench1 fibo broadcast struct pipe async
+bin_PROGRAMS= masterslave mbench1 fibo broadcast struct pipe async zerolength
 
 AM_CFLAGS = @DEBUG_FLAG@ -I../include -I../uth -I.
 
@@ -24,6 +24,9 @@ pipe_LDADD =$(LIBS)
 
 async_SOURCES = async.c
 async_LDADD =$(LIBS)
+
+zerolength_SOURCES = zerolength.c
+zerolength_LDADD =$(LIBS)
 
 .c.o:
 	$(CC) $(AM_CFLAGS) $(CFLAGS) -c $<

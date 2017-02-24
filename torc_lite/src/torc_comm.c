@@ -218,7 +218,7 @@ void send_arguments(int node, int tag, torc_t *desc)
 	}
 }
 
-/* Send a descriptor to the targer node */
+/* Send a descriptor to the target node */
 void send_descriptor(int node, torc_t *desc, int type)	/* always to a server thread */
 {
 	int tag = _torc_thread_id();
@@ -241,6 +241,7 @@ void send_descriptor(int node, torc_t *desc, int type)	/* always to a server thr
 		case TORC_ANSWER:
 			/* in case of call by reference send the data back */
 			for (i = 0; i < desc->narg; i++) {
+				if (desc->quantity[i] == 0) continue;
 				if ((desc->callway[i] == CALL_BY_COP2) && (desc->quantity[i] > 1)) {
 					free((void *)desc->temparg[i]);
 				}
