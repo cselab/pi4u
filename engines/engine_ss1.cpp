@@ -212,7 +212,7 @@ void spmd_gsl_rand_init()
 {
 	int i;
 	for (i = 0; i < torc_num_nodes(); i++) {
-		torc_create_ex(i*torc_i_num_workers(), 1, (void *)call_gsl_rand_init, 0);
+		torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_gsl_rand_init, 0);
 	}
 	torc_waitall();
 }
@@ -288,7 +288,7 @@ again:
 			thetaj[index] = xi[index];
 
 			int wid = torc_worker_id();
-			torc_create(wid, (void *)taskf, 2,
+			torc_create(wid, (void (*)())taskf, 2,
 					data.Nth, MPI_DOUBLE, CALL_BY_COP,
 					1, MPI_DOUBLE, CALL_BY_RES,
 					thetaj, &fthetaj[index]);
@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
 			a_sample[d] = uniformrand(data.lowerbound[d], data.upperbound[d]);	// direct access to the database
 		}
 
-		torc_create(-1, (void *)taskf, 2,
+		torc_create(-1, (void (*)())taskf, 2,
 				data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 				1, MPI_DOUBLE, CALL_BY_RES,
 				a_sample, &a_sample[data.Nth]);
@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
 		for (int seed_i = 0; seed_i < get_nseeds(); seed_i++) {
 			// # generate more samples with the same distribution
 			double *a_seed = get_seed(seed_i);
-			torc_create(-1, (void *)modified_metropolis, 4,
+			torc_create(-1, (void (*)())modified_metropolis, 4,
 							data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 							1, MPI_DOUBLE, CALL_BY_VAL,
 							1, MPI_INT, CALL_BY_VAL,

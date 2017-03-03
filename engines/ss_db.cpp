@@ -125,7 +125,7 @@ void add_seed(double s[], double *pfs)
 	if (torc_node_id() == 0)
 		add_seed_task(s, pfs);
 	else {
-		torc_create_direct(0, (void *)add_seed_task, 2,
+		torc_create_direct(0, (void (*)())add_seed_task, 2,
 					data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 					1, MPI_DOUBLE, CALL_BY_VAL,
 					s, pfs);
@@ -152,7 +152,7 @@ void add_sample(double s[], double *pfs)
 	if (torc_node_id() == 0)
 		add_sample_task(s, pfs);
 	else {
-		torc_create_direct(0, (void *)add_sample_task, 2,
+		torc_create_direct(0, (void (*)())add_sample_task, 2,
 					data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 					1, MPI_DOUBLE, CALL_BY_VAL,
 					s, pfs);

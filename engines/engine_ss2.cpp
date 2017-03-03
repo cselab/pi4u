@@ -193,7 +193,7 @@ void spmd_gsl_rand_init()
 {
 	int i;
 	for (i = 0; i < torc_num_nodes(); i++) {
-		torc_create_ex(i*torc_i_num_workers(), 1, (void *)call_gsl_rand_init, 0);
+		torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_gsl_rand_init, 0);
 	}
 	torc_waitall();
 }
@@ -282,7 +282,7 @@ again:
 			thetaj[index] = xi[index];
 
                         int wid = torc_worker_id();     // -1
-			torc_create(wid, (void *)taskf_model, 3,	// model evaluation
+			torc_create(wid, (void (*)())taskf_model, 3,	// model evaluation
 					data.Nth, MPI_DOUBLE, CALL_BY_COP,
 					1, MPI_INT, CALL_BY_COP,
 					1, MPI_DOUBLE, CALL_BY_RES,
@@ -345,7 +345,7 @@ void bcast_threshold()
 	
 	if (torc_num_nodes() == 1) return;
 	for (i = 0; i < torc_num_nodes(); i++) {
-		torc_create_ex(i*torc_i_num_workers(), 1, (void *)upd_threshold_task, 0);
+		torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())upd_threshold_task, 0);
 	}
 	torc_waitall();
 }
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
 			for (int d = 0; d < 1; d++) fscanf(fps, "%lf", &dummy);	// skip (the error and) the fitness value
 		}
 
-		torc_create(-1, (void *)taskf, 2,			// demand
+		torc_create(-1, (void (*)())taskf, 2,			// demand
 				data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 				1, MPI_DOUBLE, CALL_BY_RES,
 				a_sample, &a_sample[data.Nth]);
@@ -489,7 +489,7 @@ int main(int argc, char *argv[])
 		for (int seed_i = 0; seed_i < get_nseeds(); seed_i++) {
 			// # generate more samples with the same distribution
 			double *a_seed = get_seed(seed_i);
-			torc_create(-1, (void *)modified_metropolis, 4,
+			torc_create(-1, (void (*)())modified_metropolis, 4,
 							data.Nth, MPI_DOUBLE, CALL_BY_VAL,
 							1, MPI_DOUBLE, CALL_BY_VAL,
 							1, MPI_INT, CALL_BY_VAL,
