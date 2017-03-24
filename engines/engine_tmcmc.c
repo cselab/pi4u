@@ -184,9 +184,6 @@ void read_data()
 		else if (strstr(line, "use_local_cov")) {
 			sscanf(line, "%*s %d", &data.use_local_cov);
 		}
-		else if (strstr(line, "local_scale")) {
-			sscanf(line, "%*s %lf", &data.local_scale);
-		}
 	}
 
 //	if(data.prior_type == 0) /* uniform */
@@ -800,10 +797,10 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
 	return;
 }
 
-static int in_rect(double *v1, double *v2, double *diam, int D) {
+static int in_rect(double *v1, double *v2, double *diam, double sc, int D) {
     int d;
     for (d = 0; d < D; ++d) {
-        if (fabs(v1[d]-v2[d]) > diam[d]) return 0;
+        if (fabs(v1[d]-v2[d]) > sc*diam[d]) return 0;
     }
     return 1;
 }
@@ -819,7 +816,6 @@ void precompute_chain_covariances(const cgdbp_t* leader,
 
     double my_time = clock();
 
-#if 1  // in place
     // allocate space
     int* nn_ind = (int*)malloc(newchains*N*sizeof(int));
     int* nn_count = (int*)malloc(newchains*sizeof(int));
@@ -836,67 +832,63 @@ void precompute_chain_covariances(const cgdbp_t* leader,
             if (d_min > s) d_min = s;
             if (d_max < s) d_max = s;
         }
-        diam[d] = data.local_scale*(d_max-d_min);
+        diam[d] = d_max-d_min;
         printf("Diameter %d: %.6lf\n", d, diam[d]);
     }
 
-    // find neighbors in a rectangle - O(N^2)
-    for (pos = 0; pos < newchains; ++pos) {
-        nn_count[pos] = 0;
-        double* curr = leader[pos].point;
-        for (i = 0; i < N; ++i) {
-            double* s = curgen_db.entry[i].point;
-            if (in_rect(curr, s, diam, D)) {
-                nn_ind[pos*N+nn_count[pos]] = i;
-                nn_count[pos]++;
+    int status = 0;
+    for (double scale = 0.1, ds = 0.05; scale <= 1.0; scale += ds) {
+        // find neighbors in a rectangle - O(N^2)
+        for (pos = 0; pos < newchains; ++pos) {
+            nn_count[pos] = 0;
+            double* curr = leader[pos].point;
+            for (i = 0; i < N; ++i) {
+                double* s = curgen_db.entry[i].point;
+                if (in_rect(curr, s, diam, scale, D)) {
+                    nn_ind[pos*N+nn_count[pos]] = i;
+                    nn_count[pos]++;
+                }
             }
+        }
+
+        // compute the covariances
+        for (pos = 0; pos < newchains; ++pos) {
+            for (d = 0; d < D; ++d) {
+                chain_mean[d] = 0;
+                for (k = 0; k < nn_count[pos]; ++k) {
+                    ind = nn_ind[pos*N+k];
+                    chain_mean[d] += curgen_db.entry[ind].point[d];
+                }
+                chain_mean[d] /= nn_count[pos];
+            }
+
+            for (i = 0; i < D; i++)
+                for (j = 0; j < D; j++) {
+                    double s = 0;
+                    for (k = 0; k < nn_count[pos]; k++) {
+                        ind = nn_ind[pos*N+k];
+                        s += (curgen_db.entry[ind].point[i]-chain_mean[i]) *
+                             (curgen_db.entry[ind].point[j]-chain_mean[j]);
+                    }
+                    chain_cov[pos][i*D+j] = chain_cov[pos][j*D+i] = s/nn_count[pos];
+                }
+
+            // check if the matrix is positive definite
+            for (i = 0; i < D; ++i)
+                for (j = 0; j < D; ++j) {
+                    double s = chain_cov[pos][i*D+j];
+                    gsl_matrix_set(work, i, j, s);
+                }
+            gsl_set_error_handler_off();
+            status = gsl_linalg_cholesky_decomp(work);
+            if (status == GSL_SUCCESS) break;
         }
     }
 
-    // compute the covariances
-    for (pos = 0; pos < newchains; ++pos) {
-        for (d = 0; d < D; ++d) {
-            chain_mean[d] = 0;
-            for (k = 0; k < nn_count[pos]; ++k) {
-                ind = nn_ind[pos*N+k];
-                chain_mean[d] += curgen_db.entry[ind].point[d];
-            }
-            chain_mean[d] /= nn_count[pos];
-        }
-
+    if (status != GSL_SUCCESS) {
         for (i = 0; i < D; i++)
-            for (j = 0; j < D; j++) {
-                double s = 0;
-                for (k = 0; k < nn_count[pos]; k++) {
-                    ind = nn_ind[pos*N+k];
-                    s += (curgen_db.entry[ind].point[i]-chain_mean[i]) *
-                         (curgen_db.entry[ind].point[j]-chain_mean[j]);
-                }
-                chain_cov[pos][i*D+j] = chain_cov[pos][j*D+i] = s/nn_count[pos];
-            }
-
-        // check if the matrix is positive definite
-        for (i = 0; i < D; ++i)
-            for (j = 0; j < D; ++j) {
-                double s = chain_cov[pos][i*D+j];
-                gsl_matrix_set(work, i, j, s);
-            }
-
-        gsl_set_error_handler_off();
-
-        int status = gsl_linalg_cholesky_decomp(work);
-        int OK = 1;
-        if (status != GSL_SUCCESS) {
-            fprintf(stderr, "Warning: local covariance matrix is not positive "
-                    "definite, using Sigma=bbeta*SS\n");
-            OK = 0;
-        }
-
-        if (!OK) {
-            for (i = 0; i < D; i++)
-                for (j = 0; j < D; j++)
-                    chain_cov[pos][i*D+j] = data.bbeta*runinfo.SS[i][j];
-        }
+            for (j = 0; j < D; j++)
+                chain_cov[pos][i*D+j] = data.bbeta*runinfo.SS[i][j];
     }
 
     free(nn_ind);
@@ -904,190 +896,6 @@ void precompute_chain_covariances(const cgdbp_t* leader,
     free(diam);
     free(chain_mean);
     gsl_matrix_free(work);
-#endif
-
-#if 0  // FLANN
-#include "flann/flann.h"
-    // prepare dataset
-    float* dataset = (float*) malloc(D*N*sizeof(float));
-    for (pos=0; pos<N; ++pos)
-        for (i=0; i<D; i++)
-            dataset[pos*D+i] = curgen_db.entry[pos].point[i];
-
-    // prepare testset
-    float* testset = (float*) malloc(D*newchains*sizeof(float));
-    for (pos=0; pos<newchains; ++pos)
-        for (i=0; i<D; i++)
-            testset[pos*D+i] = leader[pos].point[i];
-
-    // number of nearest neighbors
-    int nn = (50>5*D+1) ? 50:5*D+1;
-
-    // allocate space
-    int* nn_ind = (int*) malloc(newchains*nn*sizeof(int));
-    float* dists = (float*) malloc(newchains*nn*sizeof(float));
-
-    struct FLANNParameters p = DEFAULT_FLANN_PARAMETERS;
-    p.algorithm = FLANN_INDEX_AUTOTUNED; // or FLANN_INDEX_KDTREE, FLANN_INDEX_KMEANS, ...
-    p.target_precision = 0.9; // want 90% precision
-
-    int lim = 1;
-    while ( (clock()-my_time)/CLOCKS_PER_SEC < 60 ) // time limit of 60 sec
-    {
-        //        flann_find_nearest_neighbors(dataset, N, D, (float*)leader, 1, nn_ind, dists, nn, &p);
-        flann_find_nearest_neighbors(dataset, N, D, testset, newchains, nn_ind, dists, nn, &p);
-        lim = 0;
-    }
-
-    if (lim)
-    {
-        printf("Time limit in nearest neighbors reached, using a global covariance.\n");
-        for (i=0; i<newchains*nn; ++i)
-            nn_ind[i] = -1;
-    }
-
-    for (pos=0; pos<newchains; ++pos)
-    {
-        int k;
-
-        // check
-        int OK = 1;
-        for(k=0; k<nn; ++k)
-            if(nn_ind[pos*nn+k] < 0 || nn_ind[pos*nn+k] > N-1)
-            {
-                OK = 0;
-                break;
-            }
-
-        if(!OK)
-        {
-            for (i=0; i<D; i++)
-                for (j=0; j<D; j++)
-                    chain_cov[pos][i*D+j] = data.bbeta*runinfo.SS[i][j];
-        }
-        else
-        {
-            // compute the covariance
-            double chain_mean[D];
-
-            for (i=0; i<D; i++) // loop over dimensions
-            {
-                chain_mean[i] = 0;
-                for (k=0; k<nn; k++) // loop over nearest neighbors
-                    chain_mean[i] += dataset[nn_ind[pos*nn+k]*D+i];
-                chain_mean[i] /= nn;
-            }
-
-            for (i=0; i<D; i++)
-                for (j=0; j<D; j++)
-                {
-                    double s = 0;
-
-                    for (k=0; k<nn; k++)
-                        s += (dataset[nn_ind[pos*nn+k]*D+i]-chain_mean[i]) *
-                            (dataset[nn_ind[pos*nn+k]*D+j]-chain_mean[j]);
-
-                    chain_cov[pos][i*D+j] = s/nn;
-                    chain_cov[pos][j*D+i] = s/nn;
-                }
-        }
-    }
-
-    free(dataset);
-    free(testset);
-    free(dists);
-    free(nn_ind);
-#endif
-
-#if 0 // python
-    FILE * fp;
-    // prepare dataset
-
-    fp = fopen("dataset.txt", "w");
-    for (pos=0; pos<N; ++pos)
-    {
-        for (i=0; i<D; i++)
-            fprintf(fp, "%.16lf ", curgen_db.entry[pos].point[i]);
-        fprintf(fp, "\n");
-    }
-    fclose(fp);
-
-    // prepare testset
-    fp = fopen("testset.txt", "w");
-    for (pos=0; pos<newchains; ++pos)
-    {
-        for (i=0; i<D; i++)
-            fprintf(fp, "%.16lf ", leader[pos].point[i]);
-        fprintf(fp, "\n");
-    }
-    fclose(fp);
-
-    double t_python = 0;
-    char command[1024];
-    sprintf(command, "python scripts/compute_chain_covariance.py 2>/dev/null\n");
-
-    FILE * pipe = popen(command, "r");
-
-    if (!pipe)
-    {
-        printf("Cannot popen %s\n", command);
-        return;
-    }
-
-    char buffer[1024];
-    while(fgets(buffer, 1024, pipe))
-    {
-        char word[512];
-        sscanf(buffer, "%s ", word);
-        if (strcmp(word, "Elapsed")==0)
-        {
-            sscanf(buffer, "%*s %*s %lf", &t_python);
-            //            printf("Elasped time in python: %.2lf sec\n", t_python);
-        }
-    }
-
-    pclose(pipe);
-
-    // read result
-    fp = fopen("nn_cov.txt", "r");
-    for(pos=0; fgets(buffer, 1024, fp); ++pos)
-    {
-        char *pbuffer = buffer;
-        int offset;
-
-        gsl_matrix *work = gsl_matrix_alloc(D,D);
-        for (i=0; i<D; ++i)
-            for (j=0; j<D; ++j)
-            {
-                double t;
-                sscanf(pbuffer, "%lf%n", &t, &offset);
-                pbuffer += offset;
-                gsl_matrix_set(work, i, j, t);
-                chain_cov[pos][i*D+j] = t;
-            }
-
-        gsl_set_error_handler_off();
-
-        // check if the matrix is singular
-        int status = gsl_linalg_cholesky_decomp(work);
-        int OK = 1;
-        if(status != GSL_SUCCESS)
-        {
-            fprintf(stderr, "Error in Cholesky decomposition in mvnrnd_silva(auxil.c), "
-                    "gsl_errno=%d\n", status);
-            OK = 0;
-        }
-        gsl_matrix_free(work);
-
-        if(!OK)
-        {
-            for (i=0; i<D; i++)
-                for (j=0; j<D; j++)
-                    chain_cov[pos][i*D+j] = data.bbeta*runinfo.SS[i][j];
-        }
-    }
-
-#endif
 
 #if 0
     for (pos=0; pos<5; ++pos)

@@ -55,10 +55,6 @@ C1		1	0	1
 # should be used if the global covariance fails
 use_local_cov   0
 
-# Percentage of the domain used to determine the neighborhood
-# for the local proposal covariance
-local_scale     0.25
-
 # Scaling for the global proposal covariance
 bbeta		    0.04
 
