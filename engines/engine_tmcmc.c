@@ -186,39 +186,36 @@ void read_data()
 		}
 	}
 
-//	if(data.prior_type == 0) /* uniform */
-	{
-		rewind(f);
-		line_no = 0;
+    rewind(f);
+    line_no = 0;
 
-		free(data.lowerbound);
-		free(data.upperbound);
-		data.lowerbound = malloc(data.Nth*sizeof(double));
-		data.upperbound = malloc(data.Nth*sizeof(double));
+    free(data.lowerbound);
+    free(data.upperbound);
+    data.lowerbound = malloc(data.Nth*sizeof(double));
+    data.upperbound = malloc(data.Nth*sizeof(double));
 
-		for (i = 0; i < data.Nth; i++) {
-			found = 0;
-			while (fgets(line, 256, f)!= NULL) {
-				line_no++;
-	
-				if ((line[0] == '#')||(strlen(line)==0)) continue;
-	
-				char bound[8];
-				sprintf(bound, "B%d", i);
-				if (strstr(line, bound) != NULL) {
-					sscanf(line, "%*s %lf %lf", &data.lowerbound[i], &data.upperbound[i]);
-					found = 1;
-					break;
-				}
-			}
-			if (!found) {
-				data.lowerbound[i] = data.lb;	/* Bdef value or Default LB */
-				data.upperbound[i] = data.ub;	/* Bdef value of Default UB */
-			}
-			rewind(f);
-			line_no = 0;
-		}
-	}
+    for (i = 0; i < data.Nth; i++) {
+        found = 0;
+        while (fgets(line, 256, f)!= NULL) {
+            line_no++;
+
+            if ((line[0] == '#')||(strlen(line)==0)) continue;
+
+            char bound[8];
+            sprintf(bound, "B%d", i);
+            if (strstr(line, bound) != NULL) {
+                sscanf(line, "%*s %lf %lf", &data.lowerbound[i], &data.upperbound[i]);
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            data.lowerbound[i] = data.lb;	/* Bdef value or Default LB */
+            data.upperbound[i] = data.ub;	/* Bdef value of Default UB */
+        }
+        rewind(f);
+        line_no = 0;
+    }
 
 	if(data.prior_type == 1) /* gaussian */
 	{
