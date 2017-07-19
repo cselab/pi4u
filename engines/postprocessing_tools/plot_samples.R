@@ -1,5 +1,5 @@
-source("kdepairs.default.R")
-source("kdepairs.R")
+source("helpers/kdepairs.default.R")
+source("helpers/kdepairs.R")
 par(cex.axis=2)
 
 library(tools)
@@ -8,7 +8,7 @@ cat("Did you delete all the variables you wanted? If no, run 'rm(list=ls())'")
 
 # ----------------------------------------------------------------------
 # name of the data file
-fname <- "curgen_db_007.txt"
+fname <- "data/samples.txt"
 
 # names of variables
 l = c(expression(theta[1]), expression(theta[2]))
