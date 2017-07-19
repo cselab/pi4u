@@ -7,147 +7,147 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <string.h>
 #include <math.h>
 #include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include <torc.h>
+#include <unistd.h>
 
 #include "gsl_headers.h"
 
+#define EXPERIMENTAL_RESULTS    0
+
+/*** HELPER STRUCTS ***/
 typedef struct data_s {
-	int	Nth;		/* = PROBDIM*/
-	int	MaxStages;	/* = MAXGENS*/
-	int	PopSize;	/* = DATANUM*/
+    int    Nth;        /* = PROBDIM*/
+    int    MaxStages;    /* = MAXGENS*/
+    int    PopSize;    /* = DATANUM*/
 
-	double	*lowerbound;	/*[PROBDIM];*/
-	double	*upperbound;	/*[PROBDIM];*/
+    double    *lowerbound;    /*[PROBDIM];*/
+    double    *upperbound;    /*[PROBDIM];*/
 
-	double *compositeprior_distr; /*[PROBDIM]*/
-
-#if 1
-	double *prior_mu;
-	double *prior_sigma;
-
-	int auxil_size;
-	double *auxil_data;
-#endif
-
-	int MinChainLength, MaxChainLength;
-
-	double lb, ub;		/*generic lower and upper bound*/
-
-	double	TolCOV;
-	double	bbeta;
-	long	seed;
-
-	struct optim_options {
-		int	MaxIter;
-		double	Tol;
-		int	Display;
-		double  Step;
-	} options;
+    double *compositeprior_distr; /*[PROBDIM]*/
 
 #if 1
-	int	sampling_type;  /* 0: uniform, 1: gaussian, 2: file */
-	int	accept_type;    /* 0: without exp(), 1: with exp() */
-	int	prior_type;     /* 0: lognormal, 1: gaussian */
+    double *prior_mu;
+    double *prior_sigma;
+
+    int auxil_size;
+    double *auxil_data;
 #endif
 
-	int	iplot;
-	int	icdump;
-	int	ifdump;
+    int MinChainLength, MaxChainLength;
 
-	int	*Num;		/*[MAXGENS];*/
-	int	LastNum;
+    double lb, ub;        /*generic lower and upper bound*/
 
-	int use_proposal_cma;
-	double  **init_mean;    /* [DATANUM][PROBDIM] */
+    double    TolCOV;
+    double    bbeta;
+    long    seed;
 
-	double  **local_cov;    /* [DATANUM][PROBDIM*PROBDIM] */
-	int use_local_cov;
-	double local_scale;
+    struct optim_options {
+        int    MaxIter;
+        double    Tol;
+        int    Display;
+        double  Step;
+    } options;
+
+#if 1
+    int    sampling_type;  /* 0: uniform, 1: gaussian, 2: file */
+    int    accept_type;    /* 0: without exp(), 1: with exp() */
+    int    prior_type;     /* 0: lognormal, 1: gaussian */
+#endif
+
+    int    iplot;
+    int    icdump;
+    int    ifdump;
+
+    int    *Num;        /*[MAXGENS];*/
+    int    LastNum;
+
+    int use_proposal_cma;
+    double  **init_mean;    /* [DATANUM][PROBDIM] */
+
+    double  **local_cov;    /* [DATANUM][PROBDIM*PROBDIM] */
+    int use_local_cov;
+    double local_scale;
 
 } data_t;
 
-
 typedef struct runinfo_s {
-	int 	Gen;
-	double	*CoefVar;		/*[MAXGENS];*/
-	double	*p;			/*[MAXGENS];		// cluster-wide*/
-	int	*currentuniques;	/*[MAXGENS];*/
-	double	*logselection;		/*[MAXGENS];*/
-	double	*acceptance;		/*[MAXGENS];*/
-	double	**SS;			/*[PROBDIM][PROBDIM];	// cluster-wide*/
-	double	**meantheta; 		/*[MAXGENS][PROBDIM]*/
+    int     Gen;
+    double    *CoefVar;        /*[MAXGENS];*/
+    double    *p;            /*[MAXGENS];        // cluster-wide*/
+    int    *currentuniques;    /*[MAXGENS];*/
+    double    *logselection;        /*[MAXGENS];*/
+    double    *acceptance;        /*[MAXGENS];*/
+    double    **SS;            /*[PROBDIM][PROBDIM];    // cluster-wide*/
+    double    **meantheta;         /*[MAXGENS][PROBDIM]*/
 } runinfo_t;
 
-extern data_t data;
-extern runinfo_t runinfo;
-
+typedef struct {
+    int idx;
+    int nsel;
+    double F;
+} sort_t;
 
 /*** DATABASES ***/
-/*
-#define MAX_DB_ENTRIES	(2*DATANUM)
-int MAX_DB_ENTRIES = 2*1024;
-extern int MAX_DB_ENTRIES;
-*/
-
 typedef struct cgdbp_s {
-	double *point; /*[PROBDIM];*/
-	double F;
-	int counter;	/* not used (?)*/
-	int nsel;	/* for selection of leaders only*/
-	int queue;	/* for submission of leaders only*/
+    double *point; /*[PROBDIM];*/
+    double F;
+    int counter;    /* not used (?)*/
+    int nsel;    /* for selection of leaders only*/
+    int queue;    /* for submission of leaders only*/
 #if 1   // NN
-	int surrogate;
-	double error;
+    int surrogate;
+    double error;
 #endif
 #if defined(_TMCMC_SN_)
-	int valid;
-	double *grad;
-	double *hes;
+    int valid;
+    double *grad;
+    double *hes;
 #endif
 } cgdbp_t;
 
 typedef struct cgdb_s {
-	cgdbp_t *entry; /*[MAX_DB_ENTRIES];*/
-	int entries;
-	pthread_mutex_t m;
+    cgdbp_t *entry; /*[MAX_DB_ENTRIES];*/
+    int entries;
+    pthread_mutex_t m;
 } cgdb_t;
 
 typedef struct dbp_s {
-	double *point; /*[PROBDIM];*/
-	double F;
-	int nG;
-	double G[64];	/* maxG*/
-	int surrogate;
+    double *point; /*[PROBDIM];*/
+    double F;
+    int nG;
+    double G[64];    /* maxG*/
+    int surrogate;
 } dbp_t;
 
 typedef struct db_s {
-	dbp_t *entry; /*[MAX_DB_ENTRIES];*/		/* */
-	int entries;
-	pthread_mutex_t m;
+    dbp_t *entry; /*[MAX_DB_ENTRIES];*/        /* */
+    int entries;
+    pthread_mutex_t m;
 } db_t;
 
-#define EXPERIMENTAL_RESULTS	0
-
 typedef struct resdbp_s {
-	double *point;	/*[EXPERIMENTAL_RESULTS+1]; // +1 for the result (F)*/
-	double F;
-	int counter;	/* not used (?)*/
-	int nsel;	/* for selection of leaders only*/
+    double *point;    /*[EXPERIMENTAL_RESULTS+1]; // +1 for the result (F)*/
+    double F;
+    int counter;    /* not used (?)*/
+    int nsel;    /* for selection of leaders only*/
 } resdbp_t;
 
 typedef struct resdb_s {
-	resdbp_t *entry; /*[MAX_DB_ENTRIES];*/
-	int entries;
-	pthread_mutex_t m;
+    resdbp_t *entry; /*[MAX_DB_ENTRIES];*/
+    int entries;
+    pthread_mutex_t m;
 } resdb_t;
+/*** END HELPER STRUCTS ***/
 
+/*** DATABASE INSTANCES ***/
+extern data_t data;
+extern runinfo_t runinfo;
 extern cgdb_t curgen_db;
 extern db_t full_db;
 extern resdb_t curres_db;
@@ -209,8 +209,6 @@ void reset_nfc();
 int get_tfc();
 
 /*** POSDEF ***/
-
 void compute_mat_product_vect(double *mat/*2D*/, double vect[], double res_vect[], double coef, int PROBDIM);
 double compute_dot_product(double row_vector[], double vector[], int PROBDIM);
 int inv_matrix(double coef, double *current_hessian/*2D*/, double *inv_current_hessian/*2D*/, int PROBDIM);
-
