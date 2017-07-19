@@ -834,7 +834,8 @@ void precompute_chain_covariances(const cgdbp_t* leader,
     }
 
     int status = 0;
-    for (double scale = 0.1, ds = 0.05; scale <= 1.0; scale += ds) {
+	double scale, ds = 0.05;
+    for (scale = 0.1; scale <= 1.0; scale += ds) {
         // find neighbors in a rectangle - O(N^2)
         for (pos = 0; pos < newchains; ++pos) {
             nn_count[pos] = 0;
