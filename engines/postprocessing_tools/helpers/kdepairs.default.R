@@ -2,6 +2,7 @@ kdepairs.default <- function(x, n_1d=20, n_2d=25, labels, density=TRUE,
                              contour=FALSE, ...) {
     require(MASS)
     require(sp)
+    par(cex.axis=1.8) # magnify the axes font
 
     fun.lower <- function(x1, x2, ...) {
         if (is.factor(x1)) x1 <- as.integer(x1)
@@ -98,7 +99,7 @@ kdepairs.default <- function(x, n_1d=20, n_2d=25, labels, density=TRUE,
 
     nd <- dim(x)[2]
     loglh <- x[, nd]
-    pairs.default(x[, 1:nd-1], labels=labels, lower.panel=fun.lower,
-                  upper.panel=fun.upper, diag.panel=fun.diag.hist)
+    pairs(x[, 1:nd-1], labels=labels, lower.panel=fun.lower,
+          upper.panel=fun.upper, diag.panel=fun.diag.hist)
     invisible(NULL)
 }

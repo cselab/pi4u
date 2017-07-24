@@ -1,6 +1,5 @@
 source("helpers/kdepairs.default.R")
 source("helpers/kdepairs.R")
-par(cex.axis=2)
 
 library(tools)
 
@@ -18,7 +17,7 @@ truelik <- 0  # use likelihood or log-likelihood for coloring
 
 # ----------------------------------------------------------------------
 print_tab <- function(text, x, nd, w) {
-  cat(text, formatC(x, digits=nd, format='f', width=w), "\n", sep="\t")
+  cat(text, formatC(x, digits=nd, format='e', width=w), "\n", sep="\t")
 }
 
 print_nd <- function(x, nd) {
@@ -72,11 +71,6 @@ if(discrepancy) data[, nd] <-    -data[, nd]
 if(truelik)     data[, nd] <- exp(data[, nd])
 
 pname <- paste0(file_path_sans_ext(fname), ".png")
-#------- this option is for big pictures ---------
-# png(pname, width=1080, height=1080, units='px', res=150, pointsize=10)
-# kdepairs(data, n_1d=20, n_2d=200, labels=l)
-#------- this option is for small pictures -------
-png(pname, width=600, height=600, units='px', res=100, pointsize=15)
-kdepairs(data, n_1d=15, n_2d=200, labels=l)
-#-------------------------------------------------
+png(pname, width=2500, height=2500, units='px', res=300, pointsize=15, type="cairo", family="times")
+kdepairs(data, n_1d=20, n_2d=200, labels=l)
 dev.off()
