@@ -1,0 +1,5 @@
+site_name: Pi4U
+pages:
+  - Home: index.md
+  - About: about.md
+theme: readthedocs
