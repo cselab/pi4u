@@ -52,13 +52,11 @@
     <a class="current" href=".">Home</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#welcome-to-mkdocs">Welcome to MkDocs</a></li>
+    <li class="toctree-l2"><a href="#welcome-to-pi4u">Welcome to Pi4U</a></li>
     
         <ul>
         
-            <li><a class="toctree-l3" href="#commands">Commands</a></li>
-        
-            <li><a class="toctree-l3" href="#project-layout">Project layout</a></li>
+            <li><a class="toctree-l3" href="#software-layout">Software layout</a></li>
         
         </ul>
     
@@ -103,20 +101,22 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="welcome-to-mkdocs">Welcome to MkDocs</h1>
-<p>For full documentation visit <a href="http://mkdocs.org">mkdocs.org</a>.</p>
-<h2 id="commands">Commands</h2>
-<ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs help</code> - Print this help message.</li>
-</ul>
-<h2 id="project-layout">Project layout</h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
+                <h1 id="welcome-to-pi4u">Welcome to Pi4U</h1>
+<p>!For full documentation visit <a href="http://mkdocs.org">mkdocs.org</a>.</p>
+<p>!## Commands</p>
+<p>!<em> <code>mkdocs new [dir-name]</code> - Create a new project.
+!</em> <code>mkdocs serve</code> - Start the live-reloading docs server.
+!<em> <code>mkdocs build</code> - Build the documentation site.
+!</em> <code>mkdocs help</code> - Print this help message.</p>
+<h2 id="software-layout">Software layout</h2>
+<pre><code>torc_lite    # TORC tasking library
+pndl         # Parallel numerical differentation library 
+engines/      # UQ + OPT algorithms
+engine_tmcmc # TMCMC
+engine_cmaes # CMAES
+...          # 
+ABC_SubSim   # ABC Subset simulation algorithm
+AMaLGaM      # Stochastic optimization algorithm
 </code></pre>
               
             </div>
@@ -164,5 +164,5 @@ docs/
 
 <!--
 MkDocs version : 0.16.3
-Build Date UTC : 2017-09-14 19:37:17
+Build Date UTC : 2017-09-14 19:45:44
 -->
