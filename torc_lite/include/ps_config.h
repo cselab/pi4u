@@ -1,2 +1,0 @@
-#define POSIX_MUTEX_TRYLOCK
-#define CACHE_LINE_SIZE 128
