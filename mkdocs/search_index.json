@@ -2,7 +2,7 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Welcome to Pi4U\n\n\n\n\n\n\n\n\n\n\n\nSoftware layout\n\n\ntorc_lite    # TORC tasking library\npndl         # Parallel numerical differentation library \nengines/      # UQ + OPT algorithms\nengine_tmcmc # TMCMC\nengine_cmaes # CMAES\n...          # \nABC_SubSim   # ABC Subset simulation algorithm\nAMaLGaM      # Stochastic optimization algorithm", 
+            "text": "Welcome to Pi4U\n\n\n\n\n\n\n\n\n\n\n\nSoftware layout\n\n\ntorc_lite    # TORC tasking library\npndl         # Parallel numerical differentation library \nengines/      # UQ + OPT algorithms\n    engine_tmcmc # TMCMC\n    engine_cmaes # CMAES\n    ...          # \nABC_SubSim   # ABC Subset simulation algorithm\nAMaLGaM      # Stochastic optimization algorithm", 
             "title": "Home"
         }, 
         {
@@ -12,7 +12,7 @@
         }, 
         {
             "location": "/#software-layout", 
-            "text": "torc_lite    # TORC tasking library\npndl         # Parallel numerical differentation library \nengines/      # UQ + OPT algorithms\nengine_tmcmc # TMCMC\nengine_cmaes # CMAES\n...          # \nABC_SubSim   # ABC Subset simulation algorithm\nAMaLGaM      # Stochastic optimization algorithm", 
+            "text": "torc_lite    # TORC tasking library\npndl         # Parallel numerical differentation library \nengines/      # UQ + OPT algorithms\n    engine_tmcmc # TMCMC\n    engine_cmaes # CMAES\n    ...          # \nABC_SubSim   # ABC Subset simulation algorithm\nAMaLGaM      # Stochastic optimization algorithm", 
             "title": "Software layout"
         }, 
         {
