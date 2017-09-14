@@ -1,17 +1,21 @@
-# Welcome to MkDocs
+# Welcome to Pi4U 
 
-For full documentation visit [mkdocs.org](http://mkdocs.org).
+!For full documentation visit [mkdocs.org](http://mkdocs.org).
 
-## Commands
+!## Commands
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
+!* `mkdocs new [dir-name]` - Create a new project.
+!* `mkdocs serve` - Start the live-reloading docs server.
+!* `mkdocs build` - Build the documentation site.
+!* `mkdocs help` - Print this help message.
 
-## Project layout
+## Software layout
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+    torc_lite    # TORC tasking library
+    pndl         # Parallel numerical differentation library 
+    engines/      # UQ + OPT algorithms
+	engine_tmcmc # TMCMC
+	engine_cmaes # CMAES
+	...          # 
+    ABC_SubSim   # ABC Subset simulation algorithm
+    AMaLGaM      # Stochastic optimization algorithm
