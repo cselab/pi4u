@@ -1,5 +1,0 @@
-pndlc.o: pndlc.c /usr/include/stdc-predef.h pndl_config.h
-
-/usr/include/stdc-predef.h:
-
-pndl_config.h:
