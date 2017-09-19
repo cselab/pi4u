@@ -4,7 +4,39 @@
     
     <url>
      <loc>/</loc>
-     <lastmod>2017-09-14</lastmod>
+     <lastmod>2017-09-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/python/</loc>
+     <lastmod>2017-09-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/matlab/</loc>
+     <lastmod>2017-09-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/rlib/</loc>
+     <lastmod>2017-09-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/hpc/</loc>
+     <lastmod>2017-09-19</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +44,7 @@
     
     <url>
      <loc>/about/</loc>
-     <lastmod>2017-09-14</lastmod>
+     <lastmod>2017-09-19</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>About - Pi4U</title>
+  <title>Python - Pi4U</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -17,9 +17,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "About";
-    var mkdocs_page_input_path = "about.md";
-    var mkdocs_page_url = "/about/";
+    var mkdocs_page_name = "Python";
+    var mkdocs_page_input_path = "python.md";
+    var mkdocs_page_url = "/python/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -52,9 +52,29 @@
     <a class="" href="..">Home</a>
 	    </li>
           
-            <li class="toctree-l1">
+            <li class="toctree-l1 current">
 		
-    <a class="" href="../python/">Python</a>
+    <a class="current" href="./">Python</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#python-interface-of-tmcmc">Python interface of TMCMC</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#tmcmc">TMCMC</a></li>
+        
+            <li><a class="toctree-l3" href="#fitness-function">Fitness function</a></li>
+        
+            <li><a class="toctree-l3" href="#plotting">Plotting</a></li>
+        
+            <li><a class="toctree-l3" href="#example">Example</a></li>
+        
+            <li><a class="toctree-l3" href="#installation-and-testing">Installation and testing</a></li>
+        
+        </ul>
+    
+
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -72,34 +92,9 @@
     <a class="" href="../hpc/">C/C++</a>
 	    </li>
           
-            <li class="toctree-l1 current">
+            <li class="toctree-l1">
 		
-    <a class="current" href="./">About</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#pi4u-high-performance-uqopt-framework">Pi4U - High Performance UQ+OPT Framework</a></li>
-    
-
-    <li class="toctree-l2"><a href="#software">Software</a></li>
-    
-
-    <li class="toctree-l2"><a href="#additional-documentation">Additional documentation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#related-publications">Related publications</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#pi4u-framework">Pi4U framework</a></li>
-        
-            <li><a class="toctree-l3" href="#applications">Applications</a></li>
-        
-            <li><a class="toctree-l3" href="#torc-task-based-runtime-library">TORC: Task-Based Runtime Library</a></li>
-        
-        </ul>
-    
-
-    </ul>
+    <a class="" href="../about/">About</a>
 	    </li>
           
         </ul>
@@ -124,7 +119,7 @@
     
       
     
-    <li>About</li>
+    <li>Python</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -134,30 +129,37 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="pi4u-high-performance-uqopt-framework">Pi4U - High Performance UQ+OPT Framework</h1>
-<p>Pi4U  is our HPC framework for Bayesian uncertainty quantification of large scale computational models.</p>
-<h1 id="software">Software</h1>
-<p>The latest version of the Pi4U framework can be downloaded from here:  pi4u_0.4.1.tar.gz  (22.03.2016)
-Previous public version: pi4u_0.2.tar.gz </p>
-<h1 id="additional-documentation">Additional documentation</h1>
-<p>Tutorial: (pdf)</p>
-<p>Poster about Pi4U: (pdf)</p>
-<p>Presentation at the Europar 2015 conference: (pdf)</p>
-<h1 id="related-publications">Related publications</h1>
-<h2 id="pi4u-framework">Pi4U framework</h2>
-<blockquote>
-<p>Hadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015  (doi) (pdf)
-Hadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532  (doi) (pdf) </p>
-</blockquote>
-<h2 id="applications">Applications</h2>
-<blockquote>
-<p>Kulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016 (doi) (pdf)
-Hadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014 (doi) (pdf)</p>
-</blockquote>
-<h2 id="torc-task-based-runtime-library">TORC: Task-Based Runtime Library</h2>
-<blockquote>
-<p>Hadjidoukas P.E., Lappas E., Dimakopoulos V.V: A Runtime Library for Platform-Independent Task Parallelism. PDP 2012: 229-236 (doi)</p>
-</blockquote>
+                <h1 id="python-interface-of-tmcmc">Python interface of TMCMC</h1>
+<h2 id="tmcmc">TMCMC</h2>
+<p>The Python interface of TMCMC is defined as follows:</p>
+<p>tmcmc(fitfun,dim=2,maxstages=20,popsize=1024,lowerbound=[-6,-6],upperbound=[6,6],id=0):</p>
+<ul>
+<li>fitfun: python script name (without the .py extension) that implements the log-likelihood function.
+The prototype is: fitfun(x, n), where x is a vector of parameter values and n the number of parameters.</li>
+<li>dim: number of parameters</li>
+<li>maxstages: maximum number of stages that can be performed by the TMCMC algorithm</li>
+<li>popsize: number of samples per stage</li>
+<li>lowerbound: lower bound for each parameter</li>
+<li>upperbound: uppoer bound for each parameter</li>
+<li>id: integer identifier for the specific tmcmc() call. The value is appended to the output files generated by the algorithm.</li>
+</ul>
+<h2 id="fitness-function">Fitness function</h2>
+<p>def fitfun0(x,n):</p>
+<h2 id="plotting">Plotting</h2>
+<h2 id="example">Example</h2>
+<h2 id="installation-and-testing">Installation and testing</h2>
+<ol>
+<li>Download from github:</li>
+</ol>
+<p>git clone https://github.com/cselab/pi4u.git -b tmcmc</p>
+<ol>
+<li>Go to pi4u/src and build the library:</li>
+</ol>
+<p>cd pi4u/src; make</p>
+<ol>
+<li>Go to demo_python and run demo.py</li>
+</ol>
+<p>cd demo; python2.7 demo.py</p>
               
             </div>
           </div>
@@ -165,8 +167,10 @@ Hadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C.,
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="../matlab/" class="btn btn-neutral float-right" title="Matlab">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-        <a href="../hpc/" class="btn btn-neutral" title="C/C++"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -192,8 +196,10 @@ Hadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C.,
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../hpc/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
       
+      
+        <span style="margin-left: 15px"><a href="../matlab/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
