@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import multivariate_normal as mvnorm
 import math
 
-def fitfun2(x,n):
+def fitfun2(x, dim):
 
 #	print('x=',x)
 

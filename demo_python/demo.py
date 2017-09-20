@@ -21,7 +21,7 @@ from tmcmc import *
 
 print("calling tmcmc")
 
-logEv=tmcmc("fitfun2",dim=2,maxstages=20,popsize=4096,lowerbound=[-10,-10],upperbound=[10,10],id=2)
+logEv=tmcmc("fitfun2", dim=2, maxstages=20, popsize=4096, lowerbound=[-10,-10], upperbound=[10,10], id=2)
 print("logEv=",logEv[0])
 
 print("tmcmc completed!")
@@ -32,4 +32,4 @@ print("tmcmc completed!")
 
 from plot_gen import *
 
-plot_gen('curgen_db_002_003.txt', Nth=2, i=1, j=2, show=1, save=1)
+plot_gen('curgen_db_002_003.txt', dim=2, i=1, j=2, show=1, save=0)

@@ -1,6 +1,6 @@
  #!/usr/local/bin/python2.7
 
-def plot_gen(filename,Nth=2,i=1,j=2,show=1,save=0):
+def plot_gen(filename, dim=2, i=1, j=2, show=1, save=0):
 	import numpy as np
 	import matplotlib.pyplot as plt
 
@@ -11,7 +11,7 @@ def plot_gen(filename,Nth=2,i=1,j=2,show=1,save=0):
 
 	x = data[:,i-1]
 	y = data[:,j-1]
-	colors = data[:,Nth]
+	colors = data[:,dim]
 
 	fig = plt.figure()
 

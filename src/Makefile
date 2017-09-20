@@ -1,12 +1,25 @@
+mygsl ?=0
+python3 ?= 0
+
 # Python
 
-PYTHON_CFLAGS = `python2.7-config --cflags`
-PYTHON_LDFLAGS = `python2.7-config --ldflags`
-PYTHON_CFLAGS += -I/usr/local/lib/python2.7/site-packages/numpy/core/include
+ifeq "$(python3)" "0"
+	PYTHON_CFLAGS = `python2.7-config --cflags`
+	PYTHON_LDFLAGS = `python2.7-config --ldflags`
+	PYTHON_CFLAGS += -I/usr/local/lib/python2.7/site-packages/numpy/core/include
+else
+	PYTHON_CFLAGS = `python3.6-config --cflags`
+	PYTHON_LDFLAGS = `python3.6-config --ldflags`
+	PYTHON_CFLAGS += -I/usr/local/lib/python3.6/site-packages/numpy/core/include
+endif
 
-#PYTHON_CFLAGS = `python3.6-config --cflags`
-#PYTHON_LDFLAGS = `python3.6-config --ldflags`
-#PYTHON_CFLAGS += -I/usr/local/lib/python3.6/site-packages/numpy/core/include
+
+ifeq "$(mygsl)" "1"
+	GSL_OBJS=../gsl/gsl-2.4/*/.libs/*.o
+else
+	GSL_OBJS=-lgsl -lgslcblas
+endif
+
 
 
 # R
@@ -43,8 +56,6 @@ ifeq ($(UNAME_S),Darwin)
 	mex_suffix = mexmaci64
 endif
 
-#GSL_OBJS=../gsl/gsl-2.4/*/.libs/*.o
-GSL_OBJS=-lgsl -lgslcblas
 
 libtmcmc.so: engine_tmcmc.c tmcmc_stats.c tmcmc_db.c auxil.c fitfun_python.c
 	$(CC) $(CFLAGS) $(PYTHON_CFLAGS) -shared -o libtmcmc.so engine_tmcmc.c tmcmc_stats.c tmcmc_db.c auxil.c fitfun_python.c $(PYTHON_LDFLAGS) $(GSL_OBJS)

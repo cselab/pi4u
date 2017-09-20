@@ -2,7 +2,7 @@ import numpy as np
 import ctypes
 import os
 
-def tmcmc(fitfun,dim=2,maxstages=20,popsize=1024,lowerbound=[-6,-6],upperbound=[6,6],id=0):
+def tmcmc(fitfun, dim=2, maxstages=20, popsize=1024, lowerbound=[-6,-6], upperbound=[6,6],id=0):
 	# get access to the library and its subroutines
 
 	path = os.path.dirname(os.path.realpath(__file__))

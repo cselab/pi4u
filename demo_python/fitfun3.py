@@ -3,7 +3,7 @@
 import numpy as np
 import math
 
-def fitfun3(x,n):
+def fitfun3(x, dim):
 
 #	print('x=',x)
 
