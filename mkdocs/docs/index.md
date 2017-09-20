@@ -1,21 +1,31 @@
-# Welcome to Pi4U 
+# Welcome to Pi4U
 
-!For full documentation visit [mkdocs.org](http://mkdocs.org).
+Pi4U is a HPC framework for Bayesian uncertainty quantification of large scale computational models.
 
-!## Commands
+# Modules and algorithms
 
-!* `mkdocs new [dir-name]` - Create a new project.
-!* `mkdocs serve` - Start the live-reloading docs server.
-!* `mkdocs build` - Build the documentation site.
-!* `mkdocs help` - Print this help message.
+##    Sampling
 
-## Software layout
+ *TMCMC*
 
-    torc_lite    # TORC tasking library
-    pndl         # Parallel numerical differentation library 
-    engines/      # UQ + OPT algorithms
-	engine_tmcmc # TMCMC
-	engine_cmaes # CMAES
-	...          # 
-    ABC_SubSim   # ABC Subset simulation algorithm
-    AMaLGaM      # Stochastic optimization algorithm
+ *ABC-Subsim*
+
+## Single-objective optimization
+
+ *CMAES*
+
+ *Amalgam*
+
+## Multi-objective optimization
+
+ *NSGA-II*
+
+ *MOCMAES*
+
+ *MOEAD*
+
+# Implementations
+
+## Parallel
+
+## Sequential
