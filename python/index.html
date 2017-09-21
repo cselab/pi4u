@@ -131,8 +131,8 @@
               
                 <h1 id="python-interface-of-tmcmc">Python interface of TMCMC</h1>
 <p>Module tmcmc implements the TMCMC (Transitional Markov-Chain Monte Carlo) algorithm.</p>
-<p>We use the C implementation of the algorithm and the ctypes wrapper module for calling it from Python.
-Since the function we are sampling from is also written in Python, we use embedded Python to call the
+<p>We use the C implementation of the algorithm and the <em>ctypes wrapper</em> module for calling it from Python.
+Since the function we are sampling from is also written in Python, we use <em>embedded Python</em> to call the
 function from the C code and <em>numpy</em> to pass arguments between the two environments.</p>
 <h2 id="tmcmc">TMCMC</h2>
 <p>The Python interface of TMCMC is defined as follows:</p>
@@ -150,12 +150,12 @@ The prototype is: fitfun(x, dim), where <em>x</em> is a vector of parameter valu
 </ul>
 <p>Outputs:</p>
 <ul>
-<li>The tmcmc function returns the log-evidence of the model.
-In addition, for each stage of the algorithm, the evaluation points and their log-likelihood are stored in text files
-named as curgen_db_xxx_yyy.txt, where <strong>xxx</strong>: <em>id</em> of the <em>tmcmc()</em> call, and <strong>yyy</strong>: stage of the algorithm.</li>
+<li>The tmcmc function returns the log-evidence of the model.</li>
+<li>In addition, for each stage of the algorithm, the evaluation points and their log-likelihood are stored in text files
+named as <em>curgen_db_xxx_yyy.txt</em>, where <strong>xxx</strong>: <em>id</em> of the <em>tmcmc()</em> call, and <strong>yyy</strong>: stage of the algorithm.</li>
 </ul>
 <h2 id="fitness-function">Fitness function</h2>
-<p>The fitness function typically computes the model output and returns the log-likelihood of the data.</p>
+<p>The fitness function typically computes the model output and <strong>returns</strong> the log-likelihood of the data.</p>
 <p><strong>def fitfun(x, dim):</strong></p>
 <ul>
 <li><strong>x</strong>: the parameters (theta) of the model</li>
@@ -180,29 +180,35 @@ import sys
 sys.path.append("../lib_python")
 from tmcmc import *
 
-logEv=tmcmc("fitfun2",dim=2,maxstages=20,popsize=4096,lowerbound=[-10,-10],upperbound=[10,10],id=2)
+logEv=tmcmc("fitfun3",dim=2,maxstages=20,popsize=4096,lowerbound=[-10,-10],upperbound=[10,10],id=3)
 print("logEv=",logEv[0])
 
 from plot_gen import *
-plot_gen('curgen_db_002_003.txt', dim=2, i=1, j=2, show=1, save=1)
+plot_gen('curgen_db_003_009.txt', dim=2, i=1, j=2, show=1, save=1)
 </code></pre>
-<h3 id="fitfun2py">fitfun2.py</h3>
-<pre><code># two multivariate gaussians
-from scipy.stats import multivariate_normal as mvnorm
+<h3 id="fitfun3py">fitfun3.py</h3>
+<pre><code># data-driven inference
+import numpy as np
 import math
 
-def fitfun2(x, dim):
+def fitfun3(x, dim):
 
-    mean1 = [-5, -5]
-    cov1 = [[1, 0], [0, 1]]  # diagonal covariance
+    a = x[0]
+    sigma = x[1]
 
-    mean2 = [5, 5]
-    cov2 = [[1, 0], [0, 1]]  # diagonal covariance
+    data = np.loadtxt('data3.txt')
+    N=data.shape[0];
 
-    s = mvnorm.pdf(x, mean1, cov1) + mvnorm.pdf(x, mean2, cov2)
-    s = math.log(s)
+    fx = data[:,0]
+    fy = data[:,1]
 
-    return s
+    y = a*fx;
+
+    SSE = np.sum((y-fy)\*\*2)
+    sy=sigma;
+    logn = -0.5*N*math.log(2*math.pi)-0.5*N*math.log(sy*sy)-0.5*SSE/(sy*sy)
+
+    return logn
 </code></pre>
 <h2 id="installation-and-testing">Installation and testing</h2>
 <h3 id="prerequisites">Prerequisites</h3>
@@ -210,8 +216,24 @@ def fitfun2(x, dim):
 <ul>
 <li>C compiler</li>
 <li>Python (2.7 or higher)</li>
-<li>Numpy (MacOS: <code>pip install numpy</code>)</li>
-<li>GNU GSL library (MacOS: <code>brew install gsl</code>, otherwise you offer the option to download and use a local copy of the GSL library)</li>
+<li>Python-devel package<ul>
+<li><code>python2-config</code> or <code>python3-config</code> must be available</li>
+<li>MacOS: automatically available if python has been installed with brew</li>
+</ul>
+</li>
+<li>Python numpy package<ul>
+<li>MacOS: <code>pip/pip3 install numpy</code></li>
+</ul>
+</li>
+<li>Python matplotlib package<ul>
+<li>MacOS: <code>pip/pip3 install matplotlib</code></li>
+</ul>
+</li>
+<li>GNU GSL library<ul>
+<li>MacOS: <code>brew install gsl</code>,</li>
+<li>We also provide the option to download and use a local copy of the GSL library</li>
+</ul>
+</li>
 </ul>
 <h3 id="steps">Steps</h3>
 <p>1. Download from github:</p>
@@ -220,12 +242,17 @@ def fitfun2(x, dim):
 <p><code>cd pi4u/src; make</code></p>
 <p><code>cd ..</code>   <em>(to move back to the pi4u folder)</em></p>
 <p>3. Go to demo_python and run demo.py</p>
-<p><code>cd demo; python2.7 demo.py</code></p>
+<p><code>cd demo; python2 demo.py</code></p>
 <h3 id="how-to-build-the-software-using-a-local-copy-of-the-gsl-library">How to build the software using a local copy of the GSL library</h3>
 <p>1. Go to pi4u/gsl and run build.sh:</p>
 <p><code>cd pi4u/gsl; ./build.sh</code></p>
 <p>2. Go to pi4u/src and build the TMCMC library:</p>
 <p><code>make mygsl=1</code></p>
+<h3 id="how-to-build-the-software-using-python3">How to build the software using python3</h3>
+<p>1. Go to pi4u/src and (re)-build the TMCMC library:</p>
+<p><code>make clean; make python3=1</code></p>
+<p>2. Go to demo_python and run demo.py</p>
+<p><code>cd demo; python3 demo.py</code></p>
               
             </div>
           </div>
