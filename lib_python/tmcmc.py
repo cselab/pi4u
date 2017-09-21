@@ -16,7 +16,8 @@ def tmcmc(fitfun, dim=2, maxstages=20, popsize=1024, lowerbound=[-6,-6], upperbo
 	pytmcmc_tmcmc = lib.tmcmc
 
 	print(fitfun)
-	pytmcmc_initialize(fitfun)
+#	pytmcmc_initialize(fitfun)
+	pytmcmc_initialize(fitfun.encode('ascii'))
 
 	# input arguments
 

@@ -11,9 +11,9 @@ ifeq "$(python3)" "0"
 else
 	PYTHON_CFLAGS = `python3.6-config --cflags`
 	PYTHON_LDFLAGS = `python3.6-config --ldflags`
-#	numpy_path :=$(shell python3.6 numpy_path.py  | sed "s/\[//g; s/\]//g; s/'//g")
 	numpy_path :=$(shell python3.6 -c 'import numpy;print(numpy.__path__)' | sed "s/\[//g; s/\]//g; s/'//g")
 	PYTHON_CFLAGS += -I$(numpy_path)/core/include
+#	PYTHON_CFLAGS+=-I/usr/local/lib/python3.6/site-packages/numpy/core/include
 endif
 
 ifeq "$(mygsl)" "1"

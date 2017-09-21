@@ -31,6 +31,7 @@ void
 fitfun_initialize(char *fitfun_name)
 {
 	printf("xxxxxxxxxxxxx %s\n", fitfun_name);
+
 	Py_Initialize();
 	PyEval_InitThreads();
 
@@ -42,8 +43,8 @@ fitfun_initialize(char *fitfun_name)
 	printf("yyyyyyyyyyyy\n");
 
 #if PY_MAJOR_VERSION >= 3
-	PyObject* myModuleString = PyUnicode_DecodeFSDefault((char *)"fitfun0");
-//	PyObject* myModuleString = PyUnicode_DecodeFSDefault(fitfun_name);
+//	PyObject* myModuleString = PyUnicode_DecodeFSDefault((char *)"fitfun2");
+	PyObject* myModuleString = PyUnicode_DecodeFSDefault(fitfun_name);
 #else
 //	PyObject* myModuleString = PyString_FromString((char*)"fitfun");
 	PyObject* myModuleString = PyString_FromString(fitfun_name);
@@ -58,7 +59,7 @@ fitfun_initialize(char *fitfun_name)
 		exit(1);
 	}
 
-//        myFunction = PyObject_GetAttrString(myModule,(char*)"fitfun");
+//	myFunction = PyObject_GetAttrString(myModule,(char*)"fitfun0");
 	myFunction = PyObject_GetAttrString(myModule,fitfun_name);
 	printf("myFunction = %p\n", myFunction);
 

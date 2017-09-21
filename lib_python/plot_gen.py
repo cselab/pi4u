@@ -1,5 +1,3 @@
- #!/usr/local/bin/python2.7
-
 def plot_gen(filename, dim=2, i=1, j=2, show=1, save=0):
 	import numpy as np
 	import matplotlib.pyplot as plt
@@ -17,8 +15,8 @@ def plot_gen(filename, dim=2, i=1, j=2, show=1, save=0):
 
 	plt.scatter(x, y, c=colors, marker='o', s=10.0, alpha=0.3)
 
-	plt.xlabel('var-'+`i`, fontsize=18)
-	plt.ylabel('var-'+`j`, fontsize=18)
+	plt.xlabel('var-'+str(i), fontsize=18)
+	plt.ylabel('var-'+str(j), fontsize=18)
 	plt.colorbar()
 
 	if (show == 1):

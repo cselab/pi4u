@@ -328,7 +328,7 @@ void calculate_statistics(tmcmc_data_t *tmcmc_data, double flc[], int n, int nse
 	unsigned int samples = n; //1000;
 	unsigned int nn[samples];
 
-	for (i = 0; i < samples; i++) sel[i] = 0;
+	for (i = 0; i < (int)samples; i++) sel[i] = 0;
 
 	int k;
 
@@ -337,12 +337,12 @@ void calculate_statistics(tmcmc_data_t *tmcmc_data, double flc[], int n, int nse
 
 		//gsl_ran_multinomial (r, K, N, q, nn);
 		multinomialrand (K, N, q, nn);
-		for (i = 0; i < K; i++) sel[i]+=nn[i];
+		for (i = 0; i < (int)K; i++) sel[i]+=nn[i];
 	}
 
 	if (display) {
 		printf("\n s = [");
-		for (i = 0; i < K; i++) printf("%d ", sel[i]);
+		for (i = 0; i < (int)K; i++) printf("%d ", sel[i]);
 		printf("]\n");
 	}
 
