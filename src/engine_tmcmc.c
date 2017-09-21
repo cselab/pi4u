@@ -930,7 +930,7 @@ int tmcmc_initialize(char *fitfun_name)
 		torc_create(i*torc_i_num_workers(), fitfun_initialize, 0);
 	torc_waitall();
 #else
-	printf("calling fitfun_initialize(%s)\n", fitfun_name);
+	printf("calling fitfun_initialize (%s)\n", fitfun_name);
 	fitfun_initialize(fitfun_name);
 #endif
 	return 0;

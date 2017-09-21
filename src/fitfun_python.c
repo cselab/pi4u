@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-//#include <Python.h>
+#include <Python.h>
 
 //#if PY_MAJOR_VERSION >= 3
 //#error "3"
@@ -9,10 +9,10 @@
 //#error "2"
 //#endif
 
-//#if PY_MAJOR_VERSION >= 3
-//#define PyInt_FromLong PyLong_FromLong
-//#define PyString_FromString PyBytes_FromString
-//#endif
+#if PY_MAJOR_VERSION >= 3
+#define PyInt_FromLong PyLong_FromLong
+#define PyString_FromString PyBytes_FromString
+#endif
 
 
 
@@ -30,7 +30,7 @@ void
 #endif
 fitfun_initialize(char *fitfun_name)
 {
-	printf("xxxxxxxxxxxxx\n");
+	printf("xxxxxxxxxxxxx %s\n", fitfun_name);
 	Py_Initialize();
 	PyEval_InitThreads();
 
@@ -42,8 +42,8 @@ fitfun_initialize(char *fitfun_name)
 	printf("yyyyyyyyyyyy\n");
 
 #if PY_MAJOR_VERSION >= 3
-//	PyObject* myModuleString = PyUnicode_DecodeFSDefault((char *)"fitfun");
-	PyObject* myModuleString = PyUnicode_DecodeFSDefault(fitfun_name);
+	PyObject* myModuleString = PyUnicode_DecodeFSDefault((char *)"fitfun0");
+//	PyObject* myModuleString = PyUnicode_DecodeFSDefault(fitfun_name);
 #else
 //	PyObject* myModuleString = PyString_FromString((char*)"fitfun");
 	PyObject* myModuleString = PyString_FromString(fitfun_name);

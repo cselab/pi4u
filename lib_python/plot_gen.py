@@ -7,7 +7,7 @@ def plot_gen(filename, dim=2, i=1, j=2, show=1, save=0):
 	data = np.loadtxt(filename)
 	N=data.shape[0];
 
-	print N 
+	print(N)
 
 	x = data[:,i-1]
 	y = data[:,j-1]
