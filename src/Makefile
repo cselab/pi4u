@@ -1,5 +1,5 @@
 mygsl ?=0
-python3 ?= 1
+python3 ?= 0
 
 # Python
 
