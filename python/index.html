@@ -71,6 +71,8 @@
         
             <li><a class="toctree-l3" href="#installation-and-testing">Installation and testing</a></li>
         
+            <li><a class="toctree-l3" href="#troubleshooting-and-additional-options">Troubleshooting and additional options</a></li>
+        
         </ul>
     
 
@@ -156,9 +158,9 @@ named as <em>curgen_db_xxx_yyy.txt</em>, where <strong>xxx</strong>: <em>id</em>
 </ul>
 <h2 id="fitness-function">Fitness function</h2>
 <p>The fitness function typically computes the model output and <strong>returns</strong> the log-likelihood of the data.</p>
-<p><strong>def fitfun(x, dim):</strong></p>
+<p><strong>def fitfun(theta, dim):</strong></p>
 <ul>
-<li><strong>x</strong>: the parameters (theta) of the model</li>
+<li><strong>theta</strong>: the parameters of the model</li>
 <li><strong>dim</strong>: the number of parameters</li>
 </ul>
 <h2 id="plotting">Plotting</h2>
@@ -168,43 +170,48 @@ can be produced by means of the <strong>plot_gen()</strong> function.</p>
 <ul>
 <li><strong>filename</strong>: curgen_db_xxx_yyy.txt file</li>
 <li><strong>dim</strong>: number of parameters</li>
-<li><strong>i</strong>: first parameter</li>
-<li><strong>j</strong>: second parameter</li>
+<li><strong>i</strong>: i-th parameter</li>
+<li><strong>j</strong>: j-th parameter</li>
+<li><strong>namei</strong>: label for the i-th parameter</li>
+<li><strong>namej</strong>: label for the j-th parameter</li>
 <li><strong>show</strong>: depict the plot on the screen</li>
 <li><strong>save</strong>: save the plot in a png file (filename.png)</li>
 </ul>
 <h2 id="example">Example</h2>
-<h3 id="demopy">demo.py</h3>
-<pre><code># Import whatever is necessary
+<h3 id="demo3py">demo3.py</h3>
+<pre><code># Import necessary modules
 import sys
 sys.path.append("../lib_python")
 from tmcmc import *
+from plot_gen import *
 
 logEv=tmcmc("fitfun3",dim=2,maxstages=20,popsize=4096,lowerbound=[-10,-10],upperbound=[10,10],id=3)
 print("logEv=",logEv[0])
 
-from plot_gen import *
-plot_gen('curgen_db_003_009.txt', dim=2, i=1, j=2, show=1, save=1)
+plot_gen('curgen_db_003_009.txt', dim=2, i=1, j=2, namei='alpha', namej='sigma^2', show=1, save=0)
 </code></pre>
 <h3 id="fitfun3py">fitfun3.py</h3>
 <pre><code># data-driven inference
+# underlying data model: y = ax + e, where
+# a=0.3 and e=N(0,sigma^2), sigma=0.1
+
 import numpy as np
 import math
 
-def fitfun3(x, dim):
+def fitfun3(theta, dim):
 
-    a = x[0]
-    sigma = x[1]
+    a = theta[0]
+    sigma = theta[1]
 
     data = np.loadtxt('data3.txt')
     N=data.shape[0];
 
-    fx = data[:,0]
-    fy = data[:,1]
+    x = data[:,0]
+    dy = data[:,1]
 
-    y = a*fx;
+    y = a*x;
 
-    SSE = np.sum((y-fy)\*\*2)
+    SSE = np.sum((y-dy)\*\*2)
     sy=sigma;
     logn = -0.5*N*math.log(2*math.pi)-0.5*N*math.log(sy*sy)-0.5*SSE/(sy*sy)
 
@@ -222,27 +229,31 @@ def fitfun3(x, dim):
 </ul>
 </li>
 <li>Python numpy package<ul>
-<li>MacOS: <code>pip/pip3 install numpy</code></li>
+<li>MacOS: <code>pip install numpy</code></li>
 </ul>
 </li>
 <li>Python matplotlib package<ul>
-<li>MacOS: <code>pip/pip3 install matplotlib</code></li>
+<li>MacOS: <code>pip install matplotlib</code></li>
 </ul>
 </li>
 <li>GNU GSL library<ul>
-<li>MacOS: <code>brew install gsl</code>,</li>
+<li>MacOS: <code>brew install gsl</code></li>
 <li>We also provide the option to download and use a local copy of the GSL library</li>
 </ul>
 </li>
 </ul>
-<h3 id="steps">Steps</h3>
+<h3 id="installation-steps">Installation steps</h3>
 <p>1. Download from github:</p>
 <p><code>git clone https://github.com/cselab/pi4u.git -b tmcmc</code></p>
 <p>2. Go to pi4u/src and build the TMCMC library:</p>
 <p><code>cd pi4u/src; make</code></p>
 <p><code>cd ..</code>   <em>(to move back to the pi4u folder)</em></p>
-<p>3. Go to demo_python and run demo.py</p>
-<p><code>cd demo; python2 demo.py</code></p>
+<h3 id="testing-running-the-demo">Testing - Running the demo</h3>
+<p>1. Go to demo_python and run demo3.py</p>
+<p><code>cd demo; python2 demo3.py</code></p>
+<p>2. The scatter plot of samples for our example should be as follows:</p>
+<p><img alt="Screenshot" src="../img/curgen_db_003_009.txt.png" /></p>
+<h2 id="troubleshooting-and-additional-options">Troubleshooting and additional options</h2>
 <h3 id="how-to-build-the-software-using-a-local-copy-of-the-gsl-library">How to build the software using a local copy of the GSL library</h3>
 <p>1. Go to pi4u/gsl and run build.sh:</p>
 <p><code>cd pi4u/gsl; ./build.sh</code></p>
