@@ -21,10 +21,9 @@ from plot_gen import *
 
 print("calling tmcmc")
 
-#logEv=tmcmc('fitfun3', dim=2, maxstages=20, popsize=4096, lowerbound=[-10,0], upperbound=[10,1], id=3)
+logEv=tmcmc('fitfun3', dim=2, maxstages=20, popsize=4096, lowerbound=[-10,0], upperbound=[10,1], id=3)
 #print("logEv=",logEv[0])
 
 print("tmcmc completed!")
 
-#plot_gen('curgen_db_003_009.txt',dim=2,i=1,j=2,show=1,save=0)
-plot_gen('curgen_db_003_009.txt',dim=2,i=1,j=2,namei='alpha',namej='sigma^2',show=1,save=1)
+plot_gen('curgen_db_003_009.txt',dim=2,i=1,j=2,namei='alpha',namej='sigma^2',show=1,save=0)
