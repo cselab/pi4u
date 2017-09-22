@@ -3,22 +3,22 @@
 import numpy as np
 import math
 
-def fitfun3(x, dim):
+def fitfun3(theta, dim):
 
-#	print('x=',x)
+#	print('theta=',theta)
 
-	a = x[0]
-	sigma = x[1]
+	a = theta[0]
+	sigma = theta[1]
 
         data = np.loadtxt('data3.txt')
         N=data.shape[0];
 
-	fx = data[:,0]
-        fy = data[:,1]
+	x = data[:,0]
+        d = data[:,1]
 	
-	y = a*fx;
+	y = a*x;
 
-	SSE = np.sum((y-fy)**2)
+	SSE = np.sum((y-d)**2)
         sy=sigma;
 	logn = -0.5*N*math.log(2*math.pi)-0.5*N*math.log(sy*sy)-0.5*SSE/(sy*sy)
 
