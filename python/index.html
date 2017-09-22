@@ -221,8 +221,8 @@ def fitfun3(theta, dim):
 <h3 id="prerequisites">Prerequisites</h3>
 <p>Make sure that the following required software has been installed.</p>
 <ul>
-<li>C compiler</li>
-<li>Python (2.7 or higher)</li>
+<li>CGG compiler</li>
+<li>Python 2.7 (or higher)</li>
 <li>Python-devel package<ul>
 <li><code>python2-config</code> or <code>python3-config</code> must be available</li>
 <li>MacOS: automatically available if python has been installed with brew</li>
@@ -244,26 +244,29 @@ def fitfun3(theta, dim):
 </ul>
 <h3 id="installation-steps">Installation steps</h3>
 <p>1. Download from github:</p>
-<p><code>git clone https://github.com/cselab/pi4u.git -b tmcmc</code></p>
-<p>2. Go to pi4u/src and build the TMCMC library:</p>
-<p><code>cd pi4u/src; make</code></p>
-<p><code>cd ..</code>   <em>(to move back to the pi4u folder)</em></p>
+<p><code>git clone https://github.com/cselab/pi4u.git pi4u-tmcmc -b tmcmc</code></p>
+<p>2. Go to pi4u-tmcmc/src and build the TMCMC library:</p>
+<p><code>cd pi4u-tmcmc/src; make</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
 <h3 id="testing-running-the-demo">Testing - Running the demo</h3>
-<p>1. Go to demo_python and run demo3.py</p>
-<p><code>cd demo; python2 demo3.py</code></p>
+<p>1. Go to pi4u-tmcmc/demo_python and run demo3.py</p>
+<p><code>cd demo_python; python2 demo3.py</code>  </p>
 <p>2. The scatter plot of samples for our example should be as follows:</p>
 <p><img alt="Screenshot" src="../img/curgen_db_003_009.txt.png" /></p>
 <h2 id="troubleshooting-and-additional-options">Troubleshooting and additional options</h2>
 <h3 id="how-to-build-the-software-using-a-local-copy-of-the-gsl-library">How to build the software using a local copy of the GSL library</h3>
-<p>1. Go to pi4u/gsl and run build.sh:</p>
-<p><code>cd pi4u/gsl; ./build.sh</code></p>
-<p>2. Go to pi4u/src and build the TMCMC library:</p>
+<p>1. Go to pi4u-tmcmc/gsl and run build.sh:</p>
+<p><code>cd pi4u-tmcmc/gsl; ./build.sh</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
+<p>2. Go to pi4u-tmcmc/src and build the TMCMC library:</p>
+<p><code>cd gsl; ./build.sh</code></p>
 <p><code>make mygsl=1</code></p>
 <h3 id="how-to-build-the-software-using-python3">How to build the software using python3</h3>
-<p>1. Go to pi4u/src and (re)-build the TMCMC library:</p>
+<p>1. Go to pi4u-tmcmc/src and (re)-build the TMCMC library:</p>
 <p><code>make clean; make python3=1</code></p>
-<p>2. Go to demo_python and run demo.py</p>
-<p><code>cd demo; python3 demo.py</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
+<p>2. Go to demo_python and run demo3.py using python3</p>
+<p><code>cd demo_python; python3 demo.py</code></p>
               
             </div>
           </div>
