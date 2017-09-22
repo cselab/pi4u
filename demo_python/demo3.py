@@ -21,16 +21,9 @@ from plot_gen import *
 
 print("calling tmcmc")
 
-#logEv=tmcmc('fitfun2', dim=2, maxstages=20, popsize=4096, lowerbound=[-10,-10], upperbound=[10,10], id=2)
 logEv=tmcmc('fitfun3', dim=2, maxstages=20, popsize=4096, lowerbound=[-10,0], upperbound=[10,1], id=3)
 print("logEv=",logEv[0])
 
 print("tmcmc completed!")
-
-# Output files can be plotted with the following python script:
-# python2.7 ../lib/display_gen.py curgen_db_xxx_yyy.txt 2 1 2 
-# xxx = id of the tmcmcm run, yyy = stage number, 2 1 2 : number of parameters, first parameter (x-axis), second parameter (y-axis) 
-
-#plot_gen('curgen_db_002_003.txt', dim=2, i=1, j=2, show=1, save=0)
 
 plot_gen('curgen_db_003_009.txt',dim=2,i=1,j=2,show=1,save=0)
