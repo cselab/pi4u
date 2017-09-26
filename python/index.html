@@ -260,10 +260,10 @@ def fitfun3(theta, dim):
 <p><code>cd pi4u-tmcmc/gsl; ./build.sh</code></p>
 <p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
 <p>2. Go to pi4u-tmcmc/src and build the TMCMC library:</p>
-<p><code>cd src; make mygsl=1</code></p>
+<p><code>cd src; make -B mygsl=1</code></p>
 <h3 id="how-to-build-the-software-using-python3">How to build the software using python3</h3>
 <p>1. Go to pi4u-tmcmc/src and (re)-build the TMCMC library:</p>
-<p><code>make clean; make python3=1</code></p>
+<p><code>make -B python3=1</code></p>
 <p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
 <p>2. Go to demo_python and run demo3.py using python3</p>
 <p><code>cd demo_python; python3 demo.py</code></p>
