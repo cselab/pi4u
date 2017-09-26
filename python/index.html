@@ -222,18 +222,18 @@ def fitfun3(theta, dim):
 <p>Make sure that the following required software has been installed.</p>
 <ul>
 <li>GCC compiler</li>
-<li>Python 2.7  <!--- (or higher) --></li>
+<li>Python 2.7 (or higher)</li>
 <li>Python-devel package<ul>
-<li><code>python2-config</code> must be available   <!---  * <code>python2-config</code> or <code>python3-config</code> must be available --></li>
+<li><code>python2-config</code> or <code>python3-config</code> must be available</li>
 <li>MacOS: automatically available if python has been installed with brew</li>
 </ul>
 </li>
 <li>Python numpy package<ul>
-<li>MacOS: <code>pip2 install numpy</code></li>
+<li>MacOS: <code>pip2 install numpy</code> or <code>pip3 install numpy</code></li>
 </ul>
 </li>
 <li>Python matplotlib package<ul>
-<li>MacOS: <code>pip2 install matplotlib</code></li>
+<li>MacOS: <code>pip2 install matplotlib</code> or <code>pip3 install matplotlib</code></li>
 </ul>
 </li>
 <li>GNU GSL library<ul>
@@ -261,19 +261,12 @@ def fitfun3(theta, dim):
 <p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
 <p>2. Go to pi4u-tmcmc/src and build the TMCMC library:</p>
 <p><code>cd src; make -B mygsl=1</code></p>
-<!---
-### How to build the software using python3
-
-1\. Go to pi4u-tmcmc/src and (re)-build the TMCMC library:
-
-`make -B python3=1`
-
-`cd ..`  (*go back to the pi4u-tmcmc directory*)
-
-2\. Go to demo_python and run demo3.py using python3
-
-`cd demo_python; python3 demo3.py`
--->
+<h3 id="how-to-build-the-software-using-python3">How to build the software using python3</h3>
+<p>1. Go to pi4u-tmcmc/src and (re)-build the TMCMC library:</p>
+<p><code>make -B python3=1</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
+<p>2. Go to demo_python and run demo3.py using python3</p>
+<p><code>cd demo_python; python3 demo3.py</code></p>
               
             </div>
           </div>
