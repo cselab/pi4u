@@ -104,15 +104,15 @@ can be produced by means of the **plot_gen()** function.
 
 Make sure that the following required software has been installed.
 
-* CGG compiler
+* GCC compiler
 * Python 2.7 (or higher)
 * Python-devel package
     * `python2-config` or `python3-config` must be available
     * MacOS: automatically available if python has been installed with brew
 * Python numpy package
-    * MacOS: `pip install numpy`
+    * MacOS: `pip2 install numpy` or `pip3 install numpy`
 * Python matplotlib package
-    * MacOS: `pip install matplotlib`
+    * MacOS: `pip2 install matplotlib` or `pip3 install matplotlib`
 * GNU GSL library
     * MacOS: `brew install gsl`
     * We also provide the option to download and use a local copy of the GSL library
@@ -154,19 +154,17 @@ If you do not have git, download *pi4u-tmcmc.zip* from here: [GitHub download li
 
 2\. Go to pi4u-tmcmc/src and build the TMCMC library:
 
-`cd gsl; ./build.sh`
-
-`make mygsl=1`
+`cd src; make -B mygsl=1`
 
 
 ### How to build the software using python3
 
 1\. Go to pi4u-tmcmc/src and (re)-build the TMCMC library:
 
-`make clean; make python3=1`
+`make -B python3=1`
 
 `cd ..`  (*go back to the pi4u-tmcmc directory*)
 
 2\. Go to demo_python and run demo3.py using python3
 
-`cd demo_python; python3 demo.py`
+`cd demo_python; python3 demo3.py`
