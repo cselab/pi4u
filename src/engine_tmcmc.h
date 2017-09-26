@@ -119,14 +119,14 @@ double posterior(double *theta, int n, double LH);
 double priorpdf(double *theta, int n, double *lowerbound, double *upperbound);
 
 /*** AUX ***/
-void inc_nfc();
+void inc_nfc(void);
 void get_nfc_task(int *);
-int get_nfc();
-void reset_nfc_task();
-void reset_nfc();
-int get_tfc();
+int get_nfc(void);
+void reset_nfc_task(void);
+void reset_nfc(void);
+int get_tfc(void);
 
 
 int tmcmc_initialize(char *fitfun_name);
-void tmcmc_finalize();
+void tmcmc_finalize(void);
 void tmcmc(double *res, int tmcmc_info[4], int Nth, int MaxStages, int PopSize, double *lb, double *ub);

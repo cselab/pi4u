@@ -40,16 +40,14 @@ fitfun_initialize(char *fitfun_name)
         PyRun_SimpleString("import sys");
         PyRun_SimpleString("sys.path.append(\".\")");
 
-	printf("yyyyyyyyyyyy\n");
-
 #if PY_MAJOR_VERSION >= 3
-//	PyObject* myModuleString = PyUnicode_DecodeFSDefault((char *)"fitfun2");
+//	PyObject* myModuleString = PyUnicode_DecodeFSDefault((char *)"fitfun3");
 	PyObject* myModuleString = PyUnicode_DecodeFSDefault(fitfun_name);
 #else
-//	PyObject* myModuleString = PyString_FromString((char*)"fitfun");
+//	PyObject* myModuleString = PyString_FromString((char*)"fitfun3");
 	PyObject* myModuleString = PyString_FromString(fitfun_name);
 #endif
-        printf("myModuleString = %p\n", myModuleString);
+	printf("myModuleString = %p\n", myModuleString);
 
         myModule = PyImport_Import(myModuleString);
         printf("myModule = %p\n", myModule);

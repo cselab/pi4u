@@ -878,7 +878,7 @@ fitfun_t fitfun_initialize;
 fitfun_t fitfun_finalize;
 #else
 extern void fitfun_initialize(char *fitfun_name);
-extern void fitfun_finalize();
+extern void fitfun_finalize(void);
 extern double fitfun(double *TP, long n, void *output, int *info);
 #endif
 
