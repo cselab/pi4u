@@ -8,8 +8,7 @@
 	aux.c to auxil.c
 	Improved propagation tool
 
-0.4:
-	TMCMC: fzerofind in tmcmc_stats.c
+0.4:	TMCMC: fzerofind in tmcmc_stats.c
 	TMCMC: support for very large number of samples
 	TMCMC: reading samples from file
 	TMCMC: multithreaded RNGs
@@ -17,5 +16,14 @@
 	AMaLGaM: algorithm added
 	ABC-SubSim: algorithm added
 
-0.5:
+0.5:	Tutorial (pdf)
+	Updated postprocessing tools
+	Asycnhronous versions of CMAES
+	DRAM algorithm (sequential version)
+	Various compilation fixes
+	Checkpoint restart for CMAES
+	Local covariance matrix in TMCMC
+
+	
+	
 	

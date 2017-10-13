@@ -11,12 +11,12 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "engine_tmcmc.h"
-#include "fitfun.c" 
-
 #define _XOPEN_SOURCE 500
 #define _BSD_SOURCE
 #define _GNU_SOURCE
+#include "engine_tmcmc.h"
+#include "fitfun.c" 
+
 #define _STEALING_
 /*#define VERBOSE 1*/
 /*#define _AFFINITY_*/

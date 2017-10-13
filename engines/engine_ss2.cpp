@@ -18,7 +18,7 @@
 #include <iostream>
 using namespace std;
 #include <mpi.h>
-#include <omp.h>
+//#include <omp.h>
 #include <math.h>
 extern "C"
 {
