@@ -664,27 +664,30 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
     torc_waitall3();
 }
 
-void torc_update_curgen_db_task(double point[], double *pF)
+void torc_update_curgen_db_task(double point[], double *pF, double *pprior)
 {
     double F = *pF;
+	double prior = *pprior;
 
     /*    printf("torc_update_curgen_db_task: %f %f %f %f\n", point[0], point[1], point[2], F); fflush(0); */
 
-    update_curgen_db(point, F);
+    update_curgen_db(point, F, prior);
 }
 
-void torc_update_curgen_db(double point[], double F)
+void torc_update_curgen_db(double point[], double F, double prior)
 {
     int me = torc_node_id();
     /*    printf("%d torc_update_curgen_db_task: %f %f %f %f\n", me, point[0], point[1], point[2], F); fflush(0); */
     if (me == 0) {
-        update_curgen_db(point, F);
+        update_curgen_db(point, F,prior);
         return;
     }
-    torc_create_direct(0, torc_update_curgen_db_task, 2,        /* message to the database manager (separate process?) or direct execution by server thread */
-            data.Nth, MPI_DOUBLE, CALL_BY_COP,
-            1, MPI_DOUBLE, CALL_BY_COP,
-            point, &F);
+	torc_create_direct(0, torc_update_curgen_db_task, 3,            /* message to the database manager (separate process?) or direct execution by server thread */
+		data.Nth, MPI_DOUBLE, CALL_BY_COP,
+		1, MPI_DOUBLE, CALL_BY_COP,
+		1, MPI_DOUBLE, CALL_BY_COP,
+		point, &F,&prior);
+
     torc_waitall3();    /* wait without releasing the worker */
 }
 
@@ -808,8 +811,10 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
 
     evaluate_F(point, &fpoint, me, gen_id, chain_id, 0, 1);
 
+	double logprior = logpriorpdf(point, data.Nth);
+
     /* update current db entry */
-    torc_update_curgen_db(point, fpoint);
+	torc_update_curgen_db(point, fpoint, logprior);
     if (data.ifdump) torc_update_full_db(point, fpoint, NULL, 0, 0);
     *out_tparam = fpoint;    /* currently not required, the result is already in the db*/
 
@@ -1024,16 +1029,26 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
             if (P < L) {
                 for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];    /* new leader! */
                 loglik_leader = loglik_candidate;
-                if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
+                if (step >= BURN_IN) {
+					double logprior_leader = logpriorpdf(leader, data.Nth);
+					torc_update_curgen_db(leader, loglik_leader, logprior_leader);
+				}
             }
             else {
                 /*increase counter or add the leader again in curgen_db*/
-                if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
+                if (step >= BURN_IN) {
+					double logprior_leader = logpriorpdf(leader, data.Nth);
+					torc_update_curgen_db(leader, loglik_leader, logprior_leader);
+				}
+
             }
         }
         else {
             /*increase counter or add the leader again in curgen_db*/
-            if (step >= BURN_IN) torc_update_curgen_db(leader, loglik_leader);
+            if (step >= BURN_IN) {
+					double logprior_leader = logpriorpdf(leader, data.Nth);
+					torc_update_curgen_db(leader, loglik_leader, logprior_leader);
+				}
         }
     }
 
@@ -1663,6 +1678,15 @@ int main(int argc, char *argv[])
 #endif
 
 end:
+    /* making a copy of last curgen_db file */
+    {
+        printf("lastgen = %d\n", runinfo.Gen);
+        char cmd[256];
+        sprintf(cmd, "cp curgen_db_%03d.txt final.txt", runinfo.Gen);
+        system(cmd);
+    }
+
+
     /* shutdown */
     printf("total function calls = %d\n", get_tfc());
     torc_finalize();

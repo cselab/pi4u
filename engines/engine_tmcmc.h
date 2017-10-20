@@ -97,6 +97,8 @@ typedef struct {
 typedef struct cgdbp_s {
     double *point; /*[PROBDIM];*/
     double F;
+	double prior;
+
     int counter;    /* not used (?)*/
     int nsel;    /* for selection of leaders only*/
     int queue;    /* for submission of leaders only*/
@@ -155,7 +157,7 @@ extern resdb_t curres_db;
 void update_full_db(double point[], double F, double *G, int n, int surrogate);
 void init_full_db();
 
-void update_curgen_db(double point[], double F);
+void update_curgen_db(double point[], double F, double prior);
 #if defined(_TMCMC_SN_)
 void update_curgen_db_der(double point[], double F, double grad[], double hes[]);
 #endif

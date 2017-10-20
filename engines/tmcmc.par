@@ -33,9 +33,9 @@ prior_type  0
 # Bdef: same boundaries in each dimension
 # Bi: boundaries in i-th dimension, e.g. B0 -1 1
 # Note: Bi overwrites Bdef 
-Bdef		-15	15
-#B0		-6	6
-#B1		-6	6
+#Bdef		-15	15
+B0		-6	6
+B1		-6	6
 
 # Parameters of the Gaussian prior
 # Note: prior_mu size is 1 x Nth, prior_sigma size is Nth x Nth
@@ -64,7 +64,7 @@ use_proposal_cma 0
 # Acceptance type in MCMC:
 # 0 - without exp()
 # 1 - with exp()
-accept      1
+accept      0
 
 
 #---------------------------- OTHER OPTIONS -----------------------------------

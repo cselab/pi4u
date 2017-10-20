@@ -36,7 +36,7 @@ void init_full_db()
 }
 
 
-void update_curgen_db(double point[], double F)
+void update_curgen_db(double point[], double F, double prior)
 {
 	int PROBDIM = data.Nth;
 	int i, pos;
@@ -50,7 +50,9 @@ void update_curgen_db(double point[], double F)
 
 	for (i = 0; i < PROBDIM; i++) curgen_db.entry[pos].point[i] = point[i];
 	curgen_db.entry[pos].F = F;
+	curgen_db.entry[pos].prior = prior;
 }
+
 
 #if defined(_TMCMC_SN_)
 void update_curgen_db_der(double point[], double F, double *grad, double *hes)
@@ -181,20 +183,14 @@ void dump_curgen_db(int Gen)
 	sprintf(fname, "curgen_db_%03d.txt", Gen);
 	fp = fopen(fname, "w");
 	for (pos = 0; pos < curgen_db.entries; pos++) {
-		if (PROBDIM == 2)
-			fprintf(fp, "%20.16lf %20.16lf %20.16lf\n",
-				curgen_db.entry[pos].point[0], curgen_db.entry[pos].point[1], curgen_db.entry[pos].F);
-		else if (PROBDIM == 3) 
-			fprintf(fp, "%20.16lf %20.16lf %20.16lf %20.16lf\n",
-				curgen_db.entry[pos].point[0], curgen_db.entry[pos].point[1], curgen_db.entry[pos].point[2], curgen_db.entry[pos].F);
-		else {
 			int i;
 			
 			for (i = 0; i < PROBDIM; i++) {
 				fprintf(fp, "%20.16lf ", curgen_db.entry[pos].point[i]);
 			}
-			fprintf(fp, "%20.16lf\n", curgen_db.entry[pos].F);
-		}
+			fprintf(fp, "%20.16lf", curgen_db.entry[pos].F);
+			fprintf(fp, "%20.16lf ", curgen_db.entry[pos].prior);
+			fprintf(fp,"\n");
 
 	}
 	fclose(fp);
@@ -230,6 +226,7 @@ int load_curgen_db(int Gen)
 			fscanf(fp, "%lf", &curgen_db.entry[pos].point[i]);
 		}
 		fscanf(fp, "%lf", &curgen_db.entry[pos].F);
+		fscanf(fp, "%lf", &curgen_db.entry[pos].prior);
 	}
 	fclose(fp);
 
