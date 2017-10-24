@@ -8,7 +8,6 @@
  *
  */
 
-#include "engine_tmcmc.h"
 #include "fitfun.c"
 
 #include <stdio.h>
@@ -19,9 +18,9 @@
 
 void taskfun(double *x, int *pn, double *res, int *info)
 {
-    int n = *pn;
+	int n = *pn;
 	*res = fitfun(x, n, (void *)NULL, info);
-    return;
+	return;
 }
 
 

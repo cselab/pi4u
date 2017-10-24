@@ -211,12 +211,12 @@ void data_init()
 #define NOISE	0
 
 //Noise=@(x) 0.0*randn(size(x));
-void Noise(double *x, double *n, int p, struct drand48_data *dr48_buffer)
+void Noise(double *x, double *n, int p, unsigned short *dr48_buffer)
 {
 	int i;
 	for (i = 0; i < p; i++) {
 		double r;
-		drand48_r(dr48_buffer, &r);
+		r = erand48(dr48_buffer);
 #if NOISE
 		n[i] = 1e-4*r;
 #else
@@ -225,7 +225,7 @@ void Noise(double *x, double *n, int p, struct drand48_data *dr48_buffer)
 	}
 }
 
-double Loss(double *x, int p, struct drand48_data *dr48_buffer)
+double Loss(double *x, int p, unsigned short *dr48_buffer)
 {
 	double n[p];
 	double sum = 0.0;
@@ -284,14 +284,19 @@ void do_work(int *pid)
 //%%% GENERATION OF AVERAGED GRADIENT AND HESSIAN %%% %%% (NO AVERAGING IF gH_avg=1) %%%
 	int id = *pid;
 
-	struct drand48_data dr48_buffer;
+	unsigned short dr48_buffer[3];
 
 	if (data.seed == 0) {
-		data.seed = time(0);
+		dr48_buffer[0] = 0;
+		dr48_buffer[1] = 0;
+		dr48_buffer[2] = time(0);
 	}
 //	srand48_r(id, &dr48_buffer);
 //	srand48_r((id+1)*time(0), &dr48_buffer);
-	srand48_r((id+1)*data.seed, &dr48_buffer);
+//	srand48_r((id+1)*data.seed, &dr48_buffer);
+//	dr48_buffer[2] = (id);
+//	dr48_buffer[2] = (id+1)*time(0);
+	dr48_buffer[2] = (id+1)*data.seed;
 
 	int i, j;
 	int m;
@@ -300,7 +305,7 @@ void do_work(int *pid)
 
 		for (i = 0; i < p; i++) {
 			double r;
-			drand48_r(&dr48_buffer, &r);
+			r = erand48(dr48_buffer);
 			delta[i] = 2*round(r)-1;
 		}
 
@@ -310,8 +315,8 @@ void do_work(int *pid)
 			thetaminus[i] = theta[i] -c*delta[i];
 		}
 
-		double yplus  = Loss(thetaplus, p, &dr48_buffer);
-		double yminus = Loss(thetaminus, p, &dr48_buffer);
+		double yplus  = Loss(thetaplus, p, dr48_buffer);
+		double yminus = Loss(thetaminus, p, dr48_buffer);
             
 		double ghat[p];
 		for (i = 0; i < p; i++) 
@@ -330,7 +335,7 @@ void do_work(int *pid)
 
 		for (i = 0; i < p; i++) {
 			double r;
-			drand48_r(&dr48_buffer, &r);
+			r = erand48(dr48_buffer);
 			deltatilda[i]=2*round(r)-1;
 		}
 
@@ -345,10 +350,10 @@ void do_work(int *pid)
 			thetaminusplustilda[i] = thetaminus[i] + c*deltatilda[i];
 		}
 
-		double yplustilda=Loss(thetaplustilda, p, &dr48_buffer);
-		double yminustilda=Loss(thetaminustilda, p, &dr48_buffer);
-		double yplusminustilda=Loss(thetaplusminustilda, p, &dr48_buffer);
-		double yminusplustilda=Loss(thetaminusplustilda, p, &dr48_buffer);
+		double yplustilda=Loss(thetaplustilda, p, dr48_buffer);
+		double yminustilda=Loss(thetaminustilda, p, dr48_buffer);
+		double yplusminustilda=Loss(thetaplusminustilda, p, dr48_buffer);
+		double yminusplustilda=Loss(thetaminusplustilda, p, dr48_buffer);
             
 		double ghatplus[p], ghatminus[p];
 		for (i = 0; i < p; i++) {

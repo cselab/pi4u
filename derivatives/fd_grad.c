@@ -192,12 +192,12 @@ void data_init()
 #define NOISE	0
 
 //Noise=@(x) 0.0*randn(size(x));
-void Noise(double *x, double *n, int p, struct drand48_data *dr48_buffer)
+void Noise(double *x, double *n, int p, unsigned short *dr48_buffer)
 {
 	int i;
 	for (i = 0; i < p; i++) {
 		double r;
-		drand48_r(dr48_buffer, &r);
+		r = erand48(dr48_buffer);
 #if NOISE
 		n[i] = 1e-4*r;
 #else
@@ -206,7 +206,7 @@ void Noise(double *x, double *n, int p, struct drand48_data *dr48_buffer)
 	}
 }
 
-static struct drand48_data *dr48_buffer;
+unsigned short **dr48_buffer;
 
 void rand_init_task()
 {
@@ -214,9 +214,13 @@ void rand_init_task()
 	int node = torc_node_id();
 	int workers = torc_i_num_workers(); 
 
-	dr48_buffer = (struct drand48_data *) malloc(workers*sizeof(struct drand48_data));
+	dr48_buffer = (unsigned short **) malloc(workers*sizeof(unsigned short *));
 	for (i = 0; i < workers; i++) {
-		srand48_r((node+1)*time(0)+i, &dr48_buffer[i]);
+		dr48_buffer[i] = malloc(32*sizeof(unsigned short));
+		dr48_buffer[i][0] = 0;
+		dr48_buffer[i][1] = 0;
+		dr48_buffer[i][2] = (node+1)*time(0)+i;
+		//srand48_r((node+1)*time(0)+i, &dr48_buffer[i]);
 	}
 }
 
@@ -236,7 +240,7 @@ double F(double *x, int *pn)
 	double sum = 0.0;
 	double n[p];
 
-	Noise(x, n, p, &dr48_buffer[torc_i_worker_id()]);
+	Noise(x, n, p, dr48_buffer[torc_i_worker_id()]);
 
 	inc_nfc();
       	sum = fitfun(x, p, NULL, NULL);

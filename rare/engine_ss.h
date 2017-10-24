@@ -58,11 +58,11 @@ typedef struct data_s {
 } data_t;
 
 
-typedef struct runinfo_s {
-} runinfo_t;
+//typedef struct runinfo_s {
+//} runinfo_t;
 
 extern data_t data;
-extern runinfo_t runinfo;
+//extern runinfo_t runinfo;
 
 
 /*** DATABASES ***/

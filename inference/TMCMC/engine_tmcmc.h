@@ -106,11 +106,6 @@ typedef struct cgdbp_s {
     int surrogate;
     double error;
 #endif
-#if defined(_TMCMC_SN_)
-    int valid;
-    double *grad;
-    double *hes;
-#endif
 } cgdbp_t;
 
 typedef struct cgdb_s {
@@ -158,9 +153,6 @@ void update_full_db(double point[], double F, double *G, int n, int surrogate);
 void init_full_db();
 
 void update_curgen_db(double point[], double F, double prior);
-#if defined(_TMCMC_SN_)
-void update_curgen_db_der(double point[], double F, double grad[], double hes[]);
-#endif
 void init_curgen_db();
 
 void update_curres_db(double point[], double F);

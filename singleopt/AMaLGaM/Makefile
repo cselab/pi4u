@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -fopenmp
+CFLAGS = #-fopenmp
 LIBS = -lm
 
 TCC = mpicc

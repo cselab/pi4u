@@ -1,7 +1,7 @@
 # Part I: common configuration options for fd_grad, fd_deriv and sa_deriv
 
 # Problem dimension
-Nth		4
+Nth		2
 
 # Boundaries
 Bdef		-4	4
@@ -36,7 +36,7 @@ order		2
 # Part V: options for sa_deriv
 
 # Total samples
-reps		100000
+reps		1000000
 
 # RNG seed
 seed		280675

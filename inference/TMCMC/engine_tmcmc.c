@@ -1502,9 +1502,7 @@ int main(int argc, char *argv[])
         printf("server: Generation %d: total elapsed time = %lf secs, generation elapsed time = %lf secs for function calls = %d\n", runinfo.Gen, gt1-t0, gt1-gt0, g_nfeval);
         reset_nfc();
 
-        print_curgen_db();
         if (data.icdump) dump_curgen_db(runinfo.Gen);
-        display_curgen_db(runinfo.Gen);
         if (data.ifdump) dump_full_db(runinfo.Gen);
 
         /* save here */
@@ -1609,9 +1607,7 @@ int main(int argc, char *argv[])
         printf("server: Generation %d: total elapsed time = %lf secs, generation elapsed time = %lf secs for function calls = %d\n", runinfo.Gen, gt1-t0, gt1-gt0, g_nfeval);
         reset_nfc();
 
-        print_curgen_db();
         if (data.icdump) dump_curgen_db(runinfo.Gen);
-        display_curgen_db(runinfo.Gen);
         if (data.ifdump) dump_full_db(runinfo.Gen);
 
         /* save here*/
