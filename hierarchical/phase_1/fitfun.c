@@ -59,12 +59,14 @@ double fitfun(double *x, int n, void *output, int *winfo) {
 
         // run simulation
         char line[BUFLEN], *largv[2];
-        sprintf(line, "sh doall.sh");
+        sprintf(line, "./doall.sh");
         parse(line, largv);
         int fd = open("output.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         dup2(fd, 1); dup2(fd, 2);  // make stdout and stderr go to file
         close(fd);
         execvp(*largv, largv);
+	printf("This point must not be reached!\n");
+	exit(1);
     }
     pthread_mutex_unlock(&fork_mutex);
 
