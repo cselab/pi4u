@@ -58,7 +58,7 @@ double fitfun(double *x, int n, void *output, int *winfo) {
         fclose(finp);
 
         // run simulation
-        char line[BUFLEN], *largv[2];
+        char line[BUFLEN], *largv[64];
         sprintf(line, "./doall.sh");
         parse(line, largv);
         int fd = open("output.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
