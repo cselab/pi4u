@@ -40,8 +40,8 @@ double fitfun(double *x, int n, void *output, int *winfo) {
     if (rf < 0) {
         printf("Fork failed\n"); fflush(0);
     } else if (rf == 0) {
-        
-	
+
+
 
 		chdir(workdir);
 
@@ -50,7 +50,7 @@ double fitfun(double *x, int n, void *output, int *winfo) {
             printf("Error in copy from dir %s\n", bindir);
             abort();
         }
-		
+
 
         // write parametes to the simulation's input file
         FILE *finp = fopen("params.txt", "w");
@@ -59,18 +59,18 @@ double fitfun(double *x, int n, void *output, int *winfo) {
 
         // run simulation
         char line[BUFLEN], *largv[64];
-        sprintf(line, "./doall.sh");
+        sprintf(line, "sh ./doall.sh");
         parse(line, largv);
         int fd = open("output.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         dup2(fd, 1); dup2(fd, 2);  // make stdout and stderr go to file
         close(fd);
-        
+
 		execvp(*largv, largv);
-		
+
 		printf("This point must not be reached!\n");
 		exit(1);
     }
-    
+
 	pthread_mutex_unlock(&fork_mutex);
 
 
