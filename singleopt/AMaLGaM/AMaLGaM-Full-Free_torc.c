@@ -1079,7 +1079,7 @@ void printVerboseOverview( void )
   printf("# Value to reach (vtr)    = %e\n", vtr);
   printf("# Fitness var. tolerance  = %e\n", fitness_variance_tolerance);
   printf("# Max. number of pop's    = %d\n", maximum_number_of_populations);
-  printf("# Random seed             = %ld\n", random_seed);
+  printf("# Random seed             = %lld\n", random_seed);
   printf("#\n");
   printf("##############################################################\n");
 }

@@ -3,7 +3,7 @@ CPP = mpic++
 MPIF90 = mpif90
 
 CFLAGS = -O3 -std=c99
-CFLAGS += -Wall 
+CFLAGS += -Wall -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 
 LDFLAGS += -lgsl -lgslcblas
 

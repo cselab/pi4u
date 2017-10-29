@@ -1,9 +1,9 @@
 CC = gcc
-CFLAGS = #-fopenmp
+CFLAGS = -D_XOPEN_SOURCE=700 -D_BSD_SOURCE #-fopenmp
 LIBS = -lm
 
 TCC = mpicc
-TCFLAGS = `torc_cflags` 
+TCFLAGS = `torc_cflags` -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 TLIBS = `torc_libs` -lm
 
 #CFLAGS += -D_RANDOMIZE_

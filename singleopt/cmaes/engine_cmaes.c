@@ -13,8 +13,6 @@
 
 #include "fitfun.c" 
 
-#define _XOPEN_SOURCE 500
-#define _BSD_SOURCE
 #define VERBOSE 1
 #define _STEALING_
 #define _IODUMP_ 1

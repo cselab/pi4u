@@ -1,7 +1,7 @@
 use_torc?=0
 
 CPP=g++
-CPPFLAGS=-std=c++11 -O2 
+CPPFLAGS=-std=c++11 -O2 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CC=gcc
 CFLAGS=-O2
 LDFLAGS=-lgsl -lgslcblas

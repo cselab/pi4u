@@ -7,9 +7,6 @@
  *
  */
 
-#define _XOPEN_SOURCE 500
-#define _BSD_SOURCE
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

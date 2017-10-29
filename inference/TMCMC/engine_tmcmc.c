@@ -10,10 +10,6 @@
 #include <assert.h>
 #include <signal.h>
 #include <stdio.h>
-
-#define _XOPEN_SOURCE 500
-#define _BSD_SOURCE
-#define _GNU_SOURCE
 #include "engine_tmcmc.h"
 #include "fitfun.c" 
 

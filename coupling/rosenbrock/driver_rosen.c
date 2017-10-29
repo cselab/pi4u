@@ -7,8 +7,6 @@
  *
  */
 
-#define _XOPEN_SOURCE 600
-#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -24,7 +22,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include "../fitfun.c"
+#include "fitfun.c"
 #include <mpi.h>
 #include <torc.h>
 
