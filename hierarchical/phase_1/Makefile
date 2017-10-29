@@ -21,4 +21,4 @@ clean:
 	rm -f engine_tmcmc  *.o
 
 clear:
-	rm -rf curgen_db*.txt curres_db*.txt runinfo.txt full_db*.txt fitness.txt final.txt
+	rm -rf *.txt

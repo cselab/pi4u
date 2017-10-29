@@ -10,7 +10,7 @@ Nth		4
 MaxStages	20
 
 # Population size
-PopSize		8192
+PopSize		100
 
 # Chain lengths:
 # 1) TMCMC (biased): min=0, max>=PopSize

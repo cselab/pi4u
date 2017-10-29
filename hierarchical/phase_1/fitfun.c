@@ -9,7 +9,7 @@
 static pthread_mutex_t fork_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int flag[4096];  // MAX_WORKERS
 
-#define REMOVEDIRS  0
+#define REMOVEDIRS  1
 #define PREFIX      "."  // "/scratch"
 #define FAIL        -1e12
 #define BUFLEN      1024
@@ -64,11 +64,14 @@ double fitfun(double *x, int n, void *output, int *winfo) {
         int fd = open("output.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         dup2(fd, 1); dup2(fd, 2);  // make stdout and stderr go to file
         close(fd);
-        execvp(*largv, largv);
-	printf("This point must not be reached!\n");
-	exit(1);
+        
+		execvp(*largv, largv);
+		
+		printf("This point must not be reached!\n");
+		exit(1);
     }
-    pthread_mutex_unlock(&fork_mutex);
+    
+	pthread_mutex_unlock(&fork_mutex);
 
 
     // wait for fork
