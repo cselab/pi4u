@@ -1079,7 +1079,7 @@ void printVerboseOverview( void )
   printf("# Value to reach (vtr)    = %e\n", vtr);
   printf("# Fitness var. tolerance  = %e\n", fitness_variance_tolerance);
   printf("# Max. number of pop's    = %d\n", maximum_number_of_populations);
-  printf("# Random seed             = %ld\n", random_seed);
+  printf("# Random seed             = %lld\n", random_seed);
   printf("#\n");
   printf("##############################################################\n");
 }
@@ -1252,7 +1252,7 @@ void rosenbrockFunctionProblemEvaluation( double *parameters, double *objective_
   for( i = 0; i < number_of_parameters-1; i++ )
     result += 100*(parameters[i+1]-parameters[i]*parameters[i])*(parameters[i+1]-parameters[i]*parameters[i]) + (1.0-parameters[i])*(1.0-parameters[i]);
 
-  usleep(10*1000);
+  //usleep(10*1000);
 
   *objective_value  = result;
   *constraint_value = 0;

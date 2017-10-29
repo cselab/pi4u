@@ -7,9 +7,9 @@
  *
  */
 
-#define _XOPEN_SOURCE 700
-#define _BSD_SOURCE
-#define _GNU_SOURCE
+//#define _XOPEN_SOURCE 700
+//#define _BSD_SOURCE
+//#define _GNU_SOURCE
 #include <assert.h>
 #include <signal.h>
 #include <stdio.h>

@@ -2,9 +2,6 @@
 /* --------------- A Very Short Example -------------------- */
 /* --------------------------------------------------------- */
 
-#define _XOPEN_SOURCE 500
-#define _BSD_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h> /* free() */
 #include "cmaes_interface.h"
@@ -272,6 +269,7 @@ void callback(int *ptid, int *pnode_id, double *pout)
 	return;
 }
 
+extern void _torc_scheduler_loop(int);
 void torc_dispatch()
 {
         _torc_scheduler_loop(1);
@@ -341,7 +339,7 @@ int main(int argn, char **args)
 	//int lambda, dim;  - peh: global variables
 	//int step = 0; - peh: global variable
 	double gt0, gt1, gt2, gt3;
-	double tt0, tt1, stt = 0.0; 
+	//double tt0 = 0, tt1 = 0, stt = 0.0; 
 	int info[4];	/* gen, chain, step, task */
 	/* peh - end */
 
@@ -429,7 +427,7 @@ int main(int argn, char **args)
 	printf("Total elapsed time = %.3lf  seconds\n", gt3-gt0);
 	printf("Initialization time = %.3lf  seconds\n", gt1-gt0);
 	printf("Processing time = %.3lf  seconds\n", gt2-gt1);
-	printf("Funtion Evaluation time = %.3lf  seconds\n", stt);
+	//printf("Funtion Evaluation time = %.3lf  seconds\n", stt);
 	printf("Finalization time = %.3lf  seconds\n", gt3-gt2);
 
 	torc_finalize();

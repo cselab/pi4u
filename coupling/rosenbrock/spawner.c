@@ -1,5 +1,3 @@
-//#define _XOPEN_SOURCE 500
-//#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,7 +33,7 @@ void parse(char *line, char **argv)
 			*line != '\t' && *line != '\n') 
 			line++;	/* skip the argument until ...*/
 	}
-	*argv = '\0';	/* mark the end of argument list */
+	*argv = 0;	/* mark the end of argument list */
 }
 
 

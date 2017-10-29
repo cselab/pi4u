@@ -1,15 +1,18 @@
+CC=gcc
+CFLAGS=-O3 -Wall -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+#CFLAGS+= -DDEBUG=1
+LDFLAGS=-lgsl -lm
+
 all: normaltest bananatest generaltest
 
 normaltest: normaltest.c dramrun.c
-	gcc -Wall -std=c99 -o normaltest normaltest.c -lgsl -lm
-#	gcc -Wall -DDEBUG=1 -std=c99 -o normaltest normaltest.c -lgsl -lm
-
+	$(CC) $(CFLAGS) -o normaltest normaltest.c $(LDFLAGS)
 
 bananatest: bananatest.c dramrun.c
-	gcc -Wall -std=c99 -o bananatest bananatest.c -lgsl -lm
+	$(CC) $(CFLAGS) -o bananatest bananatest.c $(LDFLAGS)
 
 generaltest: generaltest.c dramrun.c fitfun.c
-	gcc -Wall -std=c99 -o generaltest generaltest.c -lgsl -lm
+	$(CC) $(CFLAGS) -o generaltest generaltest.c $(LDFLAGS)
 
 clean:
 	rm -f normaltest bananatest generaltest

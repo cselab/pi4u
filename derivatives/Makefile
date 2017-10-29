@@ -2,7 +2,7 @@ CC = mpicc
 CPP = mpic++ 
 MPIF90 = mpif90
 
-CFLAGS = -O3 -std=c99 -Wall 
+CFLAGS = -O3 -std=c99 -Wall -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 
 CFLAGS += `torc_cflags`
 LDFLAGS += `torc_libs` -lpthread -lm 

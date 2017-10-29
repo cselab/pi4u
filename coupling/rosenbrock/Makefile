@@ -1,5 +1,6 @@
 CC=mpicc
-CFLAGS = -fopenmp `torc_cflags` -O3
+CFLAGS=`torc_cflags` -O3 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+
 LIBS = `torc_libs`
 
 all: driver_rosen.exe simcode
