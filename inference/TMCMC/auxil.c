@@ -10,7 +10,17 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+
+#ifdef __cplusplus
+#include <mpi.h>
+extern "C"
+{
+#endif
 #include <torc.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 #include "gsl_headers.h"
 
@@ -40,7 +50,7 @@ void reset_nfc()
     int i;
 
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, (void *)reset_nfc_task, 0);
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())reset_nfc_task, 0);
     }
     torc_waitall();
 }
@@ -56,7 +66,7 @@ int get_nfc()
     int c[1024]; /* MAX_NODES*/
 
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, (void *)get_nfc_task, 1,
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())get_nfc_task, 1,
                 1, MPI_INT, CALL_BY_RES, &c[i]);
     }
     torc_waitall();
@@ -225,7 +235,7 @@ void gsl_rand_init(int seed)
     gsl_rng_env_setup();
 
     T = gsl_rng_default;
-    r = malloc(local_workers*sizeof(gsl_rng *));
+    r = (gsl_rng **)malloc(local_workers*sizeof(gsl_rng *));
     for (i = 0; i < local_workers; i++) {
         r[i] = gsl_rng_alloc (T);
     }
@@ -432,8 +442,8 @@ int mvnrnd(double *mean, double *sigma, double *out, int N)
 #if 1
 void aux_init()
 {
-    torc_register_task(reset_nfc_task);
-    torc_register_task(get_nfc_task);
+    torc_register_task((void *)reset_nfc_task);
+    torc_register_task((void *)get_nfc_task);
 }
 #endif
 

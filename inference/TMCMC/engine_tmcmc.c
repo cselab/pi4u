@@ -11,43 +11,17 @@
 #include <signal.h>
 #include <stdio.h>
 #include "engine_tmcmc.h"
-#include "fitfun.c" 
+#include "fitfun.h"
 
 #define _STEALING_
 /*#define VERBOSE 1*/
-/*#define _AFFINITY_*/
 /*#define _RESTART_*/
-
-static int exit_signal_flag = 0;    /* new */
 
 data_t data;
 runinfo_t runinfo;
 cgdb_t curgen_db;
 db_t full_db;
 resdb_t curres_db;
-
-#if defined(_AFFINITY_)    /* BRUTUS */
-#include "affinity.c"
-
-void call_setaffinity()
-{
-    int rank = torc_node_id();
-    int numanodesize = 6;
-    int start = rank*6 % 48;
-    set_rankaff(start, numanodesize);
-
-    get_rankaff(rank);
-}
-
-void spmd_setaffinity()
-{
-    int i;
-    for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, call_setaffinity, 0);
-    }
-    torc_waitall();
-}
-#endif
 
 void read_data()
 {
@@ -64,8 +38,8 @@ void read_data()
     data.lb = -6;    /* Default LB, same for all */
     data.ub = +6;    /* Default UB, same for all */
 
-    data.lowerbound = malloc(data.Nth*sizeof(double));
-    data.upperbound = malloc(data.Nth*sizeof(double));
+    data.lowerbound = (double *)malloc(data.Nth*sizeof(double));
+    data.upperbound = (double *)malloc(data.Nth*sizeof(double));
 
     for (i = 0; i < data.Nth; i++) {
         data.lowerbound[i] = data.lb;
@@ -73,8 +47,8 @@ void read_data()
     }
 
     /* new */
-    data.prior_mu = malloc(data.Nth*sizeof(double));
-    data.prior_sigma = malloc(data.Nth*data.Nth*sizeof(double));
+    data.prior_mu = (double *)malloc(data.Nth*sizeof(double));
+    data.prior_sigma = (double *)malloc(data.Nth*data.Nth*sizeof(double));
     data.auxil_size = 0;
     data.auxil_data = NULL;
 
@@ -110,7 +84,7 @@ void read_data()
     data.icdump = 1;    /* dump current dataset of accepted points */
     data.ifdump = 0;    /* dump complete dataset of points */
 
-    data.Num = malloc(data.MaxStages*sizeof(double));
+    data.Num = (int *)malloc(data.MaxStages*sizeof(int));
     for (i = 0; i < data.MaxStages; i++) {
         data.Num[i] = data.PopSize; /* default DATANUM */
     }
@@ -216,8 +190,8 @@ ifdump        0
 
     free(data.lowerbound);
     free(data.upperbound);
-    data.lowerbound = malloc(data.Nth*sizeof(double));
-    data.upperbound = malloc(data.Nth*sizeof(double));
+    data.lowerbound = (double *)malloc(data.Nth*sizeof(double));
+    data.upperbound = (double *)malloc(data.Nth*sizeof(double));
 
     for (i = 0; i < data.Nth; i++) {
         found = 0;
@@ -249,7 +223,7 @@ ifdump        0
         line_no = 0;
 
         free(data.prior_mu);
-        data.prior_mu = malloc(data.Nth*sizeof(double));
+        data.prior_mu = (double *)malloc(data.Nth*sizeof(double));
 
         found = 0;
         while (fgets(line, 256, f)!= NULL) {
@@ -282,7 +256,7 @@ ifdump        0
         line_no = 0;
 
         free(data.prior_sigma);
-        data.prior_sigma = malloc(data.Nth*data.Nth*sizeof(double));
+        data.prior_sigma = (double *)malloc(data.Nth*data.Nth*sizeof(double));
 
         found = 0;
         while (fgets(line, 256, f)!= NULL) {
@@ -322,12 +296,12 @@ ifdump        0
         rewind(f);
         line_no = 0;
 
-        data.compositeprior_distr = malloc(data.Nth*sizeof(double));
+        data.compositeprior_distr = (double *)malloc(data.Nth*sizeof(double));
 
         free(data.prior_mu);
         free(data.prior_sigma);
-        data.prior_mu = malloc(data.Nth*sizeof(double));
-        data.prior_sigma = malloc(data.Nth*data.Nth*sizeof(double));
+        data.prior_mu = (double *)malloc(data.Nth*sizeof(double));
+        data.prior_sigma = (double *)malloc(data.Nth*data.Nth*sizeof(double));
 
         for (i = 0; i < data.Nth; i++) {
             found = 0;
@@ -376,7 +350,7 @@ ifdump        0
         rewind(f);
         line_no = 0;
 
-        data.auxil_data = malloc(data.auxil_size*sizeof(double));
+        data.auxil_data = (double *)malloc(data.auxil_size*sizeof(double));
 
         found = 0;
         while (fgets(line, 256, f)!= NULL) {
@@ -403,13 +377,13 @@ ifdump        0
 
 
 #if 0
-    print_matrix("prior_mu", data.prior_mu, data.Nth);
-    print_matrix("prior_sigma", data.prior_sigma, data.Nth*data.Nth);
-    print_matrix("auxil_data", data.auxil_data, data.auxil_size);
+    print_matrix((char *)"prior_mu", data.prior_mu, data.Nth);
+    print_matrix((char *)"prior_sigma", data.prior_sigma, data.Nth*data.Nth);
+    print_matrix((char *)"auxil_data", data.auxil_data, data.auxil_size);
 #endif
 
     free(data.Num);
-    data.Num = malloc(data.MaxStages*sizeof(double));
+    data.Num = (int *)malloc(data.MaxStages*sizeof(int));
     for (i = 0; i < data.MaxStages; i++) {
         data.Num[i] = data.PopSize;
     }
@@ -440,11 +414,11 @@ void data_init()
 #endif
 
     /* RUNINFO: running state */
-    runinfo.CoefVar = calloc(1, (data.MaxStages+1)*sizeof(double));
-    runinfo.p = calloc(1, (data.MaxStages+1)*sizeof(double));
-    runinfo.currentuniques = calloc(1, data.MaxStages*sizeof(double));
-    runinfo.logselection = calloc(1, data.MaxStages*sizeof(double));
-    runinfo.acceptance = calloc(1, data.MaxStages*sizeof(double));
+    runinfo.CoefVar = (double *)calloc(1, (data.MaxStages+1)*sizeof(double));
+    runinfo.p = (double *)calloc(1, (data.MaxStages+1)*sizeof(double));
+    runinfo.currentuniques = (int *)calloc(1, data.MaxStages*sizeof(int));
+    runinfo.logselection = (double *)calloc(1, data.MaxStages*sizeof(double));
+    runinfo.acceptance = (double *)calloc(1, data.MaxStages*sizeof(double));
 
     double *SSmem = (double *)calloc(1, data.Nth*data.Nth*sizeof(double));
     runinfo.SS = (double **)malloc(data.Nth*sizeof(double *));
@@ -452,22 +426,13 @@ void data_init()
         runinfo.SS[i] = SSmem + i*data.Nth; /*&SSmem[i*data.Nth];*/
     }
 
-    runinfo.meantheta = calloc(1, data.MaxStages*sizeof(double *));
-    for (i = 0; i < data.MaxStages; i++) {
-        runinfo.meantheta[i] = calloc(1, data.Nth*sizeof(double));
+    runinfo.meantheta = (double **)calloc(1, (data.MaxStages+1)*sizeof(double *));
+    for (i = 0; i < data.MaxStages+1; i++) {
+        runinfo.meantheta[i] = (double *)calloc(1, data.Nth*sizeof(double));
     }
 
     runinfo.Gen = 0;
     runinfo.CoefVar[0] = 10;
-
-    /* already zero */
-    runinfo.p[0] = 0;
-    for (i = 0; i < data.MaxStages; i++) {
-        runinfo.currentuniques[i] = 0;
-        runinfo.logselection[i] = 0.0;
-        runinfo.acceptance[i] = 0.0;
-    }
-
 
     printf("runinfo = %p\n", &runinfo);
     printf("runinfo.p = %p\n", runinfo.p);
@@ -569,12 +534,6 @@ void check_for_exit()
         exit(1);
     }
 
-    if (exit_signal_flag == 1) {
-        printf("Received Exit Signal!!!\n");
-        torc_finalize();
-        exit(1);    /* new */
-    }
-
     FILE *fp;
     fp = fopen("exit.txt", "r");
     if (fp != NULL) {
@@ -582,32 +541,6 @@ void check_for_exit()
         unlink("exit.txt");
         torc_finalize();
         exit(1);
-    }
-}
-
-/* this is effective only on the master process */
-void handle_signal(int signal)
-{
-    switch (signal) {
-        case SIGUSR1:
-            printf("Caught SIGUSR1, exiting at next checkpoint!\n");
-            exit_signal_flag = 1;
-            break;
-        default:
-            fprintf(stderr, "Caught wrong signal: %d\n", signal);
-            return;
-    }
-}
-
-void setup_handler()
-{
-    struct sigaction sa;
-    sa.sa_handler = &handle_signal;
-    sa.sa_flags = SA_RESTART;
-    sigfillset(&sa.sa_mask);
-
-    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-        perror("Error: cannot handle SIGUSR1"); /* Should not happen */
     }
 }
 
@@ -643,13 +576,13 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
     }
 
     if (n == 0)
-        torc_create_direct(0, torc_update_full_db_task, 3,        /* message to the database manager (separate process?) or direct execution by server thread */
+        torc_create_direct(0, (void (*)())torc_update_full_db_task, 3,        /* message to the database manager (separate process?) or direct execution by server thread */
                 data.Nth, MPI_DOUBLE, CALL_BY_VAL,
                 1, MPI_DOUBLE, CALL_BY_COP,
                 1, MPI_INT, CALL_BY_COP,
                 point, &F, &surrogate);
     else
-        torc_create_direct(0, torc_update_full_db_task_p5, 5,        /* message to the database manager (separate process?) or direct execution by server thread */
+        torc_create_direct(0, (void (*)())torc_update_full_db_task_p5, 5,
                 data.Nth, MPI_DOUBLE, CALL_BY_VAL,
                 1, MPI_DOUBLE, CALL_BY_COP,
                 n, MPI_DOUBLE, CALL_BY_COP,    /* xxx: for CALL_BY_VAL: in the full-version of the library, with n=1 we had segv */
@@ -678,7 +611,7 @@ void torc_update_curgen_db(double point[], double F, double prior)
         update_curgen_db(point, F,prior);
         return;
     }
-	torc_create_direct(0, torc_update_curgen_db_task, 3,            /* message to the database manager (separate process?) or direct execution by server thread */
+	torc_create_direct(0, (void (*)())torc_update_curgen_db_task, 3,            /* message to the database manager (separate process?) or direct execution by server thread */
 		data.Nth, MPI_DOUBLE, CALL_BY_COP,
 		1, MPI_DOUBLE, CALL_BY_COP,
 		1, MPI_DOUBLE, CALL_BY_COP,
@@ -704,7 +637,7 @@ void torc_update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
         update_curres_db(point, F);
         return;
     }
-    torc_create_direct(0, torc_update_curres_db_task, 2,        /* message to the database manager (separate process?) or direct execution by server thread */
+    torc_create_direct(0, (void (*)())torc_update_curres_db_task, 2,        /* message to the database manager (separate process?) or direct execution by server thread */
             EXPERIMENTAL_RESULTS, MPI_DOUBLE, CALL_BY_COP,
             1, MPI_DOUBLE, CALL_BY_COP,
             point, &F);
@@ -719,7 +652,6 @@ void taskfun(double /*const*/ *x, int *pN, double *res, int winfo[4])
 {
     double f;
     int N = *pN;
-    /*    printf("taskfun {%d,%d,%d,%d}\n", winfo[0], winfo[1], winfo[2], winfo[3]); */
 
     inc_nfc();    /* increment function call counter*/
 
@@ -752,42 +684,16 @@ double F(double *TP, int *pn)    /* for PNDL */
 
 void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int chain_id, int step_id, int ntasks)
 {
-    int i;
-    double G[64], F;    /* maxtasks */
+    double F;
     int winfo[4];
     int dim = data.Nth;
 
-    for (i = 0; i < ntasks; i++) {
-        winfo[0] = gen_id;
-        winfo[1] = chain_id;
-        winfo[2] = step_id;
-        winfo[3] = i;
+    winfo[0] = gen_id;
+    winfo[1] = chain_id;
+    winfo[2] = step_id;
+    winfo[3] = 0;
 
-        if (ntasks == 1) {
-            taskfun(point, &dim, &G[i], winfo);
-        }
-        else {
-            torc_create(-1, taskfun, 4,
-                    data.Nth, MPI_DOUBLE, CALL_BY_VAL,
-                    1, MPI_INT, CALL_BY_COP,
-                    1, MPI_DOUBLE, CALL_BY_RES,
-                    4, MPI_INT, CALL_BY_COP,
-                    point, &dim, &G[i], winfo);
-        }
-
-    }
-    if (ntasks > 1)
-        torc_waitall();
-
-    /* compute F from G's - how? : F fitness function = distance from ground truth */
-    F = 0.0;
-    for (i = 0; i < ntasks; i++) {
-        F += G[i];
-    }
-    F = F/ntasks;
-
-    /*update_full_db(point, F, G, ntasks, 0); - not surrogate */
-    /*...torc_update_full_db(point, F, G, ntasks, 0); - not surrogate */
+    taskfun(point, &dim, &F, winfo);
 
     *Fval = F;
 }
@@ -807,10 +713,10 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
 
     evaluate_F(point, &fpoint, me, gen_id, chain_id, 0, 1);
 
-	double logprior = logpriorpdf(point, data.Nth);
+    double logprior = logpriorpdf(point, data.Nth);
 
     /* update current db entry */
-	torc_update_curgen_db(point, fpoint, logprior);
+    torc_update_curgen_db(point, fpoint, logprior);
     if (data.ifdump) torc_update_full_db(point, fpoint, NULL, 0, 0);
     *out_tparam = fpoint;    /* currently not required, the result is already in the db*/
 
@@ -924,7 +830,7 @@ void precompute_chain_covariances(const cgdbp_t* leader,
     for (pos=0; pos<5; ++pos)
     {
         printf("Chain %d of %d: ", pos, newchains);
-        print_matrix("chain_covariance", chain_cov[pos], D*D);
+        print_matrix((char *)"chain_covariance", chain_cov[pos], D*D);
     }
 #endif
 
@@ -1103,8 +1009,8 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
         }
 
         printf("CURGEN DB (COMPLE) %d\n", runinfo.Gen);
-        print_matrix("means", meanx, data.Nth);
-        print_matrix("std", stdx, data.Nth);
+        print_matrix((char *)"means", meanx, data.Nth);
+        print_matrix((char *)"std", stdx, data.Nth);
     }/*end block*/
 
     if (1)
@@ -1156,8 +1062,8 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
             }
 
             printf("CURGEN DB (UNIQUE) %d: [un = %d]\n", runinfo.Gen, un); /* + 1);*/
-            print_matrix("means", meanx, data.Nth);
-            print_matrix("std", stdx, data.Nth);
+            print_matrix((char *)"means", meanx, data.Nth);
+            print_matrix((char *)"std", stdx, data.Nth);
         } /* end block*/
 
         for (i = 0; i < n; i++) fj[i] = curgen_db.entry[i].F;    /* separate point from F ?*/
@@ -1268,7 +1174,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
         /* cool and greedy partitioning ala Panos-- ;-) */
 
         int nworkers = torc_num_workers();
-        int *workload = calloc(1, nworkers*sizeof(int));    /* workload[1..workers] = 0*/
+        int *workload = (int *)calloc(1, nworkers*sizeof(int));    /* workload[1..workers] = 0*/
 
         for (i = 0; i < newchains; i++) {
             int least_loader_worker = compute_min_idx_i(workload, nworkers);
@@ -1276,7 +1182,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
             workload[least_loader_worker] += leaders[i].nsel;
         }
 
-        print_matrix_i("initial workload", workload, nworkers);
+        print_matrix_i((char *)"initial workload", workload, nworkers);
         free(workload);
 
 #if VERBOSE
@@ -1303,8 +1209,8 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
             }
 
             printf("CURGEN DB (LEADER) %d: [nlead=%d]\n", runinfo.Gen, newchains);
-            print_matrix("means", meanx, data.Nth);
-            print_matrix("std", stdx, data.Nth);
+            print_matrix((char *)"means", meanx, data.Nth);
+            print_matrix((char *)"std", stdx, data.Nth);
         }/*end block*/
 
         if (data.use_local_cov)
@@ -1333,7 +1239,7 @@ void spmd_gsl_rand_init()
 {
     int i;
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, call_gsl_rand_init, 0);
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_gsl_rand_init, 0);
     }
     torc_waitall();
 }
@@ -1341,7 +1247,7 @@ void spmd_gsl_rand_init()
 void call_print_matrix_2d()
 {
     printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    print_matrix_2d("runinfo.SS", runinfo.SS, data.Nth, data.Nth);
+    print_matrix_2d((char *)"runinfo.SS", runinfo.SS, data.Nth, data.Nth);
     printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
@@ -1349,7 +1255,7 @@ void spmd_print_matrix_2d()
 {
     int i;
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, call_print_matrix_2d, 0);
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_print_matrix_2d, 0);
     }
     torc_waitall();
 }
@@ -1366,7 +1272,7 @@ void spmd_update_gdata()    /* step*/
     int i;
     if (torc_num_nodes() == 1) return;
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, call_update_gdata, 0);
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_update_gdata, 0);
     }
     torc_waitall();
 }
@@ -1378,23 +1284,21 @@ int main(int argc, char *argv[])
     int winfo[4];
     int nchains; /* was below*/
 
-    torc_register_task(initchaintask);
-    torc_register_task(chaintask);
-    torc_register_task(torc_update_full_db_task);
-    torc_register_task(torc_update_curgen_db_task);
-    torc_register_task(torc_update_curres_db_task);
-    torc_register_task(reset_nfc_task);
-    torc_register_task(get_nfc_task);
-    torc_register_task(taskfun);
-    torc_register_task(call_gsl_rand_init);
-    torc_register_task(call_print_matrix_2d);
-    torc_register_task(call_update_gdata);
-#if defined(_AFFINITY_)
-    torc_register_task(call_setaffinity);
-#endif
+    torc_register_task((void *)initchaintask);
+    torc_register_task((void *)chaintask);
+    torc_register_task((void *)torc_update_full_db_task);
+    torc_register_task((void *)torc_update_curgen_db_task);
+    torc_register_task((void *)torc_update_curres_db_task);
+    torc_register_task((void *)reset_nfc_task);
+    torc_register_task((void *)get_nfc_task);
+    torc_register_task((void *)taskfun);
+    torc_register_task((void *)call_gsl_rand_init);
+    torc_register_task((void *)call_print_matrix_2d);
+    torc_register_task((void *)call_update_gdata);
 
     data_init();
-    setup_handler();
+
+    fitfun_initialize(NULL);
 
     torc_init(argc, argv, MODE_MS);
 
@@ -1474,7 +1378,7 @@ int main(int argc, char *argv[])
             }
 
             if (data.prior_type <= 2)    /* peh: file without or with function evaluations? */
-                torc_create(-1, initchaintask, 4,
+                torc_create(-1, (void (*)())initchaintask, 4,
                         data.Nth, MPI_DOUBLE, CALL_BY_COP,
                         1, MPI_INT, CALL_BY_COP,
                         1, MPI_DOUBLE, CALL_BY_RES,
@@ -1513,9 +1417,9 @@ int main(int argc, char *argv[])
     ;
 #endif
     static cgdbp_t *leaders; /*[MAXCHAINS];*/
-    leaders = calloc(1, data.PopSize*sizeof(cgdbp_t));
+    leaders = (cgdbp_t *)calloc(1, data.PopSize*sizeof(cgdbp_t));
     for (i = 0; i < data.PopSize; i++) {
-        leaders[i].point = calloc(1, data.Nth*sizeof(double));
+        leaders[i].point = (double *)calloc(1, data.Nth*sizeof(double));
     }
 
     curres_db.entries = 0;
@@ -1578,7 +1482,7 @@ int main(int argc, char *argv[])
 
             out_tparam[i] = leaders[i].F;    /* loglik_leader...*/
 
-            torc_create(leaders[i].queue, chaintask, 7,
+            torc_create(leaders[i].queue, (void (*)())chaintask, 7,
                     data.Nth, MPI_DOUBLE, CALL_BY_COP,
                     1, MPI_INT, CALL_BY_COP,
                     1, MPI_INT, CALL_BY_COP,
@@ -1621,11 +1525,11 @@ int main(int argc, char *argv[])
 
 #if 0
         printf("=================\n");
-        print_matrix("runinfo.p", runinfo.p, runinfo.Gen+1);
-        print_matrix("runinfo.CoefVar", runinfo.CoefVar, runinfo.Gen+1);
-        print_matrix_i("runinfo.currentuniques", runinfo.currentuniques, runinfo.Gen+1);
-        print_matrix("runinfo.acceptance", runinfo.acceptance, runinfo.Gen+1);
-        print_matrix("runinfo.logselection", runinfo.logselection, runinfo.Gen+1);
+        print_matrix((char *)"runinfo.p", runinfo.p, runinfo.Gen+1);
+        print_matrix((char *)"runinfo.CoefVar", runinfo.CoefVar, runinfo.Gen+1);
+        print_matrix_i((char *)"runinfo.currentuniques", runinfo.currentuniques, runinfo.Gen+1);
+        print_matrix((char *)"runinfo.acceptance", runinfo.acceptance, runinfo.Gen+1);
+        print_matrix((char *)"runinfo.logselection", runinfo.logselection, runinfo.Gen+1);
         printf("=================\n");
 #endif
 
@@ -1637,15 +1541,17 @@ int main(int argc, char *argv[])
         }
     }
 
-    print_matrix("runinfo.p", runinfo.p, runinfo.Gen+1);
-    print_matrix("runinfo.CoefVar", runinfo.CoefVar, runinfo.Gen+1);
-    print_matrix_i("runinfo.currentuniques", runinfo.currentuniques, runinfo.Gen+1);
-    print_matrix("runinfo.acceptance", runinfo.acceptance, runinfo.Gen+1);
-    print_matrix("runinfo.logselection", runinfo.logselection, runinfo.Gen+1);
+    if (data.MaxStages == 1) runinfo.Gen = 0;	// small correction for this extreme case
+
+    print_matrix((char *)"runinfo.p", runinfo.p, runinfo.Gen+1);
+    print_matrix((char *)"runinfo.CoefVar", runinfo.CoefVar, runinfo.Gen+1);
+    print_matrix_i((char *)"runinfo.currentuniques", runinfo.currentuniques, runinfo.Gen+1);
+    print_matrix((char *)"runinfo.acceptance", runinfo.acceptance, runinfo.Gen+1);
+    print_matrix((char *)"runinfo.logselection", runinfo.logselection, runinfo.Gen+1);
 
     double logEvidence[1];
     logEvidence[0] = compute_sum(runinfo.logselection, runinfo.Gen+1);
-    print_matrix("logEvidence", logEvidence, 1);
+    print_matrix((char *)"logEvidence", logEvidence, 1);
 
     /* peh:check -- inner tmcmc */
     {
@@ -1655,13 +1561,13 @@ int main(int argc, char *argv[])
         fclose(fp);
     }
 
-    print_matrix_2d("runinfo.SS", runinfo.SS, data.Nth, data.Nth);
+    print_matrix_2d((char *)"runinfo.SS", runinfo.SS, data.Nth, data.Nth);
 
     for (i = 0; i < runinfo.Gen+1; i++) {
         char title[64];
         sprintf(title, "runinfo.meantheta(%d)", i);
-        /*print_matrix("runinfo.meantheta", runinfo.meantheta[i], data.Nth);*/
-        print_matrix(title, runinfo.meantheta[i], data.Nth);
+        /*print_matrix((char *)"runinfo.meantheta", runinfo.meantheta[i], data.Nth);*/
+        print_matrix((char *)title, runinfo.meantheta[i], data.Nth);
     }
 
     /* last save here - do we need this? what happens if I restart the program with this saved data*/
@@ -1680,6 +1586,8 @@ end:
 
 
     /* shutdown */
+    fitfun_finalize();
+
     printf("total function calls = %d\n", get_tfc());
     torc_finalize();
 

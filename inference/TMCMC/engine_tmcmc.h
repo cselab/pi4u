@@ -13,7 +13,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+
+#ifdef __cplusplus
+#include <mpi.h>
+extern "C"
+{
+#endif
 #include <torc.h>
+
+#ifdef __cplusplus
+}
+#endif
+
 #include <unistd.h>
 
 #include "gsl_headers.h"
