@@ -20,7 +20,15 @@ int torc_worker_id()
 
 static int dbg_display = 0;
 
-double fitfun(double *x, int n, int info[4])
+void fitfun_initialize(char *name)
+{
+}
+
+void fitfun_finalize()
+{
+}
+
+double fitfun(double *x, int N, void *output, int *info)
 {
 	int i;
 
@@ -30,14 +38,14 @@ double fitfun(double *x, int n, int info[4])
 
 	if (dbg_display) {
 		printf("worker(%d): running task %s with params (", torc_worker_id(), taskname);
-		for (i = 0; i < n-1; i++)
+		for (i = 0; i < N-1; i++)
 			printf("%.4lf,", x[i]);
 		printf("%.4lf)\n", x[i]);
 		fflush(0);
 	}
 
 	double f = 0.0;
-	for (i=0; i<n-1; i++)   /* rosenbrock */
+	for (i=0; i<N-1; i++)   /* rosenbrock */
 		f = f + 100.0*pow((x[i+1]-x[i]*x[i]),2) + pow((x[i]-1.0),2);
 //	f = -f;
 

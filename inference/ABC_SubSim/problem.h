@@ -23,7 +23,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "fitfun.h"
 #include "random.h"
+
 
 // dimensionality of the problem (including errors)
 int PROBDIM=2;	// user input
@@ -78,13 +80,11 @@ double evaluate_logprior(const gsl_vector * sample, int * isinf)
 	return res;
 }
 
-extern double fitfun(double *x, int n, int info[4]);
-
-void run_problem(double * sample_v, double * discrepancy, int info[4])
+void run_problem(double * sample_v, double * discrepancy, int *info)
 {
 	int n = PROBDIM;
 
-	*discrepancy = fitfun(sample_v, n, info);
+	*discrepancy = fitfun(sample_v, n, NULL, info);
 }
 
 void normalize_sample(gsl_vector * sample)
