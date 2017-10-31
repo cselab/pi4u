@@ -37,8 +37,10 @@ static double logEv[NPAT];
 double loglike_psi(double *psi, int n);
 
 
+#include "engine_tmcmc.h"
+extern data_t data;
 
-void fitfun_init( data_t data ) {
+void fitfun_initialize() {
 
     int nn = data.Nth;
 
@@ -108,7 +110,7 @@ void fitfun_init( data_t data ) {
 }
 
 
-void fitfun_cleanup() {
+void fitfun_finalize() {
     for (int pp = 1; pp <= NPAT; pp++) {
         int p = pp-1;
         if (ffdata[p] != NULL) {

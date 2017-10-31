@@ -11,9 +11,10 @@ static int flag[4096];  // MAX_WORKERS
 
 
 
+//#include "engine_tmcmc.h"
+//extern data_t data;
 
-
-void fitfun_init( data_t data ) {
+void fitfun_initialize() {
 }
 
 
@@ -108,4 +109,8 @@ double fitfun(double *x, int n, void *output, int *winfo) {
 
 
     return loglike;
+}
+
+
+void fitfun_finalize() {
 }

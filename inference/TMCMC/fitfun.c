@@ -48,6 +48,9 @@ double bvnpdf(double *x, int n) /* bivariate */
 }
 #endif
 
+//#include "engine_tmcmc.h"
+//extern data_t data;
+
 void fitfun_initialize(char *name)
 {
 }

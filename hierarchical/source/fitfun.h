@@ -1,3 +1,6 @@
+#ifndef _FITFUN_H_
+#define _FITFUN_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,8 +19,10 @@
 
 
 
-void fitfun_init( data_t data );
+void fitfun_initialize();
 
 double fitfun(double *x, int n, void *output, int *info);
 
-void fitfun_cleanup( );
+void fitfun_finalize();
+
+#endif

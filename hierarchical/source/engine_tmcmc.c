@@ -12,46 +12,19 @@
 //#define _BSD_SOURCE
 //#define _GNU_SOURCE
 #include <assert.h>
-#include <signal.h>
 #include <stdio.h>
 #include "engine_tmcmc.h"
 #include "fitfun.h"
 
 #define _STEALING_
 /*#define VERBOSE 1*/
-/*#define _AFFINITY_*/
 /*#define _RESTART_*/
-
-static int exit_signal_flag = 0;    /* new */
 
 data_t data;
 runinfo_t runinfo;
 cgdb_t curgen_db;
 db_t full_db;
 resdb_t curres_db;
-
-#if defined(_AFFINITY_)    /* BRUTUS */
-#include "affinity.c"
-
-void call_setaffinity()
-{
-    int rank = torc_node_id();
-    int numanodesize = 6;
-    int start = rank*6 % 48;
-    set_rankaff(start, numanodesize);
-
-    get_rankaff(rank);
-}
-
-void spmd_setaffinity()
-{
-    int i;
-    for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, call_setaffinity, 0);
-    }
-    torc_waitall();
-}
-#endif
 
 void read_data()
 {
@@ -573,12 +546,6 @@ void check_for_exit()
         exit(1);
     }
 
-    if (exit_signal_flag == 1) {
-        printf("Received Exit Signal!!!\n");
-        torc_finalize();
-        exit(1);    /* new */
-    }
-
     FILE *fp;
     fp = fopen("exit.txt", "r");
     if (fp != NULL) {
@@ -586,32 +553,6 @@ void check_for_exit()
         unlink("exit.txt");
         torc_finalize();
         exit(1);
-    }
-}
-
-/* this is effective only on the master process */
-void handle_signal(int signal)
-{
-    switch (signal) {
-        case SIGUSR1:
-            printf("Caught SIGUSR1, exiting at next checkpoint!\n");
-            exit_signal_flag = 1;
-            break;
-        default:
-            fprintf(stderr, "Caught wrong signal: %d\n", signal);
-            return;
-    }
-}
-
-void setup_handler()
-{
-    struct sigaction sa;
-    sa.sa_handler = &handle_signal;
-    sa.sa_flags = SA_RESTART;
-    sigfillset(&sa.sa_mask);
-
-    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-        perror("Error: cannot handle SIGUSR1"); /* Should not happen */
     }
 }
 
@@ -1393,18 +1334,10 @@ int main(int argc, char *argv[])
     torc_register_task(call_gsl_rand_init);
     torc_register_task(call_print_matrix_2d);
     torc_register_task(call_update_gdata);
-#if defined(_AFFINITY_)
-    torc_register_task(call_setaffinity);
-#endif
 
     data_init();
-    setup_handler();
 
     torc_init(argc, argv, MODE_MS);
-
-#if defined(_AFFINITY_)
-    spmd_setaffinity();
-#endif
 
     spmd_gsl_rand_init();
 
@@ -1444,7 +1377,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        fitfun_init( data );
+        fitfun_initialize();
 
         for (i = 0; i < nchains; i++) {
             winfo[0] = runinfo.Gen;
@@ -1643,6 +1576,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (data.MaxStages == 1) runinfo.Gen = 0;   // small correction for this extreme case
+
     print_matrix("runinfo.p", runinfo.p, runinfo.Gen+1);
     print_matrix("runinfo.CoefVar", runinfo.CoefVar, runinfo.Gen+1);
     print_matrix_i("runinfo.currentuniques", runinfo.currentuniques, runinfo.Gen+1);
@@ -1687,6 +1622,7 @@ end:
 
     /* shutdown */
     printf("total function calls = %d\n", get_tfc());
+    fitfun_finalize();
     torc_finalize();
 
     return 0;

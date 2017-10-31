@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef _ENGINE_TMCMC_H_
+#define _ENGINE_TMCMC_H_
+
 #include <math.h>
 #include <mpi.h>
 #include <stdio.h>
@@ -217,3 +220,5 @@ int get_tfc();
 void compute_mat_product_vect(double *mat/*2D*/, double vect[], double res_vect[], double coef, int PROBDIM);
 double compute_dot_product(double row_vector[], double vector[], int PROBDIM);
 int inv_matrix(double coef, double *current_hessian/*2D*/, double *inv_current_hessian/*2D*/, int PROBDIM);
+
+#endif
