@@ -5,7 +5,7 @@ DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
 EXEC_FILE="../phase_1/engine_tmcmc"
-PAR_FILE="../phase_1/tmcmc.par"
+PAR_FILE="./tmcmc.par"
 MODEL_FILE="model/my_model.py"
 MODEL_SCRIPT="model/doall.sh"
 LL_FILE="model/log_like.py"

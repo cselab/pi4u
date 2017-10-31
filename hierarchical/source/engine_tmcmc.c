@@ -1,11 +1,12 @@
 /*
  *  engine_tmcmc.c
- *  Pi4U 
+ *  Pi4U
  *
  *  Created by Panagiotis Hadjidoukas on 1/1/14.
  *  Copyright 2014 ETH Zurich. All rights reserved.
  *
  */
+
 
 //#define _XOPEN_SOURCE 700
 //#define _BSD_SOURCE
@@ -13,9 +14,8 @@
 #include <assert.h>
 #include <signal.h>
 #include <stdio.h>
-
 #include "engine_tmcmc.h"
-#include "fitfun.c" 
+#include "fitfun.h"
 
 #define _STEALING_
 /*#define VERBOSE 1*/
@@ -100,7 +100,7 @@ void read_data()
     data.bbeta = 0.2;
     data.seed = 280675;
 
-    data.options.MaxIter = 100;    /**/ 
+    data.options.MaxIter = 100;    /**/
     data.options.Tol = 1e-6;
     data.options.Display = 0;
     data.options.Step = 1e-5;
@@ -803,7 +803,7 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
     gen_id = winfo[0];
     chain_id = winfo[1];
 
-    long me = torc_worker_id();    
+    long me = torc_worker_id();
     double point[data.Nth], fpoint;
 
     for (i = 0; i < data.Nth; i++)
@@ -1128,7 +1128,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
             unflag = 1;    /* is this point unique?*/
             for (j = 0; j < un; j++) {    /* check all the previous unique points*/
                 int compflag;
-                compflag = 1;    /**/ 
+                compflag = 1;    /**/
                 for (p = 0; p < data.Nth; p++) {
                     if (fabs(xi[p]-x[p][j]) > 1e-6) {
                         /*if (xi[p] != x[p][j]) {*/
@@ -1137,7 +1137,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
                     }
                     }
 
-                    if (compflag == 1) { 
+                    if (compflag == 1) {
                         unflag = 0;    /* not unique, just found it in the unique points table*/
                         break;
                     }
@@ -1443,6 +1443,8 @@ int main(int argc, char *argv[])
                 exit(1);
             }
         }
+
+        fitfun_init( data );
 
         for (i = 0; i < nchains; i++) {
             winfo[0] = runinfo.Gen;

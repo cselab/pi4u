@@ -1,10 +1,5 @@
-#include <fcntl.h>
-#include <ftw.h>
-#include <math.h>
-#include <stdio.h>
-#include <sys/wait.h>
-#include <errno.h>
-#include "spawner.h"
+#include "fitfun.h"
+
 
 static pthread_mutex_t fork_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int flag[4096];  // MAX_WORKERS
@@ -13,6 +8,19 @@ static int flag[4096];  // MAX_WORKERS
 #define PREFIX      "."  // "/scratch"
 #define FAIL        -1e12
 #define BUFLEN      1024
+
+
+
+
+
+void fitfun_init( data_t data ) {
+}
+
+
+
+
+
+
 
 double fitfun(double *x, int n, void *output, int *winfo) {
     char workdir[BUFLEN], bindir[BUFLEN];

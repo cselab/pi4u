@@ -32,7 +32,7 @@ void init_full_db()
 {
 	pthread_mutex_init(&full_db.m, NULL);
 	full_db.entries = 0;
-	full_db.entry = calloc(1, data.MaxStages*data.PopSize*sizeof(dbp_t));	
+	full_db.entry = calloc(1, data.MaxStages*data.PopSize*sizeof(dbp_t));
 }
 
 
@@ -65,9 +65,9 @@ void init_curgen_db()
 void update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
 {
 	int i, pos;
-	
+
 #if (EXPERIMENTAL_RESULTS <=0)
-	return; 
+	return;
 #endif
 	pthread_mutex_lock(&curres_db.m);
 	pos = curres_db.entries;
@@ -77,7 +77,7 @@ void update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
 	if (curres_db.entry[pos].point == NULL) curres_db.entry[pos].point = malloc((EXPERIMENTAL_RESULTS+1)*sizeof(double));
 
 	for (i = 0; i < EXPERIMENTAL_RESULTS; i++) curres_db.entry[pos].point[i] = point[i];
-	curres_db.entry[pos].F = F;	
+	curres_db.entry[pos].F = F;
 }
 
 void init_curres_db()
@@ -136,11 +136,11 @@ void dump_curgen_db(int Gen)
 	fp = fopen(fname, "w");
 	for (pos = 0; pos < curgen_db.entries; pos++) {
 		int i;
-			
+
 		for (i = 0; i < PROBDIM; i++) {
 			fprintf(fp, "%20.16lf ", curgen_db.entry[pos].point[i]);
 		}
-		fprintf(fp, "%20.16lf", curgen_db.entry[pos].F);
+		fprintf(fp, "%20.16lf ", curgen_db.entry[pos].F);
 		fprintf(fp, "%20.16lf ", curgen_db.entry[pos].prior);
 		fprintf(fp,"\n");
 
@@ -159,7 +159,7 @@ int load_curgen_db(int Gen)
 	fp = fopen(fname, "r");
 	if (fp == NULL) {
 		printf("DB file: %s not found!!!\n", fname);
-		exit(1); 
+		exit(1);
 		return 1;
 	}
 
@@ -169,7 +169,7 @@ int load_curgen_db(int Gen)
 		curgen_db.entries++;
 
 	fclose(fp);	/* fseek...*/
-	fp = fopen(fname, "r");	
+	fp = fopen(fname, "r");
 
 	for (pos = 0; pos < curgen_db.entries; pos++) {
 		int i;
@@ -198,7 +198,7 @@ void dump_curres_db(int Gen)
 	fp = fopen(fname, "w");
 	for (pos = 0; pos < curres_db.entries; pos++) {
 		int i;
-			
+
 		for (i = 0; i < EXPERIMENTAL_RESULTS; i++) {
 			fprintf(fp, "%20.16lf ", curres_db.entry[pos].point[i]);
 		}
