@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
 	double c = 10;  // cond number of the target covariance 
 
 	//a = ones(npar,1); // 1. direction
-	double *a = malloc(npar*sizeof(double));
+	double *a = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		a[i] = 1;
 
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 	//[Sig,Lam] = covcond(c,a) // covariance and its inverse
 
 	//mu = zeros(1,npar);       // center point
-	double *mu = malloc(npar*sizeof(double));
+	double *mu = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		mu[i] = 0;
 
@@ -322,15 +322,15 @@ int main(int argc, char *argv[])
 	//model.ssfun    = inline('(x-d.mu)*d.Lam*(x-d.mu)''','x','d');
 
 	init_params();
-	params.par0    = malloc(npar*sizeof(double));
+	params.par0    = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		params.par0[i] = mu[i]+0.1;	// initial value
 
-	params.lbounds = malloc(npar*sizeof(double));
+	params.lbounds = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		params.lbounds[i] = -1e10;	// -inf
 
-	params.ubounds = malloc(npar*sizeof(double));
+	params.ubounds = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		params.ubounds[i] = +1e10;	// -inf
 
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 	options.adaptint = 500;
 
 	//options.qcov     = Sig.*2.4^2./npar;
-	options.qcov = malloc(npar*npar*sizeof(double));
+	options.qcov = (double *)malloc(npar*npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 	for (int j = 0; j < npar; j++)
 		options.qcov[i*npar+j] = Sig[i*npar+j]*pow(2.4,2)/npar;

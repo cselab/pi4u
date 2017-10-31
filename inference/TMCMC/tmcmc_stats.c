@@ -636,7 +636,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		weight[i] = exp( flcp[i] - fjmax );
 
 	if (display)
-		print_matrix("weight", weight, n);
+		print_matrix((char *)"weight", weight, n);
 
 	double sum_weight = compute_sum(weight, n);
 
@@ -645,7 +645,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		q[i] = weight[i]/sum_weight;
 
 	if (display)
-		print_matrix("runinfo_q", q, n);
+		print_matrix((char *)"runinfo_q", q, n);
 
 	/*double sum_q = compute_sum(q, n);*/
 
@@ -659,7 +659,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		weight[i] = exp((flc[i]-fjmax)*(p[j]-p[j-1]));
 
 	if (display)
-	print_matrix("weight", weight, n);
+	print_matrix((char *)"weight", weight, n);
 
 	double sum_weight = compute_sum(weight, n);
 
@@ -668,7 +668,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		q[i] = weight[i]/sum_weight;
 
 	if (display)
-		print_matrix("runinfo_q", q, n);
+		print_matrix((char *)"runinfo_q", q, n);
 
 	/*double sum_q = compute_sum(q, n);*/
 
@@ -676,7 +676,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 #endif
 
 	if (display)
-		print_matrix("logselection", logselection, gen+1);
+		print_matrix((char *)"logselection", logselection, gen+1);
 
 	double mean_q = compute_mean(q, n);
 	double std_q = compute_std(q, n, mean_q);
@@ -684,7 +684,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	CoefVar[gen] = std_q/mean_q;
 
 	if (display)
-		print_matrix("CoefVar", CoefVar, gen+1);
+		print_matrix((char *)"CoefVar", CoefVar, gen+1);
 
 	size_t K = n;
 	unsigned int N = 1;
@@ -728,7 +728,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	}
 
 	if (display)
-		print_matrix("mean_of_theta", mean_of_theta, PROBDIM);
+		print_matrix((char *)"mean_of_theta", mean_of_theta, PROBDIM);
 
 	double meanv[PROBDIM];
 	for (i = 0; i < PROBDIM; i++) {
@@ -757,7 +757,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 #endif
 
 	if (display)
-		print_matrix_2d("runinfo.SS", runinfo.SS, PROBDIM, PROBDIM);
+		print_matrix_2d((char *)"runinfo.SS", runinfo.SS, PROBDIM, PROBDIM);
 
 	free(flcp);
 	free(weight);

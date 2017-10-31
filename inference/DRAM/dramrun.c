@@ -330,13 +330,13 @@ void dramrun(int npar)
 		inv(iR, R, npar);
 	}
 
-	double *chain = calloc(1, nsimu*npar*sizeof(double));	//  = zeros(nsimu,npar);  // we store the chain here
+	double *chain = (double *)calloc(1, nsimu*npar*sizeof(double));	//  = zeros(nsimu,npar);  // we store the chain here
 
 	double s20 = 0;
 	double *s2chain;
 	if (n0>=0)
 	{
-		s2chain = calloc(1, nsimu*sizeof(double));   // the sigma2 chain
+		s2chain = (double *)calloc(1, nsimu*sizeof(double));   // the sigma2 chain
 		s20 = sigma2;
 	}
 	else

@@ -1331,6 +1331,7 @@ int main(int argc, char * argv[])
 
 	covariance = gsl_matrix_alloc(PROBDIM, PROBDIM);	// peh: declared as global variable (can be static member of abc_subsim)
 
+	fitfun_initialize(NULL);
 #if defined(_USE_TORC_)
 	torc_register_task((void *)myrandom::set_task);			// peh: task registration for heterogenenous platforms and runtime environments
 	torc_register_task((void *)subsim_database::update_task);
@@ -1348,6 +1349,8 @@ int main(int argc, char * argv[])
 	alg.run();
 	double t1 = torc_gettime();
 	std::cout << "Total elapsed time: " << t1-t0 << " seconds" << std::endl;
+
+	fitfun_finalize();
 
 #if defined(_USE_TORC_)
 	torc_finalize();

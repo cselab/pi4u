@@ -1,9 +1,9 @@
 #include <math.h>
 
 // activate one of the following options
-//#define _USE_ROSENBROCK_
+#define _USE_ROSENBROCK_
 //#define _USE_BVNPDF_
-#define _USE_MIXED_BVNPDF_
+//#define _USE_MIXED_BVNPDF_
 //#define _USE_MIXED_MVNPDF_
 
 #if defined(_USE_MIXED_BVNPDF_)
@@ -47,6 +47,14 @@ double bvnpdf(double *x, int n) /* bivariate */
 	return P;
 }
 #endif
+
+void fitfun_initialize(char *name)
+{
+}
+
+void fitfun_finalize()
+{
+}
 
 double fitfun(double /*const*/ *x, int N, void *output, int *info)
 {

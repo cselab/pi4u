@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 	// 100  ->  5 000 000 ?
 
 	//mu = zeros(1,npar);       // center point
-	double *mu = malloc(npar*sizeof(double));
+	double *mu = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		mu[i] = 0;
 
@@ -385,15 +385,15 @@ int main(int argc, char *argv[])
 	//model.ssfun    = inline('(x-d.mu)*d.Lam*(x-d.mu)''','x','d');
 
 	init_params();
-	params.par0    = malloc(npar*sizeof(double));
+	params.par0    = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		params.par0[i] = mu[i];	//+0.1;	// initial value
 
-	params.lbounds = malloc(npar*sizeof(double));
+	params.lbounds = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		params.lbounds[i] = -1e10;	// -inf
 
-	params.ubounds = malloc(npar*sizeof(double));
+	params.ubounds = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 		params.ubounds[i] = +1e10;	// -inf
 
@@ -423,7 +423,7 @@ int main(int argc, char *argv[])
 	options.adaptint = 500;
 
 	//options.qcov     = eye(2)*5;
-	options.qcov = malloc(npar*npar*sizeof(double));
+	options.qcov = (double *)malloc(npar*npar*sizeof(double));
 	for (int i = 0; i < npar; i++)
 	for (int j = 0; j < npar; j++)
 		if (i == j) 
