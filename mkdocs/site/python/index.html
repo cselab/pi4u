@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Python - Pi4U</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Python";
+    var mkdocs_page_input_path = "python.md";
+    var mkdocs_page_url = "/python/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Pi4U</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Python</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#python-interface-of-tmcmc">Python interface of TMCMC</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#tmcmc">TMCMC</a></li>
+        
+            <li><a class="toctree-l3" href="#fitness-function">Fitness function</a></li>
+        
+            <li><a class="toctree-l3" href="#plotting">Plotting</a></li>
+        
+            <li><a class="toctree-l3" href="#example">Example</a></li>
+        
+            <li><a class="toctree-l3" href="#installation-and-testing">Installation and testing</a></li>
+        
+            <li><a class="toctree-l3" href="#troubleshooting-and-additional-options">Troubleshooting and additional options</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../matlab/">Matlab</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../rlib/">R</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../hpc/">C/C++</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../about/">About</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Pi4U</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Python</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="python-interface-of-tmcmc">Python interface of TMCMC</h1>
+<p>Module tmcmc implements the TMCMC (Transitional Markov-Chain Monte Carlo) algorithm.</p>
+<p>We use the C implementation of the algorithm and the <em>ctypes wrapper</em> module for calling it from Python.
+Since the function we are sampling from is also written in Python, we use <em>embedded Python</em> to call the
+function from the C code and <em>numpy</em> to pass arguments between the two environments.</p>
+<h2 id="tmcmc">TMCMC</h2>
+<p>The Python interface of TMCMC is defined as follows:</p>
+<p><strong>def tmcmc(fitfun, dim=2, maxstages=20, popsize=1024, lowerbound=[-6,-6], upperbound=[6,6], id=0):</strong></p>
+<p>Inputs:</p>
+<ul>
+<li><strong>fitfun</strong>: python script name (without the .py extension) that implements the log-likelihood function.
+The prototype is: fitfun(x, dim), where <em>x</em> is a vector of parameter values and <em>dim</em> the number of parameters.</li>
+<li><strong>dim</strong>: number of parameters</li>
+<li><strong>maxstages</strong>: maximum number of stages that can be performed by the TMCMC algorithm</li>
+<li><strong>popsize</strong>: number of samples per stage</li>
+<li><strong>lowerbound</strong>: lower bound for each parameter</li>
+<li><strong>upperbound</strong>: uppoer bound for each parameter</li>
+<li><strong>id</strong>: integer identifier for the specific <em>tmcmc()</em> call. The value is appended to the output files generated by the algorithm.</li>
+</ul>
+<p>Outputs:</p>
+<ul>
+<li>The tmcmc function returns the log-evidence of the model.</li>
+<li>In addition, for each stage of the algorithm, the evaluation points and their log-likelihood are stored in text files
+named as <em>curgen_db_xxx_yyy.txt</em>, where <strong>xxx</strong>: <em>id</em> of the <em>tmcmc()</em> call, and <strong>yyy</strong>: stage of the algorithm.</li>
+</ul>
+<h2 id="fitness-function">Fitness function</h2>
+<p>The fitness function typically computes the model output and <strong>returns</strong> the log-likelihood of the data.</p>
+<p><strong>def fitfun(theta, dim):</strong></p>
+<ul>
+<li><strong>theta</strong>: parameters of the model</li>
+<li><strong>dim</strong>: number of parameters</li>
+</ul>
+<h2 id="plotting">Plotting</h2>
+<p>2D scatter plots of the samples stored in the output text files, colored according to their log-likelihood values,
+can be produced by means of the <strong>plot_gen()</strong> function.</p>
+<p><strong>def plot_gen(filename, dim=2, i=1, j=2, show=1, save=0):</strong></p>
+<ul>
+<li><strong>filename</strong>: curgen_db_xxx_yyy.txt file</li>
+<li><strong>dim</strong>: number of parameters</li>
+<li><strong>i</strong>: i-th parameter</li>
+<li><strong>j</strong>: j-th parameter</li>
+<li><strong>namei</strong>: label for the i-th parameter</li>
+<li><strong>namej</strong>: label for the j-th parameter</li>
+<li><strong>show</strong>: depict the plot on the screen</li>
+<li><strong>save</strong>: save the plot in a png file (filename.png)</li>
+</ul>
+<h2 id="example">Example</h2>
+<h3 id="demo3py">demo3.py</h3>
+<pre><code># Import necessary modules
+import sys
+sys.path.append("../lib_python")
+from tmcmc import *
+from plot_gen import *
+
+logEv=tmcmc("fitfun3",dim=2,maxstages=20,popsize=4096,lowerbound=[-10,-10],upperbound=[10,10],id=3)
+print("logEv=",logEv[0])
+
+plot_gen('curgen_db_003_009.txt', dim=2, i=1, j=2, namei='alpha', namej='sigma^2', show=1, save=0)
+</code></pre>
+<h3 id="fitfun3py">fitfun3.py</h3>
+<pre><code># data-driven inference
+# underlying data model: y = ax + e, where
+# a=0.3 and e=N(0,sigma^2), sigma=0.1
+
+import numpy as np
+import math
+
+def fitfun3(theta, dim):
+
+    a = theta[0]
+    sigma = theta[1]
+
+    data = np.loadtxt('data3.txt')
+    N=data.shape[0];
+
+    x = data[:,0]
+    dy = data[:,1]
+
+    y = a*x;
+
+    SSE = np.sum((y-dy)\*\*2)
+    sy=sigma;
+    logn = -0.5*N*math.log(2*math.pi)-0.5*N*math.log(sy*sy)-0.5*SSE/(sy*sy)
+
+    return logn
+</code></pre>
+<h2 id="installation-and-testing">Installation and testing</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Make sure that the following required software has been installed.</p>
+<ul>
+<li>GCC compiler</li>
+<li>Python 2.7 (or higher)</li>
+<li>Python-devel package<ul>
+<li><code>python2-config</code> or <code>python3-config</code> must be available</li>
+<li>MacOS: automatically available if python has been installed with brew</li>
+</ul>
+</li>
+<li>Python numpy package<ul>
+<li>MacOS: <code>pip2 install numpy</code> or <code>pip3 install numpy</code></li>
+</ul>
+</li>
+<li>Python matplotlib package<ul>
+<li>MacOS: <code>pip2 install matplotlib</code> or <code>pip3 install matplotlib</code></li>
+</ul>
+</li>
+<li>GNU GSL library<ul>
+<li>MacOS: <code>brew install gsl</code></li>
+<li>We also provide the option to download and use a local copy of the GSL library</li>
+</ul>
+</li>
+</ul>
+<h3 id="installation-steps">Installation steps</h3>
+<p>1. Download from GitHub:</p>
+<p><code>git clone https://github.com/cselab/pi4u.git pi4u-tmcmc -b tmcmc</code></p>
+<p>If you do not have git, download <em>pi4u-tmcmc.zip</em> from here: <a href="https://github.com/cselab/pi4u/archive/tmcmc.zip">GitHub download link</a></p>
+<p>2. Go to pi4u-tmcmc/src and build the TMCMC library:</p>
+<p><code>cd pi4u-tmcmc/src; make</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
+<h3 id="testing-running-the-demo">Testing - Running the demo</h3>
+<p>1. Go to pi4u-tmcmc/demo_python and run demo3.py</p>
+<p><code>cd demo_python; python2 demo3.py</code>  </p>
+<p>2. The scatter plot of samples for our example should be as follows:</p>
+<p><img alt="Screenshot" src="../img/curgen_db_003_009.txt.png" /></p>
+<h2 id="troubleshooting-and-additional-options">Troubleshooting and additional options</h2>
+<h3 id="how-to-build-the-software-using-a-local-copy-of-the-gsl-library">How to build the software using a local copy of the GSL library</h3>
+<p>1. Go to pi4u-tmcmc/gsl and run build.sh:</p>
+<p><code>cd pi4u-tmcmc/gsl; ./build.sh</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
+<p>2. Go to pi4u-tmcmc/src and build the TMCMC library:</p>
+<p><code>cd src; make -B mygsl=1</code></p>
+<h3 id="how-to-build-the-software-using-python3">How to build the software using python3</h3>
+<p>1. Go to pi4u-tmcmc/src and (re)-build the TMCMC library:</p>
+<p><code>make -B python3=1</code></p>
+<p><code>cd ..</code>  (<em>go back to the pi4u-tmcmc directory</em>)</p>
+<p>2. Go to demo_python and run demo3.py using python3</p>
+<p><code>cd demo_python; python3 demo3.py</code></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../matlab/" class="btn btn-neutral float-right" title="Matlab">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../matlab/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
