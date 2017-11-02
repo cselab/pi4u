@@ -22,7 +22,7 @@ static int pat_list[NPAT] = {1, 2, 3, 4, 5};
 typedef struct ffdata_s {
     double *x;
     double loglik;
-    double prior;
+    double logprior;
 } ffdata_t;
 
 static ffdata_t *ffdata[NPAT];
@@ -89,9 +89,9 @@ void fitfun_initialize() {
                 fscanf(fp, "%lf", &(ffdata[p][i].x[j]));
 
             fscanf(fp, "%lf", &ffdata[p][i].loglik);
-            fscanf(fp, "%lf", &ffdata[p][i].prior);
+            fscanf(fp, "%lf", &ffdata[p][i].logprior);
 
-            ffdata[p][i].prior = exp(ffdata[p][i].prior);
+            // ffdata[p][i] = exp(ffdata[p][i].logprior);
         }
         fclose(fp);
 
@@ -162,13 +162,6 @@ inline double unifpdf2(double x, double l, double len) {
 }
 
 
-inline double lognpdf(double x, double m, double s) {
-    if (s > 0)
-        return gsl_ran_lognormal_pdf(x, m, s);
-    else
-        return NAN;
-}
-
 
 inline double trnpdf(double x, double m, double s, double l, double u) {
     if (s > 0)
@@ -180,26 +173,30 @@ inline double trnpdf(double x, double m, double s, double l, double u) {
 }
 
 
-double priorHB(double *x, double *psi, int n) {
-    double res = 1.0;
 
-    /* for the truncated gaussian */
-    // double l[3] = {0.05, 3.0, 1e-4};
-    // double u[3] = {10.0, 4.0, 1};
 
-    // printf("%.2f %.2f %.2f\n", x[0], x[1], x[2]);
-    // printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", psi[0], psi[1], psi[2], psi[3], psi[4], psi[5]);
+
+inline double log_lognpdf(double x, double m, double s) {
+    if (s > 0)
+      return -0.5*log(2*M_PI) - log(x) - log(s) -0.5*pow((log(x)-m)/s,2);
+    else
+      return NAN;
+}
+
+
+
+double log_priorHB(double *x, double *psi, int n) {
+
+    double res = 0.0;
 
     for (int i = 0; i < n/2; i++) {
-        /* res *= unifpdf(x[i], psi[2*i], psi[2*i+1]); */
-        /* res *= unifpdf2(x[i], psi[2*i], psi[2*i+1]); */
-        res *= lognpdf(x[i], psi[2*i], psi[2*i+1]);
-        // res *= trnpdf(x[i], psi[2*i], psi[2*i+1], l[i], u[i]);
-        // printf("%.2f\n", res);
+        res += log_lognpdf(x[i], psi[2*i], psi[2*i+1]);
     }
 
     return res;
 }
+
+
 
 
 inline double loglike_psi(double *psi, int n) {
@@ -215,9 +212,20 @@ inline double loglike_psi(double *psi, int n) {
 
         double sum = 0;
         for (int i = 0; i < NREC; i++) {
-            double pr_hb = priorHB(ffdata[p][i].x, psi, n);
-            double pri = ffdata[p][i].prior;
-            sum += pr_hb/pri;
+
+            double log_pr_hb = log_priorHB(ffdata[p][i].x, psi, n);
+            double log_pri = ffdata[p][i].logprior;
+
+            // for(int k=0; k<n; k++) printf("%f \t ",psi[k]);
+            // printf("\n");
+            // for(int k=0; k<n/2; k++) printf("%f \t ",ffdata[p][i].x[k]);
+            // printf("\n");
+            // printf("%f \n",log_pr_hb);
+            // printf("%f \n",log_pri);
+            // printf("%f \n",log_pr_hb-log_pri);
+            // exit(0);
+
+            sum += exp( log_pr_hb-log_pri ) ;
         }
 
         if (sum == 0 || isnan(sum) || isinf(sum)) {

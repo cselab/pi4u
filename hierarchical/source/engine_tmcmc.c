@@ -936,7 +936,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
     double pj = runinfo.p[runinfo.Gen];
 
-#define BURN_IN    0
+#define BURN_IN    5
     for (step = 0; step < nsteps + BURN_IN; step++) {
         double chain_mean[data.Nth];
         if (step == 0)
