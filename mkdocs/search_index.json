@@ -2,7 +2,7 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Welcome to Pi4U\n\n\nPi4U is a HPC framework for Bayesian uncertainty quantification of large scale computational models.\n\n\nModules and algorithms\n\n\nInference\n\n\nTMCMC\n\n\nABC-Subsim\n\n\nDRAM\n\n\nSingle-objective optimization\n\n\nCMAES\n\n\nAmalgam\n\n\nMulti-objective optimization\n\n\nNSGA-II\n\n\nMOCMAES\n\n\nMOEAD\n\n\nImplementations\n\n\nParallel\n\n\nSequential", 
+            "text": "Welcome to Pi4U\n\n\nPi4U is a HPC framework for Bayesian uncertainty quantification of large scale computational models.\n\n\nModules and algorithms\n\n\nInference\n\n\nTMCMC\n\n\nABC-Subsim\n\n\nDRAM\n\n\nSingle-objective optimization\n\n\nCMAES\n\n\nAmalgam\n\n\nHierarchical Bayesian inference\n\n\nMulti-objective optimization\n\n\nNSGA-II\n\n\nMOCMAES\n\n\nMOEAD\n\n\nRare event estimation\n\n\nSubset simulation\n\n\nImplementations\n\n\nParallel\n\n\nSequential", 
             "title": "Home"
         }, 
         {
@@ -26,9 +26,19 @@
             "title": "Single-objective optimization"
         }, 
         {
+            "location": "/#hierarchical-bayesian-inference", 
+            "text": "", 
+            "title": "Hierarchical Bayesian inference"
+        }, 
+        {
             "location": "/#multi-objective-optimization", 
             "text": "NSGA-II  MOCMAES  MOEAD", 
             "title": "Multi-objective optimization"
+        }, 
+        {
+            "location": "/#rare-event-estimation", 
+            "text": "Subset simulation", 
+            "title": "Rare event estimation"
         }, 
         {
             "location": "/#implementations", 
