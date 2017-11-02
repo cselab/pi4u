@@ -4,8 +4,8 @@ BASE_DIR="runs"
 DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
-EXEC_FILE="../phase_1/engine_tmcmc"
-PAR_FILE="./tmcmc.par"
+EXEC_FILE="../phase_1/sample_theta"
+PAR_FILE="./theta.par"
 MODEL_FILE="model/my_model.py"
 MODEL_SCRIPT="model/doall.sh"
 LL_FILE="model/log_like.py"
@@ -46,7 +46,7 @@ do
 	cp ${DATA_FILE} "${MODEL_DIR}/data.txt"
 
 	cp ${EXEC_FILE}    ${RUN_DIR}
-	cp ${PAR_FILE}     ${RUN_DIR}
+	cp ${PAR_FILE}     ${RUN_DIR}/tmcmc.par
 	cp ${MODEL_FILE}   ${MODEL_DIR}
 	cp ${MODEL_SCRIPT} ${MODEL_DIR}
 	cp ${LL_FILE}      ${MODEL_DIR}
