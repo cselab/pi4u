@@ -4,16 +4,16 @@ BASE_DIR="runs"
 DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
-EXEC_FILE="../phase_1/sample_theta"
+EXEC_FILE="../source/sample_theta"
 PAR_FILE="./theta.par"
 MODEL_FILE="model/my_model.py"
 MODEL_SCRIPT="model/doall.sh"
 LL_FILE="model/log_like.py"
 
 
-N=10
+N=5
 
-Ilist=(1 2 3 4 5 6 7 8 9 10)
+Ilist=(1 2 3 4 5)
 
 
 
@@ -39,7 +39,7 @@ do
 	MODEL_DIR="$RUN_DIR/model"
 	mkdir $MODEL_DIR
 
-	DATA_FILE="${DATA_DIR}/${DATA_PREFIX}${II}.txt"
+	DATA_FILE="${DATA_DIR}/${DATA_PREFIX}${II}.dat"
 
 
 

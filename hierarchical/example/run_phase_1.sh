@@ -4,10 +4,10 @@ BASE_DIR="runs"
 
 CURRENT_DIR=$(pwd)
 
-export TORC_WORKERS=2
+export TORC_WORKERS=24
 
 
-Ilist=(1 2 3 4 5 6 7 8 9 10)
+Ilist=(1 2 3 4 5)
 
 
 
@@ -31,7 +31,7 @@ do
 
         cd $RUN_DIR
 
-        mpirun -np 1   ./engine_tmcmc
+        mpirun -np 1   ./sample_theta
 
         cd $CURRENT_DIR
 

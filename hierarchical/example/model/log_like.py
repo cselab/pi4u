@@ -13,7 +13,7 @@ def log_like( sigma_data ):
 	model = np.loadtxt('./result.txt')
 	model = model[:,1]
 
-        N = data.shape[0]
+	N = data.shape[0]
 
 	if N == 1 :
 		if np.isnan((model[1])):
