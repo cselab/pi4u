@@ -1,2 +1,0 @@
-# Matlab interface of TMCMC
-
