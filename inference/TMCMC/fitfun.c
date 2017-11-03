@@ -1,10 +1,10 @@
 #include <math.h>
 
 // activate one of the following options
-#define _USE_ROSENBROCK_
+//#define _USE_ROSENBROCK_
 //#define _USE_BVNPDF_
 //#define _USE_MIXED_BVNPDF_
-//#define _USE_MIXED_MVNPDF_
+#define _USE_MIXED_MVNPDF_
 
 #if defined(_USE_MIXED_BVNPDF_)
 #include "gsl_headers.h"
@@ -20,6 +20,7 @@ double mixedbvnpdf(double *x, int n) /* bivariate */
 
 #if defined(_USE_MIXED_MVNPDF_)
 #include "gsl_headers.h"
+extern double mvnpdf(int n, double *xv, double *mv, double *vm);
 double mixedmvnpdf(double *x, int n) /* multivariate */
 {
 	double P = 0;

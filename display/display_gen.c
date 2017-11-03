@@ -138,8 +138,8 @@ void display_curgen_db(int Gen, int NGens)
 
 //double lbnd[]           = { 0.01,  0.01, 0.00, 0.00, 0.00, 0.00, 0.00,  0.00};
 //double ubnd[]           = {20.00, 20.00, 2.50, 0.30, 0.05, 0.60, 1.00, 33.00};
-double lbnd[]	= {-6, -6};
-double ubnd[]	= {+6, +6};
+double lbnd[]	= {-15, -15, -15, -15};
+double ubnd[]	= {+15, +15, +15, +15};
 
 
 void display_curgen_db_single(int Gen, int p1, int p2, int Dim, int NGens)

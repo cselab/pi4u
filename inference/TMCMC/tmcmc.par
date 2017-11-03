@@ -4,7 +4,7 @@
 
 #------------------------ GENERAL PARAMETERS ----------------------------------
 # Problem dimension
-Nth		2
+Nth		4
 
 # Max number of generations
 MaxStages	20
@@ -14,8 +14,8 @@ PopSize		8192
 
 # Chain lengths:
 # 1) TMCMC (biased): min=0, max>=PopSize
-# 2) BASIS (unbiased): min=max=1
-MinChainLength	1
+# 2) BASIS (unbiased): min=0, max=1
+MinChainLength	0
 MaxChainLength	1
 
 # Desired coefficient of variation (=std/mean) of the weights
@@ -33,9 +33,9 @@ prior_type  0
 # Bdef: same boundaries in each dimension
 # Bi: boundaries in i-th dimension, e.g. B0 -1 1
 # Note: Bi overwrites Bdef 
-#Bdef		-15	15
-B0		-6	6
-B1		-6	6
+Bdef		-15	15
+#B0		-6	6
+#B1		-6	6
 
 # Parameters of the Gaussian prior
 # Note: prior_mu size is 1 x Nth, prior_sigma size is Nth x Nth
@@ -64,7 +64,7 @@ use_proposal_cma 0
 # Acceptance type in MCMC:
 # 0 - without exp()
 # 1 - with exp()
-accept      0
+accept      1
 
 
 #---------------------------- OTHER OPTIONS -----------------------------------
