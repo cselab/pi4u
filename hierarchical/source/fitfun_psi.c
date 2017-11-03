@@ -3,7 +3,6 @@
 #include "gsl_headers.h"
 
 
-
 #define DATABASE  "./data/theta"
 #define THETAFILE1 "theta_"
 #define THETAFILE2 ".txt"
@@ -17,6 +16,7 @@
 #define NPAT 5
 
 static int pat_list[NPAT] = {1, 2, 3, 4, 5};
+
 
 
 typedef struct ffdata_s {
@@ -47,7 +47,7 @@ void fitfun_initialize() {
     printf("\nReading %d data from theta database for individuals: \n", NREC);
     for (int i = 0; i < NPAT; i++)
         printf("%d  -  ", pat_list[i]);
-    printf("");
+    printf("\n");
 
     int n = nn/2;
     for (int pp = 1; pp <= NPAT; pp++) {
@@ -201,6 +201,9 @@ double log_priorHB(double *x, double *psi, int n) {
 
 inline double loglike_psi(double *psi, int n) {
     double out = 0;
+            
+	//for(int k=0; k<n; k++) printf("%f \t ",psi[k]);
+    //printf("\n");
 
     for (int pp = 1; pp <= NPAT; pp++) {
         int p = pp-1;
@@ -216,8 +219,6 @@ inline double loglike_psi(double *psi, int n) {
             double log_pr_hb = log_priorHB(ffdata[p][i].x, psi, n);
             double log_pri = ffdata[p][i].logprior;
 
-            // for(int k=0; k<n; k++) printf("%f \t ",psi[k]);
-            // printf("\n");
             // for(int k=0; k<n/2; k++) printf("%f \t ",ffdata[p][i].x[k]);
             // printf("\n");
             // printf("%f \n",log_pr_hb);

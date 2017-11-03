@@ -6,7 +6,7 @@ CURRENT_DIR=$(pwd)
 
 SAVE_DIR="${CURRENT_DIR}/data/theta"
 
-export TORC_WORKERS=24
+export TORC_WORKERS=1
 
 
 Ilist=(1 2 3 4 5)
@@ -33,7 +33,7 @@ do
 
         cd $RUN_DIR
 
-        mpirun -np 1	./sample_theta
+        mpirun -np 1	./sample_theta_fast > out.txt
 
 		FNAME="${SAVE_DIR}/theta_${II}.txt"
 		cp final.txt $FNAME
