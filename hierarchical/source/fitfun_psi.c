@@ -13,9 +13,9 @@
 
 #define NREC 10000
 
-#define NPAT 5
+#define N_IND 5
 
-static int pat_list[NPAT] = {1, 2, 3, 4, 5};
+static int ind_list[N_IND] = {1, 2, 3, 4, 5};
 
 
 
@@ -25,8 +25,8 @@ typedef struct ffdata_s {
     double logprior;
 } ffdata_t;
 
-static ffdata_t *ffdata[NPAT];
-static double logEv[NPAT];
+static ffdata_t *ffdata[N_IND];
+static double logEv[N_IND];
 
 
 
@@ -45,18 +45,18 @@ void fitfun_initialize() {
     int nn = data.Nth;
 
     printf("\nReading %d data from theta database for individuals: \n", NREC);
-    for (int i = 0; i < NPAT; i++)
-        printf("%d  -  ", pat_list[i]);
+    for (int i = 0; i < N_IND; i++)
+        printf("%d  -  ", ind_list[i]);
     printf("\n");
 
     int n = nn/2;
-    for (int pp = 1; pp <= NPAT; pp++) {
+    for (int pp = 1; pp <= N_IND; pp++) {
         int p = pp-1;
         char filename[BUFLEN];
         FILE *fp;
 
 
-        snprintf(filename, BUFLEN, "%s/%s%03d%s", DATABASE, THETAFILE1,  pat_list[p], THETAFILE2);
+        snprintf(filename, BUFLEN, "%s/%s%03d%s", DATABASE, THETAFILE1,  ind_list[p], THETAFILE2);
         fp = fopen(filename, "r");
         if (fp == NULL) {
             printf("\n %s  does not exist. Exiting...\n", filename);
@@ -95,7 +95,7 @@ void fitfun_initialize() {
         }
         fclose(fp);
 
-        snprintf(filename, BUFLEN, "%s/%s%03d%s", DATABASE, LOGEVFILE1,  pat_list[p], LOGEVFILE2);
+        snprintf(filename, BUFLEN, "%s/%s%03d%s", DATABASE, LOGEVFILE1,  ind_list[p], LOGEVFILE2);
         fp = fopen(filename, "r");
         if (fp == NULL) {
             printf("\n %s  does not exist. Exiting...\n", filename);
@@ -111,7 +111,7 @@ void fitfun_initialize() {
 
 
 void fitfun_finalize() {
-    for (int pp = 1; pp <= NPAT; pp++) {
+    for (int pp = 1; pp <= N_IND; pp++) {
         int p = pp-1;
         if (ffdata[p] != NULL) {
             for (int i = 0; i < NREC; i++) free(ffdata[p][i].x);
@@ -205,7 +205,7 @@ inline double loglike_psi(double *psi, int n) {
 	//for(int k=0; k<n; k++) printf("%f \t ",psi[k]);
     //printf("\n");
 
-    for (int pp = 1; pp <= NPAT; pp++) {
+    for (int pp = 1; pp <= N_IND; pp++) {
         int p = pp-1;
 
         if (ffdata[p] == NULL) {

@@ -891,7 +891,6 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
     double pj = runinfo.p[runinfo.Gen];
 
-		//printf("======================================== \n");
 #define BURN_IN    4
     for (step = 0; step < nsteps + BURN_IN; step++) {
         double chain_mean[data.Nth];
@@ -911,8 +910,6 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 		if (!fail)
         {
             evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);    /* this can spawn many tasks*/
-
-			//printf("%lf   %lf \n",loglik_leader,loglik_candidate);
 
             if (data.ifdump && step >= BURN_IN) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
 
