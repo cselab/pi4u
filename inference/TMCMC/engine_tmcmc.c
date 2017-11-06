@@ -75,10 +75,7 @@ void read_data()
     data.options.Display = 0;
     data.options.Step = 1e-5;
 
-#if 1
-    data.accept_type = 0;    /* without exp() > with exp() */
     data.prior_type = 0;    /* uniform > gaussian */
-#endif
 
     data.iplot = 0;    /* gnuplot */
     data.icdump = 1;    /* dump current dataset of accepted points */
@@ -155,9 +152,6 @@ ifdump        0
         else if (strstr(line, "opt.Step")) {
             sscanf(line, "%*s %lf", &data.options.Step);
             printf("setting step = %f\n", data.options.Step);
-        }
-        else if (strstr(line, "accept")) {
-            sscanf(line, "%*s %d", &data.accept_type);
         }
         else if (strstr(line, "prior_type")) {
             sscanf(line, "%*s %d", &data.prior_type);
@@ -921,10 +915,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
             double logprior_candidate = logpriorpdf(candidate, data.Nth);    /* from PanosA */
             double logprior_leader = logpriorpdf(leader, data.Nth);
             double L;
-            if (data.accept_type == 0)
-                L = ((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);    /* without exp, with log in logpriorpdf and fitfun */
-            else
-                L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);    /* with exp, without log in logpriorpdf and fitfun */
+            L = exp((logprior_candidate-logprior_leader)+(loglik_candidate-loglik_leader)*pj);    /* with exp, with log in logpriorpdf and fitfun */
 
             if (L > 1) L = 1;
             double P = uniformrand(0,1);

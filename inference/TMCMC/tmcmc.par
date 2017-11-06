@@ -4,7 +4,7 @@
 
 #------------------------ GENERAL PARAMETERS ----------------------------------
 # Problem dimension
-Nth		4
+Nth		2
 
 # Max number of generations
 MaxStages	20
@@ -61,12 +61,6 @@ bbeta		    0.04
 # Use or not CMA-style proposal in MCMC (experimental)
 use_proposal_cma 0
 
-# Acceptance type in MCMC:
-# 0 - without exp()
-# 1 - with exp()
-accept      1
-
-
 #---------------------------- OTHER OPTIONS -----------------------------------
 # RNG seed
 seed		280675
@@ -80,7 +74,7 @@ opt.Step	1e-4
 # Online plotting of data, useful for 2D data and debugging
 iplot		0
 icdump		1
-ifdump		1
+ifdump		0
 
 # SN-TMCMC specific options
 diffstep	1e-4

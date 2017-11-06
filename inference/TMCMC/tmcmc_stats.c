@@ -813,7 +813,6 @@ double logpriorpdf(double *theta, int n)
 			break;
 	}
 
-	if (data.accept_type == 1) return exp(res);
 	return res;
 }
 

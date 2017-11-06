@@ -1,10 +1,10 @@
 #include <math.h>
 
 // activate one of the following options
-//#define _USE_ROSENBROCK_
+#define _USE_ROSENBROCK_
 //#define _USE_BVNPDF_
 //#define _USE_MIXED_BVNPDF_
-#define _USE_MIXED_MVNPDF_
+//#define _USE_MIXED_MVNPDF_
 
 #if defined(_USE_MIXED_BVNPDF_)
 #include "gsl_headers.h"
@@ -70,7 +70,7 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 	for (i=0; i<N-1; i++)	/* rosenbrock */
 		f = f + 100.0*pow((x[i+1]-x[i]*x[i]),2) + pow((x[i]-1.0),2);
 	f = -f;
-//	f = -log(f);	// peh xxx: logval = 1
+//	f = -log(f);
 #endif
 
 #if defined(_USE_BVNPDF_)

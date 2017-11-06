@@ -3,7 +3,6 @@ CPP = mpic++
 MPIF90 = mpif90
 
 CFLAGS = -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
-#CFLAGS = -O3 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall 
 
 LDFLAGS += -lgsl -lgslcblas
@@ -22,4 +21,4 @@ clean:
 	rm -f engine_tmcmc  *.o
 
 clear:
-	rm -rf curgen_db*.txt curres_db*.txt runinfo.txt full_db*.txt fitness.txt final.txt
+	rm -rf curgen_db*.txt curres_db*.txt runinfo.txt full_db*.txt fitness.txt final.txt fzero*.txt
