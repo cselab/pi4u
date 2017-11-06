@@ -67,12 +67,6 @@ bbeta		    0.01
 # Use or not CMA-style proposal in MCMC (experimental)
 use_proposal_cma 0
 
-# Acceptance type in MCMC:
-# 0 - without exp()
-# 1 - with exp()
-accept      0
-
-
 #---------------------------- OTHER OPTIONS -----------------------------------
 # RNG seed
 seed		280675
