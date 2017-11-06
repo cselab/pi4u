@@ -6,7 +6,7 @@ CURRENT_DIR=$(pwd)
 
 SAVE_DIR="${CURRENT_DIR}/data/theta"
 
-export TORC_WORKERS=1
+export TORC_WORKERS=2
 
 
 Ilist=(1 2 3 4 5)

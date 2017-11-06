@@ -3,7 +3,7 @@
 #include "gsl_headers.h"
 
 
-#define DATABASE  "./data/theta"
+#define DATABASE  "../../data/theta"
 #define THETAFILE1 "theta_"
 #define THETAFILE2 ".txt"
 #define LOGEVFILE1 "evidence_"
@@ -11,7 +11,7 @@
 
 #define BUFLEN 1024
 
-#define NREC 10000
+#define NREC 1000
 
 #define N_IND 5
 
