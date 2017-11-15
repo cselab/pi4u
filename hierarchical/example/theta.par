@@ -10,7 +10,7 @@ Nth		4
 MaxStages	40
 
 # Population size
-PopSize		10000
+PopSize		40000
 
 # Chain lengths:
 # 1) TMCMC (biased): min=0, max>=PopSize
@@ -66,12 +66,6 @@ bbeta		    0.01
 
 # Use or not CMA-style proposal in MCMC (experimental)
 use_proposal_cma 0
-
-# Acceptance type in MCMC:
-# 0 - without exp()
-# 1 - with exp()
-accept      0
-
 
 #---------------------------- OTHER OPTIONS -----------------------------------
 # RNG seed

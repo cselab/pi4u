@@ -4,7 +4,7 @@ BASE_DIR="runs"
 
 CURRENT_DIR=$(pwd)
 
-export TORC_WORKERS=24
+export TORC_WORKERS=48
 
 
 

@@ -63,7 +63,7 @@ use_proposal_cma 0
 
 #---------------------------- OTHER OPTIONS -----------------------------------
 # RNG seed
-seed		280675
+seed		0
 
 # Internal options
 opt.MaxIter	1000
