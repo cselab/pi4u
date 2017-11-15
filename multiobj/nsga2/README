@@ -1,0 +1,13 @@
+We provide a task-parallel version of the NSGA-II multiobjective algorithm.
+We have introduced minimal modifications to the original sequential code
+developed at Kanpur Genetic Algorithms Laboratory (KanGAL, IIT Kanpur) by
+the authors of the algorithm [(C) Dr. Kalyanmoy Deb 2005, see the Notice file].
+
+You can find more information about the NSGA-II code in the Readme file, 
+which has been slightly modified to include any changes introduced in the
+original code. 
+
+---------------------------------------------------------------------------
+If you have any questions about the parallel version of this code, 
+please feel free to contact Dr. Panos Hadjidoukas (phadjido at mavt.ethz.ch)
+---------------------------------------------------------------------------

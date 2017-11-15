@@ -98,18 +98,18 @@ void read_data()
        MaxStages    200
        PopSize         1024
        Bdef        -4    4
-#B0              -6    6
-#B1              -6    6
-TolCOV          1
-bbeta           0.2
-seed            280675
-opt.MaxIter     100
-opt.Tol         1e-6
-opt.Display     0
-opt.Step        1e-5
-iplot           0
-icdump        1
-ifdump        0
+	#B0              -6    6
+	#B1              -6    6
+	TolCOV          1
+	bbeta           0.2
+	seed            280675
+	opt.MaxIter     100
+	opt.Tol         1e-6
+	opt.Display     0
+	opt.Step        1e-5
+	iplot           0
+	icdump        1
+	ifdump        0
 */
 
     char line[256];
@@ -891,7 +891,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
     double pj = runinfo.p[runinfo.Gen];
 
-#define BURN_IN    0
+#define BURN_IN    4
     for (step = 0; step < nsteps + BURN_IN; step++) {
         double chain_mean[data.Nth];
         if (step == 0)

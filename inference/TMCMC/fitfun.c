@@ -1,10 +1,10 @@
 #include <math.h>
 
 // activate one of the following options
-#define _USE_ROSENBROCK_
+//#define _USE_ROSENBROCK_
 //#define _USE_BVNPDF_
 //#define _USE_MIXED_BVNPDF_
-//#define _USE_MIXED_MVNPDF_
+#define _USE_MIXED_MVNPDF_
 
 #if defined(_USE_MIXED_BVNPDF_)
 #include "gsl_headers.h"

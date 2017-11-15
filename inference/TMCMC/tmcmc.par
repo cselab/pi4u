@@ -4,13 +4,13 @@
 
 #------------------------ GENERAL PARAMETERS ----------------------------------
 # Problem dimension
-Nth		2
+Nth		4
 
 # Max number of generations
 MaxStages	20
 
 # Population size
-PopSize		8192
+PopSize		8000
 
 # Chain lengths:
 # 1) TMCMC (biased): min=0, max>=PopSize

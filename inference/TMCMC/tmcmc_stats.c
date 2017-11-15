@@ -13,7 +13,7 @@
 #include <time.h>
 
 int display = 0;
-#define LARGE_SCALE_POPS
+//#define LARGE_SCALE_POPS
 /** OBJLOGP FUNCTION **/
 double Objlogp(double x, double *fj, int fn, double pj, double tol)
 {
@@ -557,7 +557,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	int conv = 0;
 #if 1
 
-#if 0
+#if 1
 	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	if (Display)
 		printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
