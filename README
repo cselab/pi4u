@@ -85,7 +85,7 @@ a) Build the two engines
 	cd rare/subset
 	make
 
-a) Run engine_ss1
+b) Run engine_ss1
 	./engine_ss1
 
    Subset simulation for predefined levels
@@ -98,7 +98,7 @@ a) Run engine_ss1
 
    The runtime options for this engine can be set in the configuration file subset.par
 
-b) Run engine_ss2
+c) Run engine_ss2
 
 	./engine_ss2 
 
@@ -174,5 +174,6 @@ a) coupling/rosenbrock:
 
 VII) NOTES
 
-Do not hesitate to ask for help and report any problems: phadjido AT mavt.ethz.ch 
-
+Do not hesitate to ask for help and report any problems at:
+- chatzidp AT ethz.ch
+- garampat AT ethz.ch
