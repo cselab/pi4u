@@ -42,7 +42,7 @@ MPI_Datatype _torc_b2mpi_type(int btype);
 
 
 #ifndef MAX_NODES
-#define MAX_NODES					64 
+#define MAX_NODES					1024
 #endif
 
 #define TERMINATE_LOCAL_SERVER_THREAD			(120)

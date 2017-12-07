@@ -168,9 +168,9 @@ fi
 # Set max number of nodes (mpi processes)
 #==============================================================================
 
-NNODES="64"
+NNODES="1024"
 AC_ARG_WITH(maxnodes,
-	AC_HELP_STRING([--with-maxnodes=num], [maximum number of nodes (default: 64)]),
+	AC_HELP_STRING([--with-maxnodes=num], [maximum number of nodes (default: 1024)]),
 	[
 	NNODES=$withval
 	]
