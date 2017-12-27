@@ -140,13 +140,8 @@ void dump_curgen_db(int Gen)
 		for (i = 0; i < PROBDIM; i++) {
 			fprintf(fp, "%20.16lf ", curgen_db.entry[pos].point[i]);
 		}
-<<<<<<< HEAD
 		fprintf(fp, "%20.16lf ", curgen_db.entry[pos].F);
 		fprintf(fp, "%20.16lf ", curgen_db.entry[pos].prior);
-=======
-		fprintf(fp, "%20.16lf  ", curgen_db.entry[pos].F);
-		fprintf(fp, "%20.16lf  ", curgen_db.entry[pos].prior);
->>>>>>> 69244e375067e7152c82a02b107c9e39199f2ced
 		fprintf(fp,"\n");
 
 	}
