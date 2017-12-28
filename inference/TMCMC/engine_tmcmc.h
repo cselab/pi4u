@@ -45,13 +45,11 @@ typedef struct data_s {
 
     double *compositeprior_distr; /*[PROBDIM]*/
 
-#if 1
     double *prior_mu;
     double *prior_sigma;
 
     int auxil_size;
     double *auxil_data;
-#endif
 
     int MinChainLength, MaxChainLength;
 
@@ -60,6 +58,7 @@ typedef struct data_s {
     double    TolCOV;
     double    bbeta;
     long    seed;
+    int    burn_in;
 
     struct optim_options {
         int    MaxIter;
@@ -69,12 +68,10 @@ typedef struct data_s {
     } options;
 
 #if 1
-    int    sampling_type;  /* 0: uniform, 1: gaussian, 2: file */
-    int    accept_type;    /* 0: without exp(), 1: with exp() */
-    int    prior_type;     /* 0: lognormal, 1: gaussian */
+    int    prior_type;     /* 0: uniform, 1: gaussian, 3: composite */
+    int    load_from_file;
 #endif
 
-    int    iplot;
     int    icdump;
     int    ifdump;
 
@@ -88,6 +85,8 @@ typedef struct data_s {
     int use_local_cov;
     double local_scale;
 
+    int stealing;
+    int restart;
 } data_t;
 
 typedef struct runinfo_s {
@@ -199,6 +198,10 @@ void shuffle(int *perm, int N);
 int mvnrnd(double *mean, double *var, double *res, int n);
 double mvnpdf(int n, double *xv, double *mv, double *vm);
 double logmvnpdf(int n, double *xv, double *mv, double *vm);
+
+double truncated_normal_pdf (double x, double mu, double sigma, double a, double b);
+double truncated_normal_rand (double mu, double sigma, double a, double b);
+double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b);
 
 /*** STATISTICS ***/
 void calculate_statistics(double flc[], int n, int nselections, int gen, unsigned int sel[]);

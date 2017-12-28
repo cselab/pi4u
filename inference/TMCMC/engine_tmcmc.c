@@ -1,6 +1,6 @@
 /*
  *  engine_tmcmc.c
- *  Pi4U 
+ *  Pi4U
  *
  *  Created by Panagiotis Hadjidoukas on 1/1/14.
  *  Copyright 2014 ETH Zurich. All rights reserved.
@@ -13,7 +13,7 @@
 #include "engine_tmcmc.h"
 #include "fitfun.h"
 
-#define _STEALING_
+/*#define _STEALING_*/
 /*#define VERBOSE 1*/
 /*#define _RESTART_*/
 
@@ -69,15 +69,16 @@ void read_data()
     data.TolCOV = 1.0;    /* 0.25, 0.5 */
     data.bbeta = 0.2;
     data.seed = 280675;
+    data.burn_in = 0;
 
-    data.options.MaxIter = 100;    /**/ 
+    data.options.MaxIter = 100;    /**/
     data.options.Tol = 1e-6;
     data.options.Display = 0;
     data.options.Step = 1e-5;
 
-    data.prior_type = 0;    /* uniform > gaussian */
+    data.prior_type = 0;    /* uniform > gaussian > composite */
+    data.load_from_file = 0;    /* load initial samples from file instead from prior */
 
-    data.iplot = 0;    /* gnuplot */
     data.icdump = 1;    /* dump current dataset of accepted points */
     data.ifdump = 0;    /* dump complete dataset of points */
 
@@ -87,30 +88,14 @@ void read_data()
     }
     data.LastNum = data.PopSize; /* DATANUM; */
 
+    data.stealing = 0;
+    data.restart = 0;
+
     /* USER-DEFINED VALUES */
     FILE *f = fopen("tmcmc.par", "r");
     if (f == NULL) {
         return;
     }
-
-    /*
-       Nth             2
-       MaxStages    200
-       PopSize         1024
-       Bdef        -4    4
-	#B0              -6    6
-	#B1              -6    6
-	TolCOV          1
-	bbeta           0.2
-	seed            280675
-	opt.MaxIter     100
-	opt.Tol         1e-6
-	opt.Display     0
-	opt.Step        1e-5
-	iplot           0
-	icdump        1
-	ifdump        0
-*/
 
     char line[256];
 
@@ -118,7 +103,9 @@ void read_data()
     while (fgets(line, 256, f)!= NULL) {
         line_no++;
         if ((line[0] == '#')||(strlen(line)==0)) {
+#if VERBOSE
             printf("ignoring line %d\n", line_no);
+#endif
             continue;
         }
 
@@ -140,6 +127,9 @@ void read_data()
         else if (strstr(line, "seed")) {
             sscanf(line, "%*s %ld", &data.seed);
         }
+        else if (strstr(line, "burn_in")) {
+            sscanf(line, "%*s %d", &data.burn_in);
+        }
         else if (strstr(line, "opt.MaxIter")) {
             sscanf(line, "%*s %d", &data.options.MaxIter);
         }
@@ -156,8 +146,8 @@ void read_data()
         else if (strstr(line, "prior_type")) {
             sscanf(line, "%*s %d", &data.prior_type);
         }
-        else if (strstr(line, "iplot")) {
-            sscanf(line, "%*s %d", &data.iplot);
+        else if (strstr(line, "load_from_file")) {
+            sscanf(line, "%*s %d", &data.load_from_file);
         }
         else if (strstr(line, "icdump")) {
             sscanf(line, "%*s %d", &data.icdump);
@@ -177,6 +167,12 @@ void read_data()
         else if (strstr(line, "use_local_cov")) {
             sscanf(line, "%*s %d", &data.use_local_cov);
         }
+        else if (strstr(line, "stealing")) {
+            sscanf(line, "%*s %d", &data.stealing);
+        }
+        else if (strstr(line, "restart")) {
+            sscanf(line, "%*s %d", &data.restart);
+        }
     }
 
     rewind(f);
@@ -187,6 +183,7 @@ void read_data()
     data.lowerbound = (double *)malloc(data.Nth*sizeof(double));
     data.upperbound = (double *)malloc(data.Nth*sizeof(double));
 
+    /* Read the lower and upper bounds for each parameter - used by uniform and truncated gaussian priors */
     for (i = 0; i < data.Nth; i++) {
         found = 0;
         while (fgets(line, 256, f)!= NULL) {
@@ -307,8 +304,21 @@ void read_data()
                 char bound[16];
                 sprintf(bound, "C%d", i);
                 if (strstr(line, bound) != NULL) {
-                    sscanf(line, "%*s %lf %lf %lf", &data.compositeprior_distr[i],
-                            &data.lowerbound[i], &data.upperbound[i]);
+                    double type, param0, param1;
+                    sscanf(line, "%*s %lf %lf %lf", &type, &param0, &param1);
+
+                    printf("type = %lf, x0 = %lf, x1 = %lf\n", type, param0, param1);
+
+                    data.compositeprior_distr[i] = type;
+                    if (type == 0) {
+                        data.lowerbound[i] = param0;
+                        data.upperbound[i] = param1;
+                    }
+                    if ((type == 1) || (type == 2)) {
+                        data.prior_mu[i] = param0;
+                        data.prior_sigma[i] = param1;
+                    }
+
                     found = 1;
                     break;
                 }
@@ -699,7 +709,7 @@ void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[
     gen_id = winfo[0];
     chain_id = winfo[1];
 
-    long me = torc_worker_id();    
+    long me = torc_worker_id();
     double point[data.Nth], fpoint;
 
     for (i = 0; i < data.Nth; i++)
@@ -891,8 +901,9 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
 
     double pj = runinfo.p[runinfo.Gen];
 
-#define BURN_IN    4
-    for (step = 0; step < nsteps + BURN_IN; step++) {
+    int burn_in = data.burn_in;
+
+    for (step = 0; step < nsteps + burn_in; step++) {
         double chain_mean[data.Nth];
         if (step == 0)
             for (i = 0; i < data.Nth; ++i) chain_mean[i] = init_mean[i];
@@ -909,7 +920,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
         {
             evaluate_F(candidate, &loglik_candidate, me, gen_id, chain_id, step, 1);    /* this can spawn many tasks*/
 
-            if (data.ifdump && step >= BURN_IN) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
+            if (data.ifdump && step >= burn_in) torc_update_full_db(candidate, loglik_candidate, NULL, 0, 0);   /* last argument should be 1 if it is a surrogate */
 
             /* Decide */
             double logprior_candidate = logpriorpdf(candidate, data.Nth);    /* from PanosA */
@@ -922,14 +933,14 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
             if (P < L) {
                 for (i = 0; i < data.Nth; i++) leader[i] = candidate[i];    /* new leader! */
                 loglik_leader = loglik_candidate;
-                if (step >= BURN_IN) {
+                if (step >= burn_in) {
 					double logprior_leader = logpriorpdf(leader, data.Nth);
 					torc_update_curgen_db(leader, loglik_leader, logprior_leader);
 				}
             }
             else {
                 /*increase counter or add the leader again in curgen_db*/
-                if (step >= BURN_IN) {
+                if (step >= burn_in) {
 					double logprior_leader = logpriorpdf(leader, data.Nth);
 					torc_update_curgen_db(leader, loglik_leader, logprior_leader);
 				}
@@ -938,7 +949,7 @@ void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, 
         }
         else {
             /*increase counter or add the leader again in curgen_db*/
-            if (step >= BURN_IN) {
+            if (step >= burn_in) {
 					double logprior_leader = logpriorpdf(leader, data.Nth);
 					torc_update_curgen_db(leader, loglik_leader, logprior_leader);
 				}
@@ -1021,7 +1032,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
             unflag = 1;    /* is this point unique?*/
             for (j = 0; j < un; j++) {    /* check all the previous unique points*/
                 int compflag;
-                compflag = 1;    /**/ 
+                compflag = 1;    /**/
                 for (p = 0; p < data.Nth; p++) {
                     if (fabs(xi[p]-x[p][j]) > 1e-6) {
                         /*if (xi[p] != x[p][j]) {*/
@@ -1030,7 +1041,7 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
                     }
                     }
 
-                    if (compflag == 1) { 
+                    if (compflag == 1) {
                         unflag = 0;    /* not unique, just found it in the unique points table*/
                         break;
                     }
@@ -1301,33 +1312,29 @@ int main(int argc, char *argv[])
 
     curgen_db.entries = 0; /* peh+ */
 
-#if defined(_RESTART_)
     int goto_next = 0;
     int res;
+    if (data.restart) {
     res = load_runinfo();
-    if (res == 0)
-    {
+    if (res == 0) {
         load_curgen_db(runinfo.Gen);
         nchains = data.Num[0];
         printf("nchains = %d\n", nchains);
         gt0 = t0 = torc_gettime();
         goto_next = 1;
     }
-#endif
-
+    }
 
     gt0 = t0 = torc_gettime();
 
     nchains = data.Num[0];
     double out_tparam[data.PopSize];    /* nchains*/
 
-#if defined(_RESTART_)
     if (goto_next == 0)
     {
-#endif
 
         FILE *init_fp = NULL;
-        if (data.prior_type == 2) {
+        if (data.load_from_file == 1) {
             init_fp = fopen("init_db.txt", "r");    /* peh: parametrize this */
             if (init_fp == NULL) {
                 printf("init_db.txt file not found!\n");
@@ -1345,7 +1352,6 @@ int main(int argc, char *argv[])
 
             if (data.prior_type == 0)    /* uniform */
             {
-                /* peh:check this: add option for loading points/data from file */
                 /* uniform */
                 int d;
                 for (d = 0; d < data.Nth; d++) {
@@ -1358,17 +1364,38 @@ int main(int argc, char *argv[])
             {
                 mvnrnd(data.prior_mu, data.prior_sigma, in_tparam, data.Nth);
             }
-            else if (data.prior_type == 2)    /* file */
+            else if (data.prior_type == 3)    /* composite */
             {
+                int d;
+                for (d = 0; d < data.Nth; d++) {
+                    if (data.compositeprior_distr[d] == 0) {
+                        in_tparam[d] = uniformrand(0,1);
+                        in_tparam[d] *= (data.upperbound[d]-data.lowerbound[d]);
+                        in_tparam[d] += data.lowerbound[d];
+                    }
+                    else if (data.compositeprior_distr[d] == 1) {
+                        mvnrnd(&data.prior_mu[d], &data.prior_sigma[d], &in_tparam[d], 1);
+                    }
+                    else if (data.compositeprior_distr[d] == 2) {
+			in_tparam[d] = truncated_normal_rand (data.prior_mu[d], data.prior_sigma[d], data.lowerbound[d], data.upperbound[d]);
+                    }
+                }
+            }
+
+            if (data.load_from_file == 1)    /* override the computed point and read it from the file */
+            {
+		printf("reading from init_db.txt\n");
                 int j;
                 for (j = 0; j < data.Nth; j++) fscanf(init_fp, "%lf", &in_tparam[j]);
                 fscanf(init_fp, "%lf", &out_tparam[i]);
+		double prior_val;
+                fscanf(init_fp, "%lf", &prior_val);
 
                 /*torc_update_curgen_db(in_tparam, out_tparam[i]);*/    /* peh - eval or not */
                 /*if (data.ifdump) torc_update_full_db(in_tparam, out_tparam[i], NULL, 0, 0);*/
             }
 
-            if (data.prior_type <= 2)    /* peh: file without or with function evaluations? */
+            if (data.prior_type <= 3)    /* peh: file without or with function evaluations? */
                 torc_create(-1, (void (*)())initchaintask, 4,
                         data.Nth, MPI_DOUBLE, CALL_BY_COP,
                         1, MPI_INT, CALL_BY_COP,
@@ -1376,15 +1403,16 @@ int main(int argc, char *argv[])
                         4, MPI_INT, CALL_BY_COP,
                         in_tparam, &data.Nth, &out_tparam[i], winfo);
         }
-#ifdef _STEALING_
-        torc_enable_stealing();
-#endif
-        torc_waitall();
-#ifdef _STEALING_
-        torc_disable_stealing();
-#endif
 
-        if (data.prior_type == 2) {
+        if (data.stealing)
+	    torc_enable_stealing();
+
+        torc_waitall();
+
+        if (data.stealing)
+            torc_disable_stealing();
+
+        if (data.load_from_file == 1) {
             fclose(init_fp);
         }
 
@@ -1397,16 +1425,16 @@ int main(int argc, char *argv[])
         if (data.ifdump) dump_full_db(runinfo.Gen);
 
         /* save here */
-#if defined(_RESTART_)
-        save_runinfo();
-        check_for_exit();
-#endif
+        if (data.restart) {
+            save_runinfo();
+            check_for_exit();
+        }
 
-#if defined(_RESTART_)
+        if (data.MaxStages == 1) goto end;
+
     }
-    /*next1:*/
     ;
-#endif
+
     static cgdbp_t *leaders; /*[MAXCHAINS];*/
     leaders = (cgdbp_t *)calloc(1, data.PopSize*sizeof(cgdbp_t));
     for (i = 0; i < data.PopSize; i++) {
@@ -1417,7 +1445,6 @@ int main(int argc, char *argv[])
     nchains = prepare_newgen(nchains, leaders);    /* calculate statistics */
 
     spmd_update_gdata();
-    /*    spmd_print_matrix_2d();*/
     call_print_matrix_2d();
 
     /* this can be moved above */
@@ -1485,13 +1512,14 @@ int main(int argc, char *argv[])
                     init_mean, chain_cov);
         }
         /* wait for all chain tasks to finish */
-#ifdef _STEALING_
-        torc_enable_stealing();
-#endif
+
+        if (data.stealing)
+            torc_enable_stealing();
+
         torc_waitall();
-#ifdef _STEALING_
-        torc_disable_stealing();
-#endif
+        if (data.stealing)
+            torc_disable_stealing();
+
 
         gt1 = torc_gettime();
         int g_nfeval = get_nfc();
@@ -1502,10 +1530,10 @@ int main(int argc, char *argv[])
         if (data.ifdump) dump_full_db(runinfo.Gen);
 
         /* save here*/
-#if defined(_RESTART_)
-        save_runinfo();
-        check_for_exit();
-#endif
+        if (data.restart) {
+            save_runinfo();
+            check_for_exit();
+        }
 
         curres_db.entries = 0;
         nchains = prepare_newgen(nchains, leaders);    /* calculate statistics*/
@@ -1562,9 +1590,8 @@ int main(int argc, char *argv[])
     }
 
     /* last save here - do we need this? what happens if I restart the program with this saved data*/
-#if defined(_RESTART_)
-    save_runinfo();
-#endif
+    if (data.restart)
+        save_runinfo();
 
 end:
     /* making a copy of last curgen_db file */

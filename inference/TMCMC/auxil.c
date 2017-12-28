@@ -228,6 +228,7 @@ double compute_std(double *v, int n, double mean)
 /**********************************************/
 const gsl_rng_type *T;
 gsl_rng **r;
+int *local_seed;
 
 void gsl_rand_init(int seed)
 {
@@ -240,11 +241,18 @@ void gsl_rand_init(int seed)
         r[i] = gsl_rng_alloc (T);
     }
 
+    if (seed == 0) seed = time(0);
+
     for (i = 0; i < local_workers; i++) {
 #if VERBOSE
         printf("node %d: initializing rng %d with seed %d\n", torc_node_id(), i, seed+i+local_workers*torc_node_id());
 #endif
         gsl_rng_set(r[i], seed+i+local_workers*torc_node_id());
+    }
+
+    local_seed = (int *)malloc(local_workers*sizeof(int));
+    for (i = 0; i < local_workers; i++) {
+        local_seed[i] = seed+i+local_workers*torc_node_id();
     }
 }
 
@@ -543,3 +551,37 @@ double logmvnpdf(int n, double *xv, double *mv, double *vm)
     double result = gsl_dmvnorm(n, xv, mv, vm, 1);
     return result;
 }
+
+
+#include "thirdparty/truncated_normal.c"
+
+/******************************************************************************/
+double truncated_normal_pdf (double x, double mu, double sigma, double a, double b)
+{
+    double pdf;
+
+    pdf = truncated_normal_ab_pdf(x, mu, sigma, a, b);
+
+    return pdf;
+}
+
+/******************************************************************************/
+double truncated_normal_rand (double mu, double sigma, double a, double b)
+{
+    int me = torc_i_worker_id();
+
+    double x = truncated_normal_ab_sample(mu, sigma, a, b, &local_seed[me]);
+
+    return x;
+}
+
+/******************************************************************************/
+double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b)
+{
+    double pdf;
+
+    pdf = log_normal_truncated_ab_pdf(x, mu, sigma, a, b);
+
+    return pdf;
+}
+

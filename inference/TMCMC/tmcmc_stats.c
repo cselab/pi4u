@@ -809,6 +809,11 @@ double logpriorpdf(double *theta, int n)
 					res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) +
 								pow( theta[i]-data.prior_mu[i]/data.prior_sigma[i], 2 ) );
 				}
+				/* truncated normal */
+				else if(data.compositeprior_distr[i] == 2)
+				{
+					res += truncated_lognormal_pdf(theta[i], data.prior_mu[i], data.prior_sigma[i], data.lowerbound[i], data.upperbound[i]);
+				}
 			}
 			break;
 	}
