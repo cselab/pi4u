@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDLJF ( RSD, X, N, M, XL, XU, UH, FEPS, IPRINT, FJ,
+      SUBROUTINE PNDLJF ( RSD, X, N, M, XL, XU, UH, FEPS, IPRINT, FJ,
      &                   LD, NOC)
 c     &                  LD, NOC, F0 )
 C  ---------------------------------------------------------------------
@@ -43,122 +43,122 @@ C  Work spaces:
 C    F0         Real work space of length M.
 C
 C  ---------------------------------------------------------------------
-	IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	DIMENSION X(N), XL(N), XU(N), UH(N), FJ(LD,N)
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      DIMENSION X(N), XL(N), XU(N), UH(N), FJ(LD,N)
 C
-	DIMENSION F0(M)
+      DIMENSION F0(M)
 C
-	DIMENSION XX(N)
-	DIMENSION IFB(N)
-	DIMENSION HH(N)
-	INTEGER K
-C                                                  
-        EXTERNAL RSD, SPAWNTASKJ
+      DIMENSION XX(N)
+      DIMENSION IFB(N)
+      DIMENSION HH(N)
+      INTEGER K
 C
-	LOGICAL PR2, PR3
-	CHARACTER*2 FORM
+      EXTERNAL RSD, SPAWNTASKJ
 C
-	DATA ONE  / 1.0D0 /
+      LOGICAL PR2, PR3
+      CHARACTER*2 FORM
 C
-	DO K=1,N
-	XX(K) = X(K)
-	END DO
+      DATA ONE  / 1.0D0 /
 C
-	CON = SQRT(FEPS)
+      DO K=1,N
+      XX(K) = X(K)
+      END DO
+C
+      CON = SQRT(FEPS)
 
-	CALL SPAWNTASKJ(RSD, XX, N, M, F0)
-	
-	NOC = 1
-	PR2 = IPRINT.GE.2
-	PR3 = IPRINT.EQ.3
+      CALL SPAWNTASKJ(RSD, XX, N, M, F0)
+
+      NOC = 1
+      PR2 = IPRINT.GE.2
+      PR3 = IPRINT.EQ.3
 C
-	IF (PR3) WRITE (*,50)
+      IF (PR3) WRITE (*,50)
 
 
-	DO 10,I=1,N
-		XI = XX(I)
-		IF (UH(I).EQ.0.0D0) THEN
-			HI = CON*MAX(ABS(XI),ONE)
-		ELSE
-			HI = UH(I)
-		ENDIF
-		HH(I) = HI
-		XP = XI+HI
-		XM = XI-HI
+      DO 10,I=1,N
+          XI = XX(I)
+          IF (UH(I).EQ.0.0D0) THEN
+              HI = CON*MAX(ABS(XI),ONE)
+          ELSE
+              HI = UH(I)
+          ENDIF
+          HH(I) = HI
+          XP = XI+HI
+          XM = XI-HI
 C  ---------------------------------------------------------------------
 C  X_I+ below the upper bound.
-		IF (XP.LT.XU(I)) THEN
-			XX(I) = XP
-			CALL SPAWNTASKJ(RSD, XX, N, M, FJ(1,I))
-			NOC = NOC+1
-c			DO 20,K=1,M
-c20				FJ(K,I) = (FJ(K,I)-F0(K))/HI
-			IFB(I) = 1
-			FORM = 'FD'
+          IF (XP.LT.XU(I)) THEN
+              XX(I) = XP
+              CALL SPAWNTASKJ(RSD, XX, N, M, FJ(1,I))
+              NOC = NOC+1
+c            DO 20,K=1,M
+c20                FJ(K,I) = (FJ(K,I)-F0(K))/HI
+              IFB(I) = 1
+              FORM = 'FD'
 C  ---------------------------------------------------------------------
 C  X_I- above the lower bound.
-		ELSE IF (XM.GT.XL(I)) THEN
-			XX(I) = XM
-			CALL SPAWNTASKJ(RSD, XX, N, M, FJ(1,I))
-			NOC = NOC+1
-c			DO 30,K=1,M
-c30				FJ(K,I) = (F0(K)-FJ(K,I))/HI
-			IFB(I) = -1
-			FORM = 'BD'
+          ELSE IF (XM.GT.XL(I)) THEN
+              XX(I) = XM
+              CALL SPAWNTASKJ(RSD, XX, N, M, FJ(1,I))
+              NOC = NOC+1
+c            DO 30,K=1,M
+c30                FJ(K,I) = (F0(K)-FJ(K,I))/HI
+              IFB(I) = -1
+              FORM = 'BD'
 C  ---------------------------------------------------------------------
 C  X_I is confined in a very small interval.
-		ELSE
-			DO 40,K=1,M
-40				FJ(K,I) = 0.0D0
-			FORM = ' '
-			IFB(I) = 0
-			IF (PR2) WRITE (*,70)
-		END IF
-		XX(I) = XI
-		IF (PR3) WRITE (*,60) I, FORM, XI, HI
-10	CONTINUE
+          ELSE
+              DO 40,K=1,M
+40                FJ(K,I) = 0.0D0
+              FORM = ' '
+              IFB(I) = 0
+              IF (PR2) WRITE (*,70)
+          END IF
+          XX(I) = XI
+          IF (PR3) WRITE (*,60) I, FORM, XI, HI
+10    CONTINUE
 C
-c	CALL torc_enable_stealing()
-	CALL torc_waitall()
-c	CALL torc_disable_stealing()
+c    CALL torc_enable_stealing()
+      CALL torc_waitall()
+c    CALL torc_disable_stealing()
 
 C  Perform division using H()
-	DO 2,I=1,N
-		IF (IFB(I).EQ.1) THEN 
-			DO 3,K=1,M
- 				FJ(K,I) = (FJ(K,I)-F0(K))/HH(I)
-3			CONTINUE 
-		ELSE IF (IFB(I).EQ.-1) THEN 
-			DO 4,K=1,M
- 				FJ(K,I) = (F0(K)-FJ(K,I))/HH(I)
-4			CONTINUE 
-		END IF
-2	CONTINUE
+      DO 2,I=1,N
+          IF (IFB(I).EQ.1) THEN
+              DO 3,K=1,M
+                   FJ(K,I) = (FJ(K,I)-F0(K))/HH(I)
+3            CONTINUE
+          ELSE IF (IFB(I).EQ.-1) THEN
+              DO 4,K=1,M
+                   FJ(K,I) = (F0(K)-FJ(K,I))/HH(I)
+4            CONTINUE
+          END IF
+2     CONTINUE
 
 
 C
-50	FORMAT (/' PNDL:',' Index',1X,'Formula',7X,'X_i',19X,'Step_i')
-60	FORMAT (' PNDL:',I6,3X,A,3X,1PG21.14,1X,1PG21.14)
-70	FORMAT (' PNDL: Warning: Variable ',I6,' is confined in a very ',
+50    FORMAT (/' PNDL:',' Index',1X,'Formula',7X,'X_i',19X,'Step_i')
+60    FORMAT (' PNDL:',I6,3X,A,3X,1PG21.14,1X,1PG21.14)
+70    FORMAT (' PNDL: Warning: Variable ',I6,' is confined in a very ',
      &        'small interval.'
      &        /' PNDL:          Setting derivative to zero.')
-	END
+      END
 
 C  ---------------------------------------------------------------------
-	SUBROUTINE SPAWNTASKJ (RSD, XX, N, M, RES)
+      SUBROUTINE SPAWNTASKJ (RSD, XX, N, M, RES)
 C  ---------------------------------------------------------------------
-        IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-        EXTERNAL RSD
-        DIMENSION XX(N), RES(N)
-        include 'torcf.h'
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      EXTERNAL RSD
+      DIMENSION XX(N), RES(N)
+      INCLUDE 'torcf.h'
 
-        call torc_task(RSD, 0, 4,
-     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-     &      1, MPI_INTEGER, CALL_BY_VAL,
-     &      1, MPI_INTEGER, CALL_BY_VAL,
-     &      M, MPI_DOUBLE_PRECISION, CALL_BY_RES,
-     &      XX, N, M, RES)
+      CALL torc_taskf(RSD, 0, 4,
+     &                N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
+     &                1, MPI_INTEGER,          CALL_BY_VAL,
+     &                1, MPI_INTEGER,          CALL_BY_VAL,
+     &                M, MPI_DOUBLE_PRECISION, CALL_BY_RES,
+     &                XX, N, M, RES)
 
-        RETURN
-        END
+      RETURN
+      END SUBROUTINE SPAWNTASKJ
 

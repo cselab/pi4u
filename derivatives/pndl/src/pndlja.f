@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDLJA ( RSD, X, N, M, XL, XU, UH, FEPS, IORD, IPRINT,
+      SUBROUTINE PNDLJA ( RSD, X, N, M, XL, XU, UH, FEPS, IORD, IPRINT,
      &                   FJ, LD, NOC, IERR )
 C  ---------------------------------------------------------------------
 C
@@ -63,78 +63,45 @@ C                 IERR=9 -> The supplied number of squared terms (M)
 C                           is less than 1.
 C
 C  ---------------------------------------------------------------------
-	IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	EXTERNAL RSD
-	DIMENSION X(N), XL(N), XU(N), UH(N), FJ(LD,N)
-	EXTERNAL PNDLJF, PNDLJQ
-	include 'torcf.h'
-C  Informative message (routine starts executing).
-	CALL PNDLMSG(IPRINT,'PNDLJA',0)
-	IF (IPRINT.EQ.3) WRITE (*,10) N, M, FEPS, IORD
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      EXTERNAL RSD
+      DIMENSION X(N), XL(N), XU(N), UH(N), FJ(LD,N)
+      EXTERNAL PNDLJF, PNDLJQ
+      INCLUDE 'torcf.h'
+
+C     Informative message (routine starts executing).
+      CALL PNDLMSG(IPRINT,'PNDLJA',0)
+      IF (IPRINT.EQ.3) WRITE (*,10) N, M, FEPS, IORD
+
+C     Check validity of arguments.
+      CALL PNDLARG(X,N,XL,XU,FEPS,IPRINT,IERR)
+      IF (IERR.NE.0) GOTO 100
+
+C     Print bounds.
+      CALL PNDLBND(X,XL,XU,N,IPRINT)
+
+C     Make sure M is at least 1.
+      IF (M.LT.1) THEN
+          IF (IPRINT.GT.0) WRITE (*,20) M
+          IERR = 9
+          GOTO 100
+      END IF
+
+C     Call a routine to do the actual computation according to the
+C     desired order of accuracy.
+      IF (IORD.EQ.1) THEN
+         CALL PNDLJF(RSD,X,N,M,XL,XU,UH,FEPS,IPRINT,FJ,LD,NOC)
+      ELSE IF (IORD.EQ.2) THEN
+         CALL PNDLJQ(RSD,X,N,M,XL,XU,UH,FEPS,IPRINT,FJ,LD,NOC)
+      ELSE
+          IF (IPRINT.GT.0) WRITE (*,30) IORD
+          IERR = 1
+      END IF
 C
-C  Check validity of arguments.
-	CALL PNDLARG(X,N,XL,XU,FEPS,IPRINT,IERR)
-	IF (IERR.NE.0) GOTO 100
+100   CALL PNDLMSG(IPRINT,'PNDLJA',1)
 C
-C  Print bounds.
-	CALL PNDLBND(X,XL,XU,N,IPRINT)
-C
-C  Make sure M is at least 1.
-	IF (M.LT.1) THEN
-		IF (IPRINT.GT.0) WRITE (*,20) M
-		IERR = 9
-		GOTO 100
-	END IF
-C
-C  Call a routine to do the actual computation according to the
-C  desired order of accuracy.
-	IF (IORD.EQ.1) THEN
-	IF (.TRUE.) THEN
-		CALL PNDLJF(RSD,X,N,M,XL,XU,UH,FEPS,IPRINT,FJ,LD,NOC)
-	ELSE
-c	call torc_task(PNDLJF, 1, 12,
-c     &      1, MPI_INTEGER, CALL_BY_VAD,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      LD*N, MPI_DOUBLE_PRECISION, CALL_BY_RES,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_RES,
-c     &      RSD,X,N,M,XL,XU,UH,FEPS,IPRINT,FJ,LD,NOC)
-	ENDIF
-	ELSE IF (IORD.EQ.2) THEN
-	IF (.TRUE.) THEN
-		CALL PNDLJQ(RSD,X,N,M,XL,XU,UH,FEPS,IPRINT,FJ,LD,NOC)
-	ELSE
-c	call torc_task(PNDLJQ, 1, 12,
-c     &      1, MPI_INTEGER, CALL_BY_VAD,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      LD*N, MPI_DOUBLE_PRECISION, CALL_BY_RES,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_RES,
-c     &      RSD,X,N,M,XL,XU,UH,FEPS,IPRINT,FJ,LD,NOC)
-	ENDIF
-	ELSE
-		IF (IPRINT.GT.0) WRITE (*,30) IORD
-		IERR = 1
-	END IF
-C
-100	CALL PNDLMSG(IPRINT,'PNDLJA',1)
-C
-10	FORMAT (' PNDL: ',3X,'N = ',I6,3X,'M = ',I6,3X,'FEPS = ',1PG21.14,
+10    FORMAT (' PNDL: ',3X,'N = ',I6,3X,'M = ',I6,3X,'FEPS = ',1PG21.14,
      &        3X,'IORD = ',I2)
-20	FORMAT (/' PNDL: Error: Number of functions (M) is less than 1'/)
-30	FORMAT (/' PNDL: Error: Incorrect order (IORD) ',I6/)
-	END
+20    FORMAT (/' PNDL: Error: Number of functions (M) is less than 1'/)
+30    FORMAT (/' PNDL: Error: Incorrect order (IORD) ',I6/)
+      END SUBROUTINE PNDLJA

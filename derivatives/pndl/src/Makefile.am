@@ -2,7 +2,7 @@ pndllibdir = $(libdir)
 pndllib_LIBRARIES = libpndl.a
 
 AM_FFLAGS = @DEBUG_FLAG@ -I../../torc_lite/include -I. $(FFLAGS)
-AM_CFLAGS = @DEBUG_FLAG@ -I. 
+AM_CFLAGS = @DEBUG_FLAG@ -I.
 
 libpndl_a_SOURCES = pndl1f.f pndl1n.f pndl1q.f \
 	pndl2ff.f pndl2fq.f pndl2gf.f pndl2gq.f \
@@ -13,8 +13,7 @@ libpndl_a_SOURCES = pndl1f.f pndl1n.f pndl1q.f \
 	pndlghfa.f pndl3ff.f pndl3fq.f pndlc.c
 
 pndlincdir = $(includedir)
-pndlinc_HEADERS = ./pndlc.h 
-
+pndlinc_HEADERS = ./pndlc.h
 
 .f$(OBJEXT):
 	$(F77) $(AM_FFLAGS) -c $<

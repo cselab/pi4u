@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDLHG ( GRD, X, N, IORD, HES, LD )
+      SUBROUTINE PNDLHG ( GRD, X, N, IORD, HES, LD )
 C  ---------------------------------------------------------------------
 C
 C  Description:                              PNDL user interface routine.
@@ -32,47 +32,31 @@ C               diagonal elements) is returned.
 C    LD         Leading dimension of matrix HES.
 C
 C  ---------------------------------------------------------------------
-	IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	EXTERNAL GRD
-	DIMENSION X(N), HES(LD,N)
-	EXTERNAL PNDLHGA
-	COMMON /DUMMY/ NOCx, IERRx
-	include 'torcf.h'
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      EXTERNAL GRD
+      DIMENSION X(N), HES(LD,N)
+      EXTERNAL PNDLHGA
+      COMMON /DUMMY/ NOCx, IERRx
+      INCLUDE 'torcf.h'
 C
-	PARAMETER ( BIG = 1.0D300 )
+      PARAMETER ( BIG = 1.0D300 )
 C
-	DIMENSION XL(N), XU(N), UH(N)
+      DIMENSION XL(N), XU(N), UH(N)
 C
-C  Use the machine accuracy.
-	FEPS = 0.0D0
+C     Use the machine accuracy.
+      FEPS = 0.0D0
 C
-C  Print fatal errors.
-	IPRINT = 1
+C     Print fatal errors.
+      IPRINT = 1
 C
-C  Set lower/upper bounds to large numbers (=>no bounds).
-C  Set stepsizes to zero (=>default steps).
-	DO 10,I=1,N
-		XL(I) = -BIG
-		XU(I) =  BIG
-		UH(I) = 0.0D0
-10	CONTINUE
+C     Set lower/upper bounds to large numbers (=>no bounds).
+C     Set stepsizes to zero (=>default steps).
+      DO 10,I=1,N
+         XL(I) = -BIG
+         XU(I) =  BIG
+         UH(I) = 0.0D0
+10    CONTINUE
 C
-C  Call the main routine.
-	CALL PNDLHGA(GRD,X,N,XL,XU,UH,FEPS,IORD,IPRINT,HES,LD,NOC,IERR)
-c	call torc_task(PNDLHGA, 1, 13,
-c     &      1, MPI_INTEGER, CALL_BY_VAD,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      LD*N, MPI_DOUBLE_PRECISION, CALL_BY_RES,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_RES,
-c     &      1, MPI_INTEGER, CALL_BY_RES,
-c     &      GRD,X,N,XL,XU,UH,FEPS,IORD,IPRINT,HES,LD,NOCx,IERRx)
-C
-	END
+C     Call the main routine.
+      CALL PNDLHGA(GRD,X,N,XL,XU,UH,FEPS,IORD,IPRINT,HES,LD,NOC,IERR)
+      END SUBROUTINE PNDLHG
