@@ -11,7 +11,7 @@ c
 	include 'torcf.h'
 
 	call pndl_init()
-	call torc_init()
+	call torc_initf()
 c   ...
 	x1(1) = 1.0d0
 	x1(2) = 1.1d0
