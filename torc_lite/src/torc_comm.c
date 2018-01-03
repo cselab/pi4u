@@ -54,12 +54,15 @@ void torc_register_task(void *f)
     number_of_functions++;
 }
 
+#define f77fun 1
+#if F77_FUNC_(f77fun, F77FUN) == f77fun
+#else
 void F77_FUNC_(torc_register_task, TORC_REGISTER_TASK)(void *f)
 {
-    //    printf("%s: %p\n", __FUNCTION__, f);
     torc_register_task(f);
-    /* nothing to do */
 }
+#endif
+#undef f77fun
 
 int getfuncnum(func_t f)
 {
