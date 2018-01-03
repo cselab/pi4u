@@ -54,7 +54,7 @@ C
 C	CALL MPI_INIT_THREAD(MPI_THREAD_MULTIPLE, IPROV, IERR)
 	CALL PNDL_INIT()
 	CALL TORC_REGISTER_TASK(RSD)
-	CALL TORC_INIT()
+	CALL TORC_INITF()
 
 c	CALL MPI_COMM_RANK(MPI_COMM_WORLD, IRANK, IERR)
 	IRANK = 0
@@ -229,7 +229,7 @@ C  ---------------------------------------------------------------------
 	SUBROUTINE JACAN ( X, N, M, FJ, LD )
 C  ---------------------------------------------------------------------
 C  Description:
-C    Returns the analytic value of the Jacobian matrix. It may return 
+C    Returns the analytic value of the Jacobian matrix. It may return
 C    the Jacobian of several different functions according to a
 C    selector (ISEL).
 C
