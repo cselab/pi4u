@@ -15,8 +15,6 @@
 
 #define torc_desc_size sizeof(torc_t)    /* should be less */
 
-extern MPI_Comm comm_out;
-
 static torc_t no_work_desc;
 
 volatile int termination_flag = 0;
@@ -41,7 +39,7 @@ int process_a_received_descriptor(torc_t *work/*, int tag1*/)
     if ((tag < 0) || (tag > MAX_NVPS)) {    /* tag == MAX_NVPS occurs with asynchronous stealing */
         //Error1("Invalid message tag %d", tag);
         printf("...Invalid message tag %d from node %d [type=%d]\n", tag, work->sourcenode, work->type); fflush(0);
-        MPI_Abort(MPI_COMM_WORLD, 1);
+        MPI_Abort(comm_out, 1);
         return 1;
     }
 
@@ -375,17 +373,18 @@ void shutdown_server_thread()
 void terminate_workers()
 {
     torc_t mydata;
-    int node, nnodes = torc_num_nodes();
+    int nnodes = torc_num_nodes();
+    int mynode = torc_node_id();
 
 #if DBG
     printf("Terminating worker threads ...\n");
 #endif
     memset(&mydata, 0, sizeof(torc_t));
-    mydata.localarg[0] = torc_node_id();
-    mydata.homenode = torc_node_id();
+    mydata.localarg[0] = mynode;
+    mydata.homenode = mynode;
 
-    for (node = 0; node < nnodes; node++) {
-        if (node != torc_node_id())
+    for (int node = 0; node < nnodes; node++) {
+        if (node != mynode)
             send_descriptor(node, &mydata, TERMINATE_WORKER_THREADS);
     }
 }
@@ -451,8 +450,6 @@ void torc_disable_stealing ()
             send_descriptor(node, &mydata, DISABLE_INTERNODE_STEALING);    /* OK. This descriptor is a stack variable */
     }
 }
-
-
 
 void torc_enable_stealing ()
 {

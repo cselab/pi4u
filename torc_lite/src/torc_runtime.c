@@ -330,7 +330,7 @@ void _torc_opt (int argc, char *argv[])
     }
 
     MPI_Comm_dup(MPI_COMM_WORLD, &comm_out);
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(comm_out);
 
     _torc_comm_pre_init();
 }
@@ -343,7 +343,6 @@ void _torc_env_init(void)
     _torc_md_init();    /* workers */
     _torc_comm_init();
 }
-
 
 torc_t *get_next_task()
 {
@@ -377,7 +376,6 @@ torc_t *get_next_task()
 
     return rte_next;
 }
-
 
 int torc_fetch_work()
 {
@@ -419,7 +417,6 @@ void _torc_cleanup(torc_t *rte)
 
 int _torc_scheduler_loop (int once)
 {
-    int wait_count;
     int self = torc_i_worker_id();
     torc_t * rte_next;
 
@@ -445,7 +442,6 @@ int _torc_scheduler_loop (int once)
         if (once) return 1;
     }
 }
-
 
 /* WTH is this? Maybe just a backup of the code? */
 int _torc_scheduler_loop2 (int once)
@@ -476,5 +472,3 @@ int _torc_scheduler_loop2 (int once)
         if (once) return 0;    // what is this?
     }
 }
-
-
