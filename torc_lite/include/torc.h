@@ -28,6 +28,7 @@ extern "C"
 
 void torc_init (int argc, char *argv[], int ms);
 void torc_reset_statistics();
+
 typedef double torc_time_t;
 torc_time_t torc_gettime();
 
@@ -50,12 +51,15 @@ void torc_enable_stealing();
 void torc_disable_stealing();
 void torc_i_enable_stealing();
 void torc_i_disable_stealing();
+void start_server_thread();
+void shutdown_server_thread();
 
 void torc_taskinit();
 void torc_waitall();
 void torc_waitall2();
 void torc_waitall3();
 void torc_tasksync();
+int  torc_scheduler_loop(int);
 
 //#ifndef __cplusplus
 void torc_task(int queue, void (*f) (), int narg, ...);
