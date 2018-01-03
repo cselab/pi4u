@@ -163,7 +163,7 @@ VI) COUPLING WITH EXTERNAL SOFTWARE
    The coupling/ folder includes examples that demonstrate how external software can be called within a fitness function (fitfun)
    and coupled with any of the engines and tools available in the Pi4U framework.
    External software can include any kind of sequential or parallel code (OpenMP, MPI), 
-   and implemented in any possible programming language and environment (C/C++, Fortran, Python, Matlab). 
+   and be implemented in any possible programming language and environment (C/C++, Fortran, Python, Matlab). 
  	
 Currently the following examples are included:
 
