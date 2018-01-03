@@ -18,10 +18,10 @@
 
 #include <unistd.h>
 
-typedef /*unsigned*/ int       INT32;
-typedef /*unsigned*/ long long INT64;
-typedef unsigned     long      VIRT_ADDR;
-typedef void                   (*func_t)();
+typedef int             INT32;
+typedef long long       INT64;
+typedef unsigned long   VIRT_ADDR;
+typedef void          (*func_t)();
 
 #ifndef MAX_NVPS
 #define MAX_NVPS 32

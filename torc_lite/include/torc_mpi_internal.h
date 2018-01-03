@@ -10,7 +10,7 @@
 #ifndef _torc_mpi_internal_included
 #define _torc_mpi_internal_included
 
-#include <mpi.h>
+MPI_Comm comm_out;
 
 void    enter_comm_cs();
 void    leave_comm_cs();
@@ -36,11 +36,11 @@ torc_t *direct_synchronous_stealing_request(int target_node);
 func_t  getfuncptr(int funcpos);
 int     getfuncnum(func_t f);
 
-int _torc_mpi2b_type(MPI_Datatype dtype);
+int          _torc_mpi2b_type(MPI_Datatype dtype);
 MPI_Datatype _torc_b2mpi_type(int btype);
 
 #ifndef MAX_NODES
-#define MAX_NODES                             64
+#define MAX_NODES                            1024
 #endif
 
 #define TERMINATE_LOCAL_SERVER_THREAD       (120)
@@ -67,7 +67,7 @@ extern struct node_info *node_info;
 #define Error(msg)                              \
 {                                               \
     printf("ERROR in %s: %s\n", __func__, msg); \
-    MPI_Abort(MPI_COMM_WORLD, 1);               \
+    MPI_Abort(comm_out, 1);               \
 }
 
 #define Error1(msg,arg)                \
@@ -75,7 +75,7 @@ extern struct node_info *node_info;
     printf("ERROR in %s:", __func__);  \
     printf(msg, arg);                  \
     printf("\n");                      \
-    MPI_Abort(MPI_COMM_WORLD, 1);      \
+    MPI_Abort(comm_out, 1);      \
 }
 
 #define Warning1(msg,arg)               \
