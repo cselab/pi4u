@@ -1,5 +1,5 @@
 #include <math.h>
-
+#include <unistd.h>
 // activate one of the following options
 #define _USE_ROSENBROCK_
 //#define _USE_BVNPDF_
@@ -84,6 +84,7 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 #if defined(_USE_MIXED_MVNPDF_)
 	f = log(mixedmvnpdf(x, N));
 #endif
+
+	usleep(100*1000);
 	return f;
 }
-

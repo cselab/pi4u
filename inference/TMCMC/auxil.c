@@ -11,8 +11,10 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifdef __cplusplus
+#if defined(_USE_TORC_)
 #include <mpi.h>
+
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -20,6 +22,23 @@ extern "C"
 
 #ifdef __cplusplus
 }
+#endif
+
+#else
+
+#include <pthread.h>
+static int torc_node_id() { return 0; }
+static int torc_num_nodes() { return 1; }
+
+#if defined(_USE_OPENMP_)
+#include <omp.h>
+static int torc_i_worker_id() { return omp_get_thread_num(); }
+static int torc_i_num_workers() { return omp_get_max_threads(); }
+#else
+static int torc_i_worker_id() { return 0; }
+static int torc_i_num_workers() { return 1; }
+#endif
+
 #endif
 
 #include "gsl_headers.h"
@@ -47,12 +66,16 @@ void reset_nfc_task()
 
 void reset_nfc()
 {
+#if defined(_USE_TORC_)
     int i;
 
     for (i = 0; i < torc_num_nodes(); i++) {
         torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())reset_nfc_task, 0);
     }
     torc_waitall();
+#else
+    reset_nfc_task();
+#endif
 }
 
 void get_nfc_task(int *x)
@@ -65,11 +88,15 @@ int get_nfc()
     int i;
     int c[1024]; /* MAX_NODES*/
 
+#if defined(_USE_TORC_)
     for (i = 0; i < torc_num_nodes(); i++) {
         torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())get_nfc_task, 1,
                 1, MPI_INT, CALL_BY_RES, &c[i]);
     }
     torc_waitall();
+#else
+    get_nfc_task(&c[0]);
+#endif
 
     unsigned int s = 0;
     printf("get_nfc:");
@@ -450,8 +477,10 @@ int mvnrnd(double *mean, double *sigma, double *out, int N)
 #if 1
 void aux_init()
 {
+#if defined(_USE_TORC_)
     torc_register_task((void *)reset_nfc_task);
     torc_register_task((void *)get_nfc_task);
+#endif
 }
 #endif
 

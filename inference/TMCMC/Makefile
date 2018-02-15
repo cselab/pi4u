@@ -1,14 +1,22 @@
-CC = mpicc
-CPP = mpic++ 
-MPIF90 = mpif90
+use_torc?=0
+use_omp?=1
 
-CFLAGS = -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+CC = gcc-7
+CFLAGS = -g -ggdb -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall 
+LDFLAGS += -lgsl -lgslcblas -lm
 
-LDFLAGS += -lgsl -lgslcblas
+ifeq ($(use_torc),1)
+CC = mpicc
+CFLAGS += -D_USE_TORC_=1 `torc_cflags`
+LDFLAGS += `torc_libs`
+endif
 
-CFLAGS += `torc_cflags`
-LDFLAGS += `torc_libs` -lpthread -lm 
+ifeq ($(use_omp),1)
+CFLAGS += -D_USE_OPENMP_=1 -fopenmp
+LDFLAGS += -fopenmp 
+endif
+
 
 TARGETS = engine_tmcmc 
 

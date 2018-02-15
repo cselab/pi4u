@@ -12,8 +12,19 @@
 #include "engine_tmcmc.h"
 #include <time.h>
 
+#if !defined(_USE_TORC_)
+#include <sys/time.h>
+static double torc_gettime()
+{
+        struct timeval t;
+        gettimeofday(&t, NULL);
+        return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
+}
+#endif
+
 int display = 0;
-//#define LARGE_SCALE_POPS
+#define LARGE_SCALE_POPS
+
 /** OBJLOGP FUNCTION **/
 double Objlogp(double x, double *fj, int fn, double pj, double tol)
 {
@@ -35,7 +46,7 @@ double Objlogp(double x, double *fj, int fn, double pj, double tol)
 #else
 	double q[fn];
 #endif
-	
+
 	for (i = 0; i < fn; i++)
 		q[i] = weight[i]/sum_weight;
 
@@ -80,7 +91,6 @@ double Objlogp_gsl(double x, void *param)
 	double tol = fp->tol;
 
 	double res = Objlogp(x, fj, fn, pj, tol);
-/*	printf("Objlogp(%lf)=%lf\n", x, res); */
 	return res;
 }
 
@@ -119,7 +129,7 @@ retry:
 	if (first_try) dump=1;
 
 	if (dump) {
-		sprintf(fname, "fzero_%03d.txt", counter); 
+		sprintf(fname, "fzero_%03d.txt", counter);
 		fp = fopen(fname, "w");
 	}
 
@@ -143,14 +153,14 @@ retry:
 		if (fabs(fx) <= Tol) {
 			found = 1;
 			break;
-		} 
+		}
 	}
 #else
 	#pragma omp parallel
 	{
 	double lm = 0;
-	double lfm = DBL_MAX; 
-	
+	double lfm = DBL_MAX;
+
 	#pragma omp for
 	for (iter = 0; iter < niters; iter++)
 	{
@@ -193,9 +203,9 @@ retry:
 		if (x_lo < 0) x_lo = 0;
 		x_hi = m + 10*Step;
 		if (x_hi > 4) x_hi = 4;
-		Step = 0.1*Step; 
+		Step = 0.1*Step;
 		if (Step < 1e-16) {
-			return 1;
+			return 0;
 		} else {
 			if (Display)
 				printf("fzerofind (%e): m=%.16f fm=%.16f iter=%ld, time=%lf s\n", Step, m, fm, niters, t1-t0);
@@ -211,110 +221,13 @@ retry:
 
 	if (dump) fclose(fp);
 
-	return (conv = 1);
+	return (conv == 1);
 }
 
-int fzerofind1(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
-{
-	size_t iter = 0;
-	/*size_t max_iter = data.options.MaxIter;*/	/* USER input - not used here */
-	double Tol = data.options.Tol;
-	int Display = data.options.Display;
-	double Step = data.options.Step;
-	double x_lo = 0, x_hi = 4.0;
-	int conv = 0;
-
-	size_t niters;
-
-retry:
-	if (Display) printf("fminzero: Step = %e\n", Step);
-	niters = (unsigned long) ((x_hi-x_lo) / Step);
-
-	double m = 0;
-	double fm = DBL_MAX;
-	double t0 = torc_gettime();
-	int found = 0;
-#if !defined(_OPENMP)
-	for (iter = 0; iter < niters; iter++)
-	{
-		double x = x_lo + iter*Step;
-		double fx = Objlogp(x, fj, fn, pj, tol);
-		if (fx < fm)
-		{
-			fm = fx;
-			m = x;
-		}
-		if (fabs(fx) <= Tol) {
-			found = 1;
-			break;
-		} 
-	}
-#else
-	#pragma omp parallel
-	{
-	double lm = 0;
-	double lfm = DBL_MAX; 
-	
-	#pragma omp for
-	for (iter = 0; iter < niters; iter++)
-	{
-		double x, fx;
-
-		if (found == 0)
-		{
-			x  = x_lo + iter*Step;
-			fx = Objlogp(x, fj, fn, pj, tol);
-			if (fx < lfm)
-			{
-				lfm = fx;
-				lm = x;
-			}
-			if (fabs(fx) <= Tol) {
-				found = 1;
-				#pragma omp flush(found)
-			}
-		} /* task cancellation ? */
-	}
-
-	#pragma omp critical
-	{
-		if (lfm < fm)
-		{
-			fm = lfm;
-			m = lm;
-		}
-	}
-
-	}
-#endif
-	double t1 = torc_gettime();
-
-	if (found) conv = 1;
-
-	/* If fm is not within Tolerance, we can go back and retry with better refinement (more iterations) */
-	if (!found) {
-		Step = 0.1*Step; 
-		if (Step < 1e-6) {
-			return 1;
-		} else {
-			if (Display)
-				printf("fzerofind (%e): m=%.16f fm=%.16f iter=%ld, time=%lf s\n", Step, m, fm, niters, t1-t0);
-			goto retry;
-		}
-	}
-
-	if (Display)
-		printf("fzerofind: m=%.16f fm=%.16f iter=%ld, time=%lf s\n", m, fm, niters, t1-t0);
-
-	*xmin = m;
-	*fmin = fm;
-
-	return (conv = 1);
-}
 
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
 {
-	const gsl_multimin_fminimizer_type *T; 
+	const gsl_multimin_fminimizer_type *T;
 	gsl_multimin_fminimizer *s = NULL;
 	gsl_vector *ss, *x;
 	gsl_multimin_function minex_func;
@@ -338,7 +251,7 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 	ss = gsl_vector_alloc (1);
 	gsl_vector_set_all (ss, Step); /* input */
 
-       /* Initialize method and iterate */
+  /* Initialize method and iterate */
 	minex_func.n = 1;
 	minex_func.f = Objlogp_gsl2;
 	minex_func.params = &fp;
@@ -368,28 +281,24 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 			if (Display)
 				printf ("converged to minimum at\n");
 		}
-#if 1
 		else if (fabs(s->fval) <= Tol) {
 			conv = 1;
 			status = GSL_SUCCESS;
 			if (Display)
 				printf ("found minimum at\n");
 		}
-#endif
 		if (Display)
 			printf ("%3ld x =  %.16lf f() = %.16f size = %.16f\n",
 				iter, gsl_vector_get (s->x, 0), s->fval, size);
 
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
-#if 1
 	/* double-check */
 	if ((conv == 1) && (fabs(s->fval) > Tol)) {
 		conv = 0;
 		if (Display)
 			printf ("fminsearch: converged but not found minimum.\n");
 	}
-#endif
 
 	if (conv) {
 		conv = 1;
@@ -431,7 +340,7 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 	F.function = Objlogp_gsl;
 	F.params = &fp;
 
-	T = gsl_min_fminimizer_brent; 
+	T = gsl_min_fminimizer_brent;
 /*	T = gsl_min_fminimizer_goldensection;*/
 /*	T = gsl_min_fminimizer_quad_golden;*/
 	s = gsl_min_fminimizer_alloc (T);
@@ -498,14 +407,12 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 				printf ("Converged:\n");
 			conv = 1;
 		}
-#if 1
 		else if (fabs(gsl_min_fminimizer_f_minimum(s)) <= Tol) {
 			conv = 1;
 			status = GSL_SUCCESS;
 			if (Display)
 				printf ("found minimum at\n");
 		}
-#endif
 
 		if (Display)
 			printf ("%5d [%.16f, %.16f] %.16f f()=%.16f %.16f\n",
@@ -513,14 +420,12 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 
 	} while (status == GSL_CONTINUE && iter < max_iter);
 
-#if 1
 	/* double-check */
 	if ((conv == 1) && (fabs(gsl_min_fminimizer_f_minimum(s)) > Tol)) {
 		conv = 0;
 		if (Display)
 			printf ("converged but not found minimum.\n");
 	}
-#endif
 
 	if (conv) {
 		conv = 1;
@@ -540,9 +445,15 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 
 
 /*** STATISTICS ***/
+
+#define _USE_FMINCON_
+#define _USE_FMINSEARCH_
+#define _USE_FZEROFIND_
+
+
 #include "posdef.c" 	/* peh */
 
-void calculate_statistics(double flc[], int n, int nselections, int gen, unsigned int sel[])
+void calculate_statistics(double flc[], unsigned int n, int nselections, int gen, unsigned int sel[])
 {
 	int Display = data.options.Display;
 	/*double pflag = 0;*/
@@ -555,21 +466,20 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	double Step = data.options.Step;
 	double fmin = 0, xmin = 0;
 	int conv = 0;
-#if 1
 
-#if 1
+#if defined(_USE_FMINCON_)
 	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
 	if (Display)
 		printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
 #endif
-#if 1
+#if defined(_USE_FMINSEARCH_)
 	if (!conv) {
 		conv = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
 		if (Display)
 			printf("fminsearch: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
 	}
 #endif
-#if 1
+#if defined(_USE_FZEROFIND_)
 	if (!conv) {
 		conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
 		if (Display)
@@ -577,27 +487,9 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	}
 #endif
 
-#else
-	/* testing */
-	if (Display) printf("\n");
-	double t0, t1;
-	t0 = torc_gettime();
-	int conv_con = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
-	t1 = torc_gettime();
-	printf("statopt - fmincon: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_con, xmin, fmin, t1-t0);
-	t0 = torc_gettime();
-	int conv_search = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
-	t1 = torc_gettime();
-	printf("statopt - fminsearch: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_search, xmin, fmin, t1-t0);
-	t0 = torc_gettime();
-	int conv_zero = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
-	t1 = torc_gettime();
-	printf("statopt - fzerofind: conv=%d xmin=%.16lf fmin=%.16lf in %f s\n", conv_zero, xmin, fmin, t1-t0);
-/*	conv = conv_search; */
-	conv = conv_zero;
-#endif
+
 	/* gen: next generation number */
-	int j = gen+1;
+	unsigned int j = gen+1;
 
 	if ((conv)&&(xmin > p[gen])) {
 		p[j] = xmin;
@@ -613,19 +505,11 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 		Num[j]=data.LastNum;
 	}
 
-	/*print_matrix("p", p, j);*/
-
-/*
-	if (p[j] > 10) {
-		 data.Rsq = data.Rsqstrict;
-	}
-*/
 	/* Compute weights and normalize*/
+	unsigned int i;
 
-	int i;
-#if 1
 	double *flcp = (double *)malloc(n*sizeof(double));
-	for (i= 0; i<n; i++)
+	for (i = 0; i<n; i++)
 		flcp[i] = flc[i]*(p[j]-p[j-1]);
 
 
@@ -651,29 +535,6 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 	/*logselection[gen] = log(sum_weight/currentuniques[gen])+fjmax*(p[gen+1]-p[gen]); PA definition change for all types of resampling 23/06/15*/
 	logselection[gen]= log(sum_weight) + fjmax -log(n);
-#else
-	double fjmax = compute_max(flc, n);
-
-	double weight[n];
-	for (i = 0; i < n; i++)
-		weight[i] = exp((flc[i]-fjmax)*(p[j]-p[j-1]));
-
-	if (display)
-	print_matrix((char *)"weight", weight, n);
-
-	double sum_weight = compute_sum(weight, n);
-
-	double q[n];
-	for (i = 0; i < n; i++)
-		q[i] = weight[i]/sum_weight;
-
-	if (display)
-		print_matrix((char *)"runinfo_q", q, n);
-
-	/*double sum_q = compute_sum(q, n);*/
-
-	logselection[gen] = log(sum_weight/currentuniques[gen])+fjmax*(p[gen+1]-p[gen]);
-#endif
 
 	if (display)
 		print_matrix((char *)"logselection", logselection, gen+1);
@@ -695,19 +556,10 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	for (i = 0; i < samples; i++) sel[i] = 0;
 
 	if (nselections == 0) nselections = samples; /* n;*/
-#if 0
-	int k;
-	for (k = 0; k < nselections; k++) {
-		/*gsl_ran_multinomial (r, K, N, q, nn);*/
-		multinomialrand (K, N, q, nn);
-		for (i = 0; i < K; i++) sel[i]+=nn[i];
-	}
-#else
 	N = nselections;
 	/*gsl_ran_multinomial (r, K, N, q, nn);*/
 	multinomialrand (K, N, q, nn);
 	for (i = 0; i < K; i++) sel[i]+=nn[i];
-#endif
 
 	if (display) {
 		printf("\n s = [");
@@ -716,7 +568,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	}
 
 	/* compute SS */
-	int PROBDIM = data.Nth;
+	unsigned int PROBDIM = data.Nth;
 
 	double mean_of_theta[PROBDIM];
 
@@ -738,7 +590,7 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 	for (i = 0; i < PROBDIM; i++) {
 		for (j = 0; j < PROBDIM; j++) {
 			double s;
-			int k;
+			unsigned int k;
 			s = 0;
 			for (k = 0; k < n; k++) {
 				s += q[k]*(curgen_db.entry[k].point[i]-meanv[i])*(curgen_db.entry[k].point[j]-meanv[j]);
@@ -767,7 +619,6 @@ void calculate_statistics(double flc[], int n, int nselections, int gen, unsigne
 
 double logpriorpdf(double *theta, int n)
 {
-	/* peh:check this */
 	double res = 0;
 	int i;
 
@@ -789,7 +640,7 @@ double logpriorpdf(double *theta, int n)
 			break;
 
 		case 2:
-			/* file -  nothing to do*/
+      /* no available */
 			break;
 
 		case 3:
@@ -804,7 +655,7 @@ double logpriorpdf(double *theta, int n)
 					res += -log(data.upperbound[i] - data.lowerbound[i]);
 				}
 				/* normal */
-				else if(data.compositeprior_distr[i] == 1) 
+				else if(data.compositeprior_distr[i] == 1)
 				{
 					res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) +
 								pow( theta[i]-data.prior_mu[i]/data.prior_sigma[i], 2 ) );
@@ -820,4 +671,3 @@ double logpriorpdf(double *theta, int n)
 
 	return res;
 }
-

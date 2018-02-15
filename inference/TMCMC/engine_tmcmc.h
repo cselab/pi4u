@@ -11,21 +11,27 @@
 #define _ENGINE_TMCMC_H_
 
 #include <math.h>
-#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 
-#ifdef __cplusplus
+#if defined(_USE_TORC_)
+
 #include <mpi.h>
+#ifdef __cplusplus
 extern "C"
 {
 #endif
+
 #include <torc.h>
 
 #ifdef __cplusplus
 }
+#endif
+
+#else
+#include <pthread.h>
 #endif
 
 #include <unistd.h>
@@ -204,7 +210,7 @@ double truncated_normal_rand (double mu, double sigma, double a, double b);
 double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b);
 
 /*** STATISTICS ***/
-void calculate_statistics(double flc[], int n, int nselections, int gen, unsigned int sel[]);
+void calculate_statistics(double flc[], unsigned int n, int nselections, int gen, unsigned int sel[]);
 
 /*** PROBLEM FUNCTIONS ***/
 double likelihood(double *x, int N);

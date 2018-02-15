@@ -17,6 +17,25 @@
 /*#define VERBOSE 1*/
 /*#define _RESTART_*/
 
+#if !defined(_USE_TORC_)
+static int torc_node_id() { return 0; }
+
+#if defined(_USE_OPENMP_)
+#include <omp.h>
+static int torc_worker_id() { return omp_get_thread_num(); }
+#else
+static int torc_worker_id() { return 0; }
+#endif
+
+#include <sys/time.h>
+static double torc_gettime()
+{
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
+}
+#endif
+
 data_t data;
 runinfo_t runinfo;
 cgdb_t curgen_db;
@@ -52,7 +71,7 @@ void read_data()
     data.auxil_size = 0;
     data.auxil_data = NULL;
 
-    for (i = 0; i < data.Nth; i++) {
+    for (int i = 0; i < data.Nth; i++) {
         data.prior_mu[i] = 0.0;
     }
 
@@ -534,7 +553,9 @@ void check_for_exit()
 
     if (exitgen == runinfo.Gen) {
         printf("Read Exit Envrironment Variable!!!\n");
+#if defined(_USE_TORC_)
         torc_finalize();
+#endif
         exit(1);
     }
 
@@ -543,20 +564,20 @@ void check_for_exit()
     if (fp != NULL) {
         printf("Found Exit File!!!\n");
         unlink("exit.txt");
+#if defined(_USE_TORC_)
         torc_finalize();
+#endif
         exit(1);
     }
 }
 
-#if 1    /* TORC-BASED DATA MANAGEMENT */
+/* TORC-BASED DATA MANAGEMENT */
 void torc_update_full_db_task(double point[], double *pF, int *psurrogate)
 {
     double F = *pF;
     int surrogate = *psurrogate;
     double *G = NULL;
     int n = 0;
-
-    /*    printf("torc_update_full_db_task: %f %f %f %f %f\n", point[0], point[1], point[2], F, G[0]); fflush(0); */
 
     update_full_db(point, F, G, n, surrogate);
 }
@@ -566,8 +587,6 @@ void torc_update_full_db_task_p5(double point[], double *pF, double *G, int *pn,
     double F = *pF;
     int n = *pn;
     int surrogate = *psurrogate;
-
-    /*    printf("torc_update_full_db_task: %f %f %f %f %f\n", point[0], point[1], point[2], F, G[0]); fflush(0); */
 
     update_full_db(point, F, G, n, surrogate);
 }
@@ -579,6 +598,7 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
         return;
     }
 
+#if defined(_USE_TORC_)
     if (n == 0)
         torc_create_direct(0, (void (*)())torc_update_full_db_task, 3,        /* message to the database manager (separate process?) or direct execution by server thread */
                 data.Nth, MPI_DOUBLE, CALL_BY_VAL,
@@ -595,6 +615,7 @@ void torc_update_full_db(double point[], double F, double *G, int n, int surroga
                 point, &F, G, &n, &surrogate);
 
     torc_waitall3();
+#endif
 }
 
 void torc_update_curgen_db_task(double point[], double *pF, double *pprior)
@@ -602,19 +623,19 @@ void torc_update_curgen_db_task(double point[], double *pF, double *pprior)
     double F = *pF;
 	double prior = *pprior;
 
-    /*    printf("torc_update_curgen_db_task: %f %f %f %f\n", point[0], point[1], point[2], F); fflush(0); */
-
     update_curgen_db(point, F, prior);
 }
 
 void torc_update_curgen_db(double point[], double F, double prior)
 {
     int me = torc_node_id();
-    /*    printf("%d torc_update_curgen_db_task: %f %f %f %f\n", me, point[0], point[1], point[2], F); fflush(0); */
+
     if (me == 0) {
         update_curgen_db(point, F,prior);
         return;
     }
+
+#if defined(_USE_TORC_)
 	torc_create_direct(0, (void (*)())torc_update_curgen_db_task, 3,            /* message to the database manager (separate process?) or direct execution by server thread */
 		data.Nth, MPI_DOUBLE, CALL_BY_COP,
 		1, MPI_DOUBLE, CALL_BY_COP,
@@ -622,13 +643,12 @@ void torc_update_curgen_db(double point[], double F, double prior)
 		point, &F,&prior);
 
     torc_waitall3();    /* wait without releasing the worker */
+#endif
 }
 
 void torc_update_curres_db_task(double point[EXPERIMENTAL_RESULTS], double *pF)
 {
     double F = *pF;
-
-    /*    printf("torc_update_curres_db_task: %f %f %f\n", point[0], point[1], point[2]); fflush(0); */
 
     update_curres_db(point, F);
 }
@@ -636,22 +656,22 @@ void torc_update_curres_db_task(double point[EXPERIMENTAL_RESULTS], double *pF)
 void torc_update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
 {
     int me = torc_node_id();
-    /*    printf("%d torc_update_curres_db_task: %f %f %f\n", me, point[0], point[1], point[2]); fflush(0); */
+
     if (me ==0) {
         update_curres_db(point, F);
         return;
     }
+
+#if defined(_USE_TORC_)
     torc_create_direct(0, (void (*)())torc_update_curres_db_task, 2,        /* message to the database manager (separate process?) or direct execution by server thread */
             EXPERIMENTAL_RESULTS, MPI_DOUBLE, CALL_BY_COP,
             1, MPI_DOUBLE, CALL_BY_COP,
             point, &F);
     torc_waitall3();
+#endif
 }
 
-#endif
-
 /*** TASK MANAGEMENT ***/
-#if 1
 void taskfun(double /*const*/ *x, int *pN, double *res, int winfo[4])
 {
     double f;
@@ -684,7 +704,7 @@ double F(double *TP, int *pn)    /* for PNDL */
 
     return gres;
 }
-#endif
+
 
 void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int chain_id, int step_id, int ntasks)
 {
@@ -697,6 +717,7 @@ void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int cha
     winfo[2] = step_id;
     winfo[3] = 0;
 
+    printf("running on worker %d\n", worker_id);
     taskfun(point, &dim, &F, winfo);
 
     *Fval = F;
@@ -1039,196 +1060,209 @@ int prepare_newgen(int nchains, cgdbp_t *leaders)
                         compflag = 0;    /* they differ*/
                         break;
                     }
-                    }
-
-                    if (compflag == 1) {
-                        unflag = 0;    /* not unique, just found it in the unique points table*/
-                        break;
-                    }
                 }
-                if (unflag) {    /* unique, put it in the table */
-                    for (p = 0; p < data.Nth; p++) {
-                        x[p][un] = xi[p];
-                    }
-                    un++;
+
+                if (compflag == 1) {
+                    unflag = 0;    /* not unique, just found it in the unique points table*/
+                    break;
                 }
-            } /* end block*/
-
-            runinfo.currentuniques[runinfo.Gen] = un; /*+ 1*/;
-            runinfo.acceptance[runinfo.Gen] = (1.0*runinfo.currentuniques[runinfo.Gen])/data.Num[runinfo.Gen]; /* check this*/
-
-            double meanx[data.Nth], stdx[data.Nth];
-            for (p = 0; p < data.Nth; p++) {
-                meanx[p] = compute_mean(x[p], un);
-                stdx[p] = compute_std(x[p], un, meanx[p]);
             }
-
-            printf("CURGEN DB (UNIQUE) %d: [un = %d]\n", runinfo.Gen, un); /* + 1);*/
-            print_matrix((char *)"means", meanx, data.Nth);
-            print_matrix((char *)"std", stdx, data.Nth);
-        } /* end block*/
-
-        for (i = 0; i < n; i++) fj[i] = curgen_db.entry[i].F;    /* separate point from F ?*/
-        calculate_statistics(fj, n, data.Num[runinfo.Gen], runinfo.Gen, sel);
-
-        newchains = 0;
-        for (i = 0; i < n; i++) {
-            if (sel[i] != 0) newchains++;
+            if (unflag) {    /* unique, put it in the table */
+                for (p = 0; p < data.Nth; p++) {
+                    x[p][un] = xi[p];
+                }
+                un++;
+            }
         }
 
-        sort_t list[n];
-        for (i = 0; i < n; i++) {
-            list[i].idx = i;
-            list[i].nsel = sel[i];
-            list[i].F = curgen_db.entry[i].F;
+        runinfo.currentuniques[runinfo.Gen] = un; /*+ 1*/;
+        runinfo.acceptance[runinfo.Gen] = (1.0*runinfo.currentuniques[runinfo.Gen])/data.Num[runinfo.Gen]; /* check this*/
+
+        double meanx[data.Nth], stdx[data.Nth];
+        for (p = 0; p < data.Nth; p++) {
+            meanx[p] = compute_mean(x[p], un);
+            stdx[p] = compute_std(x[p], un, meanx[p]);
         }
+
+        printf("CURGEN DB (UNIQUE) %d: [un = %d]\n", runinfo.Gen, un); /* + 1);*/
+        print_matrix((char *)"means", meanx, data.Nth);
+        print_matrix((char *)"std", stdx, data.Nth);
+    } /* end block*/
+
+    {
+      double t0 = torc_gettime();
+    for (i = 0; i < n; i++) fj[i] = curgen_db.entry[i].F;    /* separate point from F ?*/
+    double t1 = torc_gettime();
+    calculate_statistics(fj, n, data.Num[runinfo.Gen], runinfo.Gen, sel);
+    double t2 = torc_gettime();
+    printf("init + calc stats : %lf + %lf = %lf seconds\n", t2-t1, t1-t0, t2-t0);
+    }
+
+    newchains = 0;
+    for (i = 0; i < n; i++) {
+        if (sel[i] != 0) newchains++;
+    }
+
+    //sort_t list[n];
+    sort_t *list;
+    list = calloc(1, n*sizeof(sort_t));
+    for (i = 0; i < n; i++) {
+        list[i].idx = i;
+        list[i].nsel = sel[i];
+        list[i].F = curgen_db.entry[i].F;
+    }
 
 #if VERBOSE
-        printf("Points before\n");
-        for (i = 0; i < n; i++) {
-            printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
-        }
+    printf("Points before\n");
+    for (i = 0; i < n; i++) {
+        printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
+    }
 #endif
 
-        qsort(list, n, sizeof(sort_t), compar_desc);
+    qsort(list, n, sizeof(sort_t), compar_desc);
 
 #if VERBOSE
-        printf("Points after\n");
-        for (i = 0; i < n; i++) {
-            printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
-        }
+    printf("Points after\n");
+    for (i = 0; i < n; i++) {
+        printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
+    }
 #endif
 
 #if 1   /* UPPER THRESHOLD */
-        /* peh:check this */
-        /* breaking long chains */
-        int initial_newchains = newchains;
-        int h_threshold = data.MaxChainLength;    /* peh: configuration file + more balanced lengths */
-        for (i = 0; i < initial_newchains; i++) {
-            if (list[i].nsel > h_threshold) {
-                while (list[i].nsel > h_threshold) {
-                    list[newchains] = list[i];
-                    list[newchains].nsel = h_threshold;
-                    list[i].nsel = list[i].nsel - h_threshold;
-                    newchains++;
-                }
+      /* peh:check this */
+      /* breaking long chains */
+    int initial_newchains = newchains;
+    int h_threshold = data.MaxChainLength;    /* peh: configuration file + more balanced lengths */
+    for (i = 0; i < initial_newchains; i++) {
+        if (list[i].nsel > h_threshold) {
+            while (list[i].nsel > h_threshold) {
+                list[newchains] = list[i];
+                list[newchains].nsel = h_threshold;
+                list[i].nsel = list[i].nsel - h_threshold;
+                newchains++;
             }
         }
+    }
 
-        qsort(list, n, sizeof(sort_t), compar_desc);
+    qsort(list, n, sizeof(sort_t), compar_desc);
 
 #if VERBOSE
-        printf("Points broken\n");
-        for (i = 0; i < n; i++) {
-            printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
-        }
+    printf("Points broken\n");
+    for (i = 0; i < n; i++) {
+        printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
+    }
 #endif
 
 #endif
 
 #if 1   /* LOWER THRESHOLD */
-        /* single to double step chains */
-        int l_threshold = data.MinChainLength;    /* peh: configuration file + more balanced lengths */
-        for (i = 0; i < newchains; i++) {
-            if ((list[i].nsel > 0)&&(list[i].nsel < l_threshold)) {
-                list[i].nsel = l_threshold;
-            }
+    /* single to double step chains */
+    int l_threshold = data.MinChainLength;    /* peh: configuration file + more balanced lengths */
+    for (i = 0; i < newchains; i++) {
+        if ((list[i].nsel > 0)&&(list[i].nsel < l_threshold)) {
+            list[i].nsel = l_threshold;
         }
-
-        qsort(list, n, sizeof(sort_t), compar_desc);
-
-#if VERBOSE
-        printf("Points advanced\n");
-        for (i = 0; i < n; i++) {
-            printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
-        }
-#endif
-
-#endif
-
-
-
-
-
-        int ldi;    /* leader index*/
-        ldi = 0;
-        for (i = 0; i < n; i++) {    /* newleader */
-            if (list[i].nsel != 0) {
-                int idx = list[i].idx;
-                for (p = 0; p < data.Nth; p++) {
-                    leaders[ldi].point[p] = curgen_db.entry[idx].point[p];
-                }
-                leaders[ldi].F = curgen_db.entry[idx].F;
-                leaders[ldi].nsel = list[i].nsel;
-                ldi++;
-            }
-        }
-
-        for (i = 0; i < newchains; i++) leaders[i].queue = -1;    /* rr*/
-
-#if VERBOSE
-        printf("Leaders before\n");
-        for (i = 0; i < newchains; i++) {
-            printf("%d %d %f %d\n", i, leaders[i].nsel, leaders[i].F, leaders[i].queue);
-        }
-#endif
-
-        /* cool and greedy partitioning ala Panos-- ;-) */
-
-        int nworkers = torc_num_workers();
-        int *workload = (int *)calloc(1, nworkers*sizeof(int));    /* workload[1..workers] = 0*/
-
-        for (i = 0; i < newchains; i++) {
-            int least_loader_worker = compute_min_idx_i(workload, nworkers);
-            leaders[i].queue = least_loader_worker;
-            workload[least_loader_worker] += leaders[i].nsel;
-        }
-
-        print_matrix_i((char *)"initial workload", workload, nworkers);
-        free(workload);
-
-#if VERBOSE
-        printf("Leaders after\n");
-        for (i = 0; i < newchains; i++) {
-            printf("%d %d %f %d\n", i, leaders[i].nsel, leaders[i].F, leaders[i].queue);
-        }
-#endif
-
-        if (1)
-        {/*start block*/
-            /*    double x[data.Nth][n];*/
-            double **x = g_x;
-            for (i = 0; i < newchains; i++) {
-                for (p = 0; p < data.Nth; p++) {
-                    x[p][i] = leaders[i].point[p];
-                }
-            }
-
-            double meanx[data.Nth], stdx[data.Nth];
-            for (p = 0; p < data.Nth; p++) {
-                meanx[p] = compute_mean(x[p], newchains);
-                stdx[p] = compute_std(x[p], newchains, meanx[p]);
-            }
-
-            printf("CURGEN DB (LEADER) %d: [nlead=%d]\n", runinfo.Gen, newchains);
-            print_matrix((char *)"means", meanx, data.Nth);
-            print_matrix((char *)"std", stdx, data.Nth);
-        }/*end block*/
-
-        if (data.use_local_cov)
-            precompute_chain_covariances(leaders, data.init_mean, data.local_cov, newchains);
-
-        curgen_db.entries = 0;    /* reset curgen db*/
-        printf("calculate_statistics: newchains=%d\n", newchains);
-
-        for (i = 0; i < data.Nth; i++) free(g_x[i]);
-        free(g_x);
-
-        free(fj);
-        free(sel);
-
-        return newchains;
     }
+
+    qsort(list, n, sizeof(sort_t), compar_desc);
+
+#if VERBOSE
+    printf("Points advanced\n");
+    for (i = 0; i < n; i++) {
+        printf("%d: %d %d %f\n", i, list[i].idx, list[i].nsel, list[i].F);
+    }
+#endif
+
+#endif
+
+
+
+
+
+    int ldi;    /* leader index*/
+    ldi = 0;
+    for (i = 0; i < n; i++) {    /* newleader */
+        if (list[i].nsel != 0) {
+            int idx = list[i].idx;
+            for (p = 0; p < data.Nth; p++) {
+                leaders[ldi].point[p] = curgen_db.entry[idx].point[p];
+            }
+            leaders[ldi].F = curgen_db.entry[idx].F;
+            leaders[ldi].nsel = list[i].nsel;
+            ldi++;
+        }
+    }
+
+    free(list);
+
+    for (i = 0; i < newchains; i++) leaders[i].queue = -1;    /* rr*/
+
+#if VERBOSE
+    printf("Leaders before\n");
+    for (i = 0; i < newchains; i++) {
+        printf("%d %d %f %d\n", i, leaders[i].nsel, leaders[i].F, leaders[i].queue);
+    }
+#endif
+
+
+#if defined(_USE_TORC_)
+    /* cool and greedy partitioning ala Panos-- ;-) */
+
+    int nworkers = torc_num_workers();
+    int *workload = (int *)calloc(1, nworkers*sizeof(int));    /* workload[1..workers] = 0*/
+
+    for (i = 0; i < newchains; i++) {
+        int least_loader_worker = compute_min_idx_i(workload, nworkers);
+        leaders[i].queue = least_loader_worker;
+        workload[least_loader_worker] += leaders[i].nsel;
+    }
+
+    print_matrix_i((char *)"initial workload", workload, nworkers);
+    free(workload);
+#endif
+
+#if VERBOSE
+    printf("Leaders after\n");
+    for (i = 0; i < newchains; i++) {
+        printf("%d %d %f %d\n", i, leaders[i].nsel, leaders[i].F, leaders[i].queue);
+    }
+#endif
+
+    if (1)
+    {/*start block*/
+        /*    double x[data.Nth][n];*/
+        double **x = g_x;
+        for (i = 0; i < newchains; i++) {
+            for (p = 0; p < data.Nth; p++) {
+                x[p][i] = leaders[i].point[p];
+            }
+        }
+
+        double meanx[data.Nth], stdx[data.Nth];
+        for (p = 0; p < data.Nth; p++) {
+            meanx[p] = compute_mean(x[p], newchains);
+            stdx[p] = compute_std(x[p], newchains, meanx[p]);
+        }
+
+        printf("CURGEN DB (LEADER) %d: [nlead=%d]\n", runinfo.Gen, newchains);
+        print_matrix((char *)"means", meanx, data.Nth);
+        print_matrix((char *)"std", stdx, data.Nth);
+    }/*end block*/
+
+    if (data.use_local_cov)
+        precompute_chain_covariances(leaders, data.init_mean, data.local_cov, newchains);
+
+    curgen_db.entries = 0;    /* reset curgen db*/
+    printf("calculate_statistics: newchains=%d\n", newchains);
+
+    for (i = 0; i < data.Nth; i++) free(g_x[i]);
+    free(g_x);
+
+    free(fj);
+    free(sel);
+
+    return newchains;
+}
 
 /*** HELPFUL ***/
 void call_gsl_rand_init()
@@ -1239,11 +1273,15 @@ void call_gsl_rand_init()
 
 void spmd_gsl_rand_init()
 {
+#if defined(_USE_TORC_)
     int i;
     for (i = 0; i < torc_num_nodes(); i++) {
         torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_gsl_rand_init, 0);
     }
     torc_waitall();
+#else
+    call_gsl_rand_init();
+#endif
 }
 
 void call_print_matrix_2d()
@@ -1255,28 +1293,36 @@ void call_print_matrix_2d()
 
 void spmd_print_matrix_2d()
 {
+#if defined(_USE_TORC_)
     int i;
     for (i = 0; i < torc_num_nodes(); i++) {
         torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_print_matrix_2d, 0);
     }
     torc_waitall();
+#else
+    call_print_matrix_2d();
+#endif
 }
 
 void call_update_gdata()    /* step for p[j]*/
 {
+#if defined(_USE_TORC_)
     MPI_Bcast(runinfo.SS[0], data.Nth*data.Nth, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(runinfo.p, data.MaxStages, MPI_DOUBLE, 0, MPI_COMM_WORLD);    /* just p[Gen]*/
     MPI_Bcast(&runinfo.Gen, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
 }
 
 void spmd_update_gdata()    /* step*/
 {
+#if defined(_USE_TORC_)
     int i;
     if (torc_num_nodes() == 1) return;
     for (i = 0; i < torc_num_nodes(); i++) {
         torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_update_gdata, 0);
     }
     torc_waitall();
+#endif
 }
 
 int main(int argc, char *argv[])
@@ -1286,6 +1332,7 @@ int main(int argc, char *argv[])
     int winfo[4];
     int nchains; /* was below*/
 
+#if defined(_USE_TORC_)
     torc_register_task((void *)initchaintask);
     torc_register_task((void *)chaintask);
     torc_register_task((void *)torc_update_full_db_task);
@@ -1297,12 +1344,15 @@ int main(int argc, char *argv[])
     torc_register_task((void *)call_gsl_rand_init);
     torc_register_task((void *)call_print_matrix_2d);
     torc_register_task((void *)call_update_gdata);
+#endif
 
     data_init();
 
     fitfun_initialize(NULL);
 
+#if defined(_USE_TORC_)
     torc_init(argc, argv, MODE_MS);
+#endif
 
 #if defined(_AFFINITY_)
     spmd_setaffinity();
@@ -1342,6 +1392,14 @@ int main(int argc, char *argv[])
             }
         }
 
+#if defined(_USE_OPENMP_)
+#pragma omp parallel
+	{
+    printf("Hello from thread %d of %d\n", omp_get_thread_num(), omp_get_num_threads());
+#pragma omp for
+//	{
+#endif
+
         for (i = 0; i < nchains; i++) {
             winfo[0] = runinfo.Gen;
             winfo[1] = i;
@@ -1377,18 +1435,18 @@ int main(int argc, char *argv[])
                         mvnrnd(&data.prior_mu[d], &data.prior_sigma[d], &in_tparam[d], 1);
                     }
                     else if (data.compositeprior_distr[d] == 2) {
-			in_tparam[d] = truncated_normal_rand (data.prior_mu[d], data.prior_sigma[d], data.lowerbound[d], data.upperbound[d]);
+                      	in_tparam[d] = truncated_normal_rand (data.prior_mu[d], data.prior_sigma[d], data.lowerbound[d], data.upperbound[d]);
                     }
                 }
             }
 
             if (data.load_from_file == 1)    /* override the computed point and read it from the file */
             {
-		printf("reading from init_db.txt\n");
+              	printf("reading from init_db.txt\n");
                 int j;
                 for (j = 0; j < data.Nth; j++) fscanf(init_fp, "%lf", &in_tparam[j]);
                 fscanf(init_fp, "%lf", &out_tparam[i]);
-		double prior_val;
+                double prior_val;
                 fscanf(init_fp, "%lf", &prior_val);
 
                 /*torc_update_curgen_db(in_tparam, out_tparam[i]);*/    /* peh - eval or not */
@@ -1396,14 +1454,43 @@ int main(int argc, char *argv[])
             }
 
             if (data.prior_type <= 3)    /* peh: file without or with function evaluations? */
+            {
+#if defined(_USE_TORC_)
                 torc_create(-1, (void (*)())initchaintask, 4,
                         data.Nth, MPI_DOUBLE, CALL_BY_COP,
                         1, MPI_INT, CALL_BY_COP,
                         1, MPI_DOUBLE, CALL_BY_RES,
                         4, MPI_INT, CALL_BY_COP,
                         in_tparam, &data.Nth, &out_tparam[i], winfo);
+#else
+
+//#if defined(_USE_OPENMP_)
+//#endif
+
+//                #pragma omp task shared(data, out_tparam) firstprivate(i, in_tparam, winfo)
+//                {
+//                initchaintask(
+//                        in_tparam, &data.Nth, &out_tparam[i], winfo);
+//                }
+
+                #pragma omp task firstprivate(i, winfo, in_tparam) shared(data, out_tparam)
+                {
+                  //usleep(10*1000);
+                  //printf("hello from task %d on worker %d\n", i, omp_get_thread_num());
+                  initchaintask(in_tparam, &data.Nth, &out_tparam[i], winfo);
+                }
+
+#endif
+            }
         }
 
+#if defined(_USE_OPENMP_)
+	//} // single
+	} // parallel
+#endif
+
+
+#if defined(_USE_TORC_)
         if (data.stealing)
 	    torc_enable_stealing();
 
@@ -1411,6 +1498,7 @@ int main(int argc, char *argv[])
 
         if (data.stealing)
             torc_disable_stealing();
+#endif
 
         if (data.load_from_file == 1) {
             fclose(init_fp);
@@ -1466,6 +1554,14 @@ int main(int argc, char *argv[])
         int nsteps;
         gt0 = torc_gettime();
 
+
+#if defined(_USE_OPENMP_)
+#pragma omp parallel
+	{
+#pragma omp single nowait
+	{
+#endif
+
         for (i = 0; i < nchains; i++) {
             winfo[0] = runinfo.Gen;
             winfo[1] = i;
@@ -1500,6 +1596,7 @@ int main(int argc, char *argv[])
 
             out_tparam[i] = leaders[i].F;    /* loglik_leader...*/
 
+#if defined(_USE_TORC_)
             torc_create(leaders[i].queue, (void (*)())chaintask, 7,
                     data.Nth, MPI_DOUBLE, CALL_BY_COP,
                     1, MPI_INT, CALL_BY_COP,
@@ -1510,16 +1607,33 @@ int main(int argc, char *argv[])
                     data.Nth*data.Nth, MPI_DOUBLE, CALL_BY_COP,
                     in_tparam, &data.Nth, &nsteps, &out_tparam[i], winfo,
                     init_mean, chain_cov);
+#else
+
+#if defined(_USE_OPENMP_)
+	    #pragma omp task shared(data, out_tparam) firstprivate(i, nsteps, in_tparam, winfo, init_mean, chain_cov)
+#endif
+            chaintask(
+                    in_tparam, &data.Nth, &nsteps, &out_tparam[i], winfo,
+                    init_mean, chain_cov);
+#endif
         }
+
         /* wait for all chain tasks to finish */
 
+#if defined(_USE_OPENMP_)
+	} // single
+	} // parallel
+#endif
+
+
+#if defined(_USE_TORC_)
         if (data.stealing)
             torc_enable_stealing();
 
         torc_waitall();
         if (data.stealing)
             torc_disable_stealing();
-
+#endif
 
         gt1 = torc_gettime();
         int g_nfeval = get_nfc();
@@ -1607,7 +1721,8 @@ end:
     fitfun_finalize();
 
     printf("total function calls = %d\n", get_tfc());
+#if defined(_USE_TORC_)
     torc_finalize();
-
+#endif
     return 0;
 }
