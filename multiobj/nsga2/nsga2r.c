@@ -8,7 +8,20 @@
 # include "global.h"
 # include "rand.h"
 
+#if defined(_USE_TORC_)
 # include <torc.h>
+#endif
+
+#if !defined(_USE_TORC_)
+#include <sys/time.h>
+static double torc_gettime()
+{
+        struct timeval t;
+        gettimeofday(&t, NULL);
+        return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
+}
+#endif
+
 
 /* JOBMAXTIME is used for clean restarts, at the moment works only if 
  * first two generations are executed in same job */
@@ -54,13 +67,15 @@ int main (int argc, char **argv)
     FILE *fpt3;
     FILE *fpt4;
     FILE *fpt5;
-    FILE *gp;
+    FILE *gp = NULL;
     population *parent_pop;
     population *child_pop;
     population *mixed_pop;
 
+#if defined(_USE_TORC_)
 	torc_register_task(test_problem_v2);
 	torc_init(argc, argv, MODE_MW);
+#endif
 
 	gt0 = torc_gettime();	// time at start of execution
 
@@ -702,6 +717,8 @@ int main (int argc, char **argv)
     printf("\n Routine successfully exited \n");
 
 
+#if defined(_USE_TORC_)
 	torc_finalize();
+#endif
     return (0);
 }

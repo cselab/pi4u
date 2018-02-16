@@ -1,17 +1,29 @@
+use_torc?=0
+use_omp?=0
+
 # Makefile for compiling NSGA-II source code
-CC=mpicc
-LD=mpicc
-RM=rm -f
+CC=gcc
+LD=gcc
 #CFLAGS=-Wall -ansi -pedantic -g
-CFLAGS=-Wall --std=c99 -g -DIODUMP=1 -DBINARY=0 
-#CFLAGS+=-fopenmp
-CFLAGS+= -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 
-#LDFLAGS+=-fopenmp
-#LIBS+=`torc_libs` -lm
+CFLAGS = -g -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+CFLAGS += -Wall
+CFLAGS += -DIODUMP=1 -DBINARY=0 
+LDFLAGS += -lm
 
-LIBS+= `torc_libs` -lm  # -L/users/sverma/usr/torc/lib -ltorc
-CFLAGS+=`torc_cflags` #  -I/users/sverma/usr/torc/include
+ifeq ($(use_torc),1)
+CC = mpicc
+LD = mpicc
+CFLAGS += -D_USE_TORC_=1 `torc_cflags` #-I/users/sverma/usr/torc/include
+LDFLAGS += `torc_libs` #-L/users/sverma/usr/torc/lib -ltorc
+endif
+
+ifeq ($(use_omp),1)
+CFLAGS += -D_USE_OPENMP_=1 -fopenmp
+LDFLAGS += -fopenmp
+endif
+
+RM=rm -f
 
 OBJS1:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun_inline.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
 MAIN1=nsga2r

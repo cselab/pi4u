@@ -7,9 +7,25 @@
 # include "global.h"
 # include "rand.h"
 
-//# include <omp.h>
+#if defined(_USE_OPENMP_)
+# include <omp.h>
+#endif
+
+#if defined(_USE_TORC_)
 # include <torc.h>
-#if 0
+#endif
+
+#if !defined(_USE_TORC_)
+#include <sys/time.h>
+static double torc_gettime()
+{
+        struct timeval t;
+        gettimeofday(&t, NULL);
+        return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
+}
+#endif
+
+#if 0 // peh: original code
 /* Routine to evaluate objective function values and constraints for a population */
 void evaluate_pop (population *pop, int popid)
 {
@@ -61,15 +77,17 @@ void evaluate_pop (population *pop, int popid)
 
     double t0 = torc_gettime();
 
-#if 0
+#if !defined(_USE_TORC_)
 
+#if defined(_USE_OPENMP_)
 #pragma omp parallel for private(ind, info)
+#endif
     for (i=0; i<popsize; i++)
     {
 	info[0] = 0; info[1] = 0; info[2] = popid; info[3] = i;
 	ind = &(pop->ind[i]);
         ind->constr_violation = 0.0;
-	test_problem_v2 (ind->xreal, &nr, ind->obj, &no, info);
+	test_problem_v2 (ind->xreal, &nr, ind->obj, &no, ind->constr, &nc, &ind->constr_violation, info);
     }
 
 #else
@@ -90,8 +108,7 @@ void evaluate_pop (population *pop, int popid)
 			1, MPI_INT, CALL_BY_COP,
 			1, MPI_DOUBLE, CALL_BY_RES,
 			4, MPI_INT, CALL_BY_COP,
-			ind->xreal, &nr, ind->obj, &no, ind->constr, &nc, &ind->constr_violation,
-			info);
+			ind->xreal, &nr, ind->obj, &no, ind->constr, &nc, &ind->constr_violation, info);
     }
 	torc_waitall();
 
