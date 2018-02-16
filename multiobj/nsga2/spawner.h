@@ -154,7 +154,7 @@ int copy_from_dir(char *name)
 		while ((ent = readdir (dir)) != NULL) {
 			//if (ent->d_type == DT_REG) {
 				//printf ("%s (%d)\n", ent->d_name, ent->d_type);
-				char source[256], dest[256];
+				char source[4096], dest[4096];
 
 				sprintf(source, "%s/%s", name, ent->d_name);
 				sprintf(dest, "./%s", ent->d_name);

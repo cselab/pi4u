@@ -13,18 +13,25 @@ CFLAGS+= -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 LIBS+= `torc_libs` -lm  # -L/users/sverma/usr/torc/lib -ltorc
 CFLAGS+=`torc_cflags` #  -I/users/sverma/usr/torc/include
 
-OBJS:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
-MAIN=nsga2r
-all:$(MAIN)
+OBJS1:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun_inline.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
+MAIN1=nsga2r
 
-$(MAIN):$(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -o $(MAIN) $(LIBS)
+OBJS2:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun_external.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
+MAIN2=nsga2r_ext
+
+all:$(MAIN1) $(MAIN2)
+
+$(MAIN1):$(OBJS1)
+	$(LD) $(LDFLAGS) $(OBJS1) -o $(MAIN1) $(LIBS)
+
+$(MAIN2):$(OBJS2)
+	$(LD) $(LDFLAGS) $(OBJS2) -o $(MAIN2) $(LIBS)
 
 %.o: %.c global.h rand.h
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	$(RM) $(OBJS) $(MAIN)
+	$(RM) $(OBJS1) $(MAIN1) $(OBJS2) $(MAIN2)
 
 clear:
 	$(RM) eval_db_*.txt curgen_db_*.txt *.out

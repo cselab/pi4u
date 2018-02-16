@@ -3,7 +3,7 @@
 
 void fitfun(double *x, int nx, void *output, int *winfo, double *result, int ncon, double *constraints) // ny must be also available
 {
-//      usleep(100*1000);
+	usleep(10*1000);
 
 //	result[0] = pow((x[0]+2.0),2.0)-10;
 //	result[1] = pow((x[0]-2.0),2.0)+20;

@@ -17,13 +17,13 @@ static pthread_mutex_t fork_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define CONSTRFILE	"constr_viol.txt"
 #define REMOVEDIRS	0
 
-// REMOVEDIRS=1 removes the directories... =0 keeps them
+// REMOVEDIRS=1 removes the directories..., =0 keeps them
 
 void fitfun(double /*const*/ *x, int N, void *output, int *winfo, double *result, int ncon, double *constraints)
 {
 	// 0.
 	int n  = N;
-	int me = getpid();  /* spanwer_id : worker_id */
+	int me = getpid();
 	char line[1024];
 	char *largv[64];
 	char taskname[256];
@@ -41,7 +41,6 @@ void fitfun(double /*const*/ *x, int N, void *output, int *winfo, double *result
 job_restart:
 
 	sprintf(taskname, "tmpdir.%d.%d.%d.%d", gen, chain, step, task);
-	//mkdir(taskname, S_IRWXU);
 	mkdir(taskname, S_IRWXU | S_IRWXG | S_IRWXO);	
 
 	{
@@ -96,18 +95,14 @@ retry:
 			abort();
 		}
 
-
-		// 1.3 write input parametes to the simulation's input file (first 3)
-		const double scale[6] = {1, 1, 1, 1, 1, 1}; // 6 just to be safe
+		// 1.3 write input parametes to the simulation's input file
 		FILE *finp = fopen(PARAMSFILE, "w");
 		int i;
-		for (i = 0; i < n; i++) fprintf(finp, "%.16lf\n", scale[i]*x[i]);
-		//for (i = 0; i < n; i++) fprintf(finp, "%.16lf\n", x[i]);
+		for (i = 0; i < n; i++) fprintf(finp, "%.16lf\n", x[i]);
 		fclose(finp);
 
 		/* 2. run simulation */
 		sprintf(line, "./run.sh");
-		//printf("parameters are \t %e \t %e \t %e \t %e \t %e \t %e \t %e\n",x[0],x[1],x[2],x[3],x[4],x[5],x[6]);
 		parse(line, largv);
 
 #if 1
@@ -162,7 +157,6 @@ retry:
 	}
 	else
 	{
-		//while (!feof(pFile))
 		fscanf(pFile, "%lf", &fitness1 );
 		fscanf(pFile, "%lf", &fitness2 );
 
@@ -224,10 +218,10 @@ retry:
 	result[1] = res2;
 	
 	job_try++;
-	if ((res1==1e12 || res2==1e12 || isnan(res1) || isnan(res2) || (t1-t0)<50.0) && (job_try < 5)) // i.e., if fitness.txt doesn't exist, or if the sim ended in less than 50 seconds real time, and retries have been less than 5.
+	if ((res1==1e12 || res2==1e12 || isnan(res1) || isnan(res2) || (t1-t0)<0.0) && (job_try < 5)) // i.e., if fitness.txt doesn't exist, or if the sim ended in less than 0 seconds real time, and retries have been less than 5.
 		goto job_restart;
 
 
-	return; //res;
+	return;
 }
 
