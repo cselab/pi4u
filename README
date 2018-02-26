@@ -37,6 +37,13 @@ III. INSTALLATION STEPS
    For example, the exact location of the GSL library must be specificed.
    Moreover on some platforms, the MPI compiler can be named differently (e.g. CC=cc on Piz Daint).
 
+   The following compilation options are supported:
+	- make use_omp=1		# builds the OpenMP version
+	- make use_torc=1		# builds the TORC-based version 
+	- make use_omp=0 use_torc=0	# builds the serial version
+	- make				# default option is use_omp=1
+
+
 IV. TESTING
 
 1) inference/TMCMC

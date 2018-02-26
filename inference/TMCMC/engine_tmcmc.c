@@ -1547,10 +1547,6 @@ int main(int argc, char *argv[])
         /* process current generation, compute probs, find new chains */
         /*leader[i]: { point[data.Nth], F, nsteps}*/
 
-        int winfo[4];
-        double in_tparam[data.Nth];
-        double init_mean[data.Nth];
-        double chain_cov[data.Nth*data.Nth];
         int nsteps;
         gt0 = torc_gettime();
 
@@ -1561,6 +1557,10 @@ int main(int argc, char *argv[])
 #pragma omp single nowait
 	{
 #endif
+        int winfo[4];
+        double in_tparam[data.Nth];
+        double init_mean[data.Nth];
+        double chain_cov[data.Nth*data.Nth];
 
         for (i = 0; i < nchains; i++) {
             winfo[0] = runinfo.Gen;

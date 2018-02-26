@@ -9,18 +9,18 @@ LD=gcc
 CFLAGS = -g -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall
 CFLAGS += -DIODUMP=1 -DBINARY=0 
-LDFLAGS += -lm
+LDFLAGS += -pthread -lm
 
 ifeq ($(use_torc),1)
 CC = mpicc
 LD = mpicc
 CFLAGS += -D_USE_TORC_=1 `torc_cflags` #-I/users/sverma/usr/torc/include
-LDFLAGS += `torc_libs` #-L/users/sverma/usr/torc/lib -ltorc
+LIBS += `torc_libs` #-L/users/sverma/usr/torc/lib -ltorc
 endif
 
 ifeq ($(use_omp),1)
 CFLAGS += -D_USE_OPENMP_=1 -fopenmp
-LDFLAGS += -fopenmp
+LIBS += -fopenmp
 endif
 
 RM=rm -f

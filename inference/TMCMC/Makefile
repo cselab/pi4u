@@ -1,7 +1,7 @@
 use_torc?=0
 use_omp?=1
 
-CC = gcc-7
+CC = gcc
 CFLAGS = -g -ggdb -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall 
 LDFLAGS += -lgsl -lgslcblas -lm

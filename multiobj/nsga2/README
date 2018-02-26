@@ -7,6 +7,14 @@ You can find more information about the NSGA-II code in the Readme file,
 which has been slightly modified to include any changes introduced in the
 original code. 
 
+
+The following compilation options are supported:
+- make use_omp=1		# builds the OpenMP version
+- make use_torc=1		# builds the TORC-based version
+- make use_omp=0 use_torc=0	# builds the serial version
+- make				# builds the serial version
+
+
 ---------------------------------------------------------------------------
 If you have any questions about the parallel version of this code, 
 please feel free to contact Dr. Panos Hadjidoukas (phadjido at mavt.ethz.ch)
