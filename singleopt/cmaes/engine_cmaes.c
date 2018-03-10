@@ -5,13 +5,28 @@
 #include <stdio.h>
 #include <stdlib.h> /* free() */
 #include "cmaes_interface.h"
-#include <mpi.h>
-#include <torc.h>
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
 
-#include "fitfun.c" 
+#if defined(_USE_TORC_)
+
+#include <mpi.h>
+#include <torc.h>
+
+#else
+
+#include <sys/time.h>
+static double torc_gettime()
+{
+        struct timeval t;
+        gettimeofday(&t, NULL);
+        return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
+}
+
+#endif
+
+#include "fitfun.c"
 
 #define VERBOSE 1
 #define _STEALING_
@@ -57,19 +72,21 @@ int main(int argn, char **args)
 {
     cmaes_t evo; /* an CMA-ES type struct or "object" */
     double *arFunvals, *const*pop, *xfinal;
-    int i; 
+    int i;
     /* peh - start */
     int lambda, dim;
     double gt0, gt1, gt2, gt3;
-    double tt0, tt1, stt = 0.0; 
+    double tt0, tt1, stt = 0.0;
     int step = 0;
     int info[4];    /* gen, chain, step, task */
     /* peh - end */
 
+#if defined(_USE_TORC_)
     torc_register_task(taskfun);
 
     /* Initialize everything into the struct evo, 0 means default */
     torc_init(argn, args, MODE_MS);
+#endif
 
     if (argn == 2) {        /* new */
         if (!strcmp(args[1], "-cr")) {
@@ -78,37 +95,75 @@ int main(int argn, char **args)
     }
 
     gt0 = torc_gettime();
-    arFunvals = cmaes_init(&evo, 0, NULL, NULL, 0, 0, "cmaes_initials.par"); 
+    arFunvals = cmaes_init(&evo, 0, NULL, NULL, 0, 0, "cmaes_initials.par");
     printf("%s\n", cmaes_SayHello(&evo));
     cmaes_ReadSignals(&evo, "cmaes_signals.par");  /* write header and initial values */
 
-    int d = cmaes_Get(&evo, "dim"); 
-    lower_bound = malloc(d*sizeof(double));
-    upper_bound = malloc(d*sizeof(double));
-    for (i = 0; i < d; i++) {
+    dim = cmaes_Get(&evo, "dim");
+    lower_bound = malloc(dim*sizeof(double));
+    upper_bound = malloc(dim*sizeof(double));
+    for (i = 0; i < dim; i++) {
         lower_bound[i] = -6;
         upper_bound[i] = +6;
     }
 
+    FILE *f = fopen("cmaes_bounds.txt", "r");
+    if (f != NULL) {
+      printf("Reading the bounds from cmaes_bounds.txt\n");
+
+      char line[256];
+      int found;
+      int line_no = 0;
+      for (i = 0; i < dim; i++) {
+        found = 0;
+        while (fgets(line, 256, f)!= NULL) {
+          line_no++;
+
+          if ((line[0] == '#')||(strlen(line)==0)) continue;
+
+          char bound[32];
+          sprintf(bound, "B%d", i);
+          if (strstr(line, bound) != NULL) {
+            sscanf(line, "%*s %lf %lf", &lower_bound[i], &upper_bound[i]);
+            found = 1;
+            break;
+          }
+        }
+        if (!found) {
+          printf("Using the hardcoded bounds for parameter %d\n", i);
+        }
+        rewind(f);
+        line_no = 0;
+      }
+      fclose(f);
+    }
+    else {
+      printf("Using the hardcoded bounds for all parameters\n");
+    }
+
+    printf("Parameter Bounds:\n");
+    for (i = 0; i < dim; i++) {
+      printf("B%d: %15.6f %15.6f\n", i, lower_bound[i], upper_bound[i]);
+    }
 
     /* Iterate until stop criterion holds */
     gt1 = torc_gettime();
     while(!cmaes_TestForTermination(&evo))
-    { 
+    {
         /* generate lambda new search points, sample population */
         pop = cmaes_SamplePopulation(&evo); /* do not change content of pop */
 
         /* Here we may resample each solution point pop[i] until it
            becomes feasible. function is_feasible(...) needs to be
-           user-defined.  
+           user-defined.
            Assumptions: the feasible domain is convex, the optimum is
            not on (or very close to) the domain boundary, initialX is
            feasible and initialStandardDeviations are sufficiently small
            to prevent quasi-infinite looping.
         */
 
-        lambda = cmaes_Get(&evo, "lambda"); 
-        dim = cmaes_Get(&evo, "dim"); 
+        lambda = cmaes_Get(&evo, "lambda");
+        dim = cmaes_Get(&evo, "dim");
 
         if (checkpoint_restart)
         {
@@ -142,24 +197,26 @@ int main(int argn, char **args)
 
         if (!checkpoint_restart)
         {
-            for (i = 0; i < cmaes_Get(&evo, "popsize"); ++i) 
-                while (!is_feasible(pop[i], dim)) 
-                    cmaes_ReSampleSingle(&evo, i); 
+            for (i = 0; i < cmaes_Get(&evo, "popsize"); ++i)
+                while (!is_feasible(pop[i], dim))
+                    cmaes_ReSampleSingle(&evo, i);
 
-            /* evaluate the new search points using fitfun */ 
+            /* evaluate the new search points using fitfun */
             tt0 = torc_gettime();
             for (i = 0; i < lambda; ++i) {
-#if 0
-                /*arFunvals[i] =*/ fitfun(pop[i], (int) dim, &arFunvals[i]);
-#endif
                 info[0] = 0; info[1] = 0; info[2] = step; info[3] = i;     /* gen, chain, step, task */
+#if defined(_USE_TORC_)
                 torc_create(-1, taskfun, 4,
                         dim, MPI_DOUBLE, CALL_BY_VAL,
                         1, MPI_INT, CALL_BY_COP,
                         1, MPI_DOUBLE, CALL_BY_RES,
                         4, MPI_INT, CALL_BY_COP,
                         pop[i], &dim, &arFunvals[i], info);
+#else
+                taskfun(pop[i], &dim, &arFunvals[i], info);
+#endif
             }
+#if defined(_USE_TORC_)
 #if defined(_STEALING_)
             torc_enable_stealing();
 #endif
@@ -167,7 +224,7 @@ int main(int argn, char **args)
 #if defined(_STEALING_)
             torc_disable_stealing();
 #endif
-
+#endif
             tt1 = torc_gettime();
             stt += (tt1-tt0);
         }
@@ -230,7 +287,7 @@ int main(int argn, char **args)
                 printf("No more available time, exiting...\n");
                 evo.sp.stopMaxIter=step+1;
                 break;
-            }    
+            }
 
         }
 #endif
@@ -243,10 +300,10 @@ int main(int argn, char **args)
 
     /* get best estimator for the optimum, xmean */
     xfinal = cmaes_GetNew(&evo, "xmean"); /* "xbestever" might be used as well */
-    cmaes_exit(&evo); /* release memory */ 
+    cmaes_exit(&evo); /* release memory */
 
     /* do something with final solution and finally release memory */
-    free(xfinal); 
+    free(xfinal);
 
     gt3 = torc_gettime();
     printf("Total elapsed time = %.3lf  seconds\n", gt3-gt0);
@@ -255,7 +312,8 @@ int main(int argn, char **args)
     printf("Funtion Evaluation time = %.3lf  seconds\n", stt);
     printf("Finalization time = %.3lf  seconds\n", gt3-gt2);
 
+#if defined(_USE_TORC_)
     torc_finalize();
-
+#endif
     return 0;
 }
