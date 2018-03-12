@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDLMSG ( IPRINT, NAME, IEND )
+      SUBROUTINE PNDLMSG ( IPRINT, NAME, IEND )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -15,20 +15,20 @@ C    IEND       IEND=0 -> Indicates that the routine starts.
 C               IEND=1 -> Indicates that the routine ends.
 C
 C  ---------------------------------------------------------------------
-	CHARACTER*(*) NAME
+      CHARACTER*(*) NAME
 C
-	IF (IPRINT.NE.3) RETURN
+      IF (IPRINT.NE.3) RETURN
 C
-	IF (IEND.EQ.0) THEN
-		WRITE (*,10) NAME
-	ELSE
-		WRITE (*,20) NAME
-	END IF
+      IF (IEND.EQ.0) THEN
+          WRITE (*,10) NAME
+      ELSE
+          WRITE (*,20) NAME
+      END IF
 C
-10	FORMAT (/' PNDL: ',75('-')
+10    FORMAT (/' PNDL: ',75('-')
      &        /' PNDL: ',22X,'Start of SUBROUTINE ',A
      &        /' PNDL: ',75('-'))
-20	FORMAT (/' PNDL: ',75('-')
+20    FORMAT (/' PNDL: ',75('-')
      &        /' PNDL: ',23X,'End of SUBROUTINE ',A
      &        /' PNDL: ',75('-'))
-	END
+      END

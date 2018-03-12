@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL_INIT ( )
+      SUBROUTINE PNDL_INIT ( )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -8,15 +8,15 @@ C    Initializes the underlying tasking library.
 C
 C  ---------------------------------------------------------------------
 C
-	INCLUDE 'torcf.h'
+      INCLUDE 'torcf.h'
 C
-C	CALL torc_init()
+C    CALL torc_initf()
 
 
-	END
+      END
 
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL_FINALIZE ( )
+      SUBROUTINE PNDL_FINALIZE ( )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -25,15 +25,15 @@ C    Shutdowns the underlying tasking library.
 C
 C  ---------------------------------------------------------------------
 C
-	INCLUDE 'torcf.h'
+      INCLUDE 'torcf.h'
 C
-	CALL torc_waitall()
-	CALL torc_finalize()
+      CALL torc_waitall()
+      CALL torc_finalize()
 
-	END
+      END
 
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL_BARRIER ( )
+      SUBROUTINE PNDL_BARRIER ( )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -42,17 +42,17 @@ C    Task-aware SPMD barrier.
 C
 C  ---------------------------------------------------------------------
 C
-	INCLUDE 'torcf.h'
+      INCLUDE 'torcf.h'
 C
-c	CALL torc_enable()
-c	CALL torc_waitall()
-	CALL torc_spmd_barrier()
-c	CALL torc_disable()
+c    CALL torc_enable()
+c    CALL torc_waitall()
+      CALL torc_spmd_barrier()
+c    CALL torc_disable()
 
-	END
+      END
 
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL_TASKWAIT ( )
+      SUBROUTINE PNDL_TASKWAIT ( )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -61,8 +61,8 @@ C    Task-aware SPMD barrier.
 C
 C  ---------------------------------------------------------------------
 C
-	INCLUDE 'torcf.h'
+      INCLUDE 'torcf.h'
 C
-	CALL torc_waitall()
+      CALL torc_waitall()
 
-	END
+      END

@@ -2,7 +2,7 @@
 C  ---------------------------------------------------------------------
 C  PNDL test program.
 C  -----------------
-C  Computes the second derivative matrix (Hessian) of several 
+C  Computes the second derivative matrix (Hessian) of several
 C  two-dimensional functions, with all possible orders of accuracy.
 C  The computation takes place at several different points, taking
 C  into account all possible situations of point-bound proximity.
@@ -51,7 +51,7 @@ C
 C	CALL MPI_INIT_THREAD(MPI_THREAD_MULTIPLE, IPROV, IERR)
 	CALL PNDL_INIT()
 	CALL TORC_REGISTER_TASK(GRAD)
-	CALL TORC_INIT()
+	CALL TORC_INITF()
 
 c	CALL MPI_COMM_RANK(MPI_COMM_WORLD, IRANK, IERR)
 	IRANK = 0
@@ -296,7 +296,7 @@ C    N          Number of variables.
 C    LD         Leading dimension of matrix HES.
 C
 C  Output arguments:
-C    HES        Array containing the Hessian matrix. Note that only 
+C    HES        Array containing the Hessian matrix. Note that only
 C               the lower triangular part (plus the diagonal elements)
 C               is returned.
 C

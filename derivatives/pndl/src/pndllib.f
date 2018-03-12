@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL_INIT ( )
+      SUBROUTINE PNDL_INIT ( )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -8,21 +8,21 @@ C    Initializes the underlying tasking library.
 C
 C  ---------------------------------------------------------------------
 C
-	INCLUDE 'torcf.h'
+      INCLUDE 'torcf.h'
 C
-C	CALL torc_init()
-	EXTERNAL TASKFUN
+C    CALL torc_initf()
+      EXTERNAL TASKFUN
 C       GRD, RSD
 
-	call torc_register_task(TASKFUN)
-c	call torc_register_task(GRD)
-c	call torc_register_task(RSD)
+      call torc_register_task(TASKFUN)
+c    call torc_register_task(GRD)
+c    call torc_register_task(RSD)
 
 
-	END
+      END
 
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL_FINALIZE ( )
+      SUBROUTINE PNDL_FINALIZE ( )
 C  ---------------------------------------------------------------------
 C
 C  Description:                                    PNDL internal routine.
@@ -31,8 +31,8 @@ C    Shutdowns the underlying tasking library.
 C
 C  ---------------------------------------------------------------------
 C
-	INCLUDE 'torcf.h'
+      INCLUDE 'torcf.h'
 C
 
-	END
+      END
 

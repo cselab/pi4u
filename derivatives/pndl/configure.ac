@@ -43,7 +43,7 @@ if test x$GCC = xyes; then
 fi
 
 
-AC_ARG_WITH(mpi, 
+AC_ARG_WITH(mpi,
 	[  --with-mpi=<dir>        Location of the MPI installation],
 	if test x$withval = xyes; then
 		AC_MSG_ERROR(--with-mpi must be given a pathname)
@@ -54,7 +54,7 @@ AC_ARG_WITH(mpi,
 		MPILIB="-lmpich"
 	fi)
 
-AC_ARG_WITH(mpilib, 
+AC_ARG_WITH(mpilib,
 	[  --with-mpilib=<mpilib>        Name of MPI library],
 	if test x$withval = xyes; then
 		AC_MSG_WARN(--with-mpilib must be given a library. Using default: mpich)
@@ -64,7 +64,7 @@ AC_ARG_WITH(mpilib,
 	fi)
 
 
-AC_ARG_WITH(mpiincdir, 
+AC_ARG_WITH(mpiincdir,
 	[  --with-mpiincdir=<mpiincdir>        Directory of MPI header files],
 	if test x$withval = xyes; then
 		AC_MSG_ERROR(--with-mpiincdir must be given a directory)
@@ -74,7 +74,7 @@ AC_ARG_WITH(mpiincdir,
 	fi)
 
 
-AC_ARG_WITH(mpilibdir, 
+AC_ARG_WITH(mpilibdir,
 	[  --with-mpilibdir=<mpilibdir>        Directory of MPI library],
 	if test x$withval = xyes; then
 		AC_MSG_ERROR(--with-mpilibdir must be given a directory)

@@ -1,10 +1,10 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDLG ( F, X, N, IORD, G )
+      SUBROUTINE PNDLG ( F, X, N, IORD, G )
 C  ---------------------------------------------------------------------
 C
 C  Description:                              PNDL user interface routine.
 C                                            ---------------------------
-C    This is a simple interface to the main differentiation 
+C    This is a simple interface to the main differentiation
 C    routine PNDLGA.
 C    Given a multidimensional function (F), this routine returns the
 C    gradient vector (G) by applying a numerical differentiation
@@ -26,48 +26,31 @@ C  Output arguments:
 C    G          Array containing the resulting gradient vector.
 C
 C  ---------------------------------------------------------------------
-	IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	EXTERNAL F
-	DIMENSION X(N), G(N)
-	EXTERNAL PNDLGA
-	COMMON /DUMMY/ NOCx, IERRx
-        include 'torcf.h'
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      EXTERNAL F
+      DIMENSION X(N), G(N)
+      EXTERNAL PNDLGA
+      COMMON /DUMMY/ NOCx, IERRx
+      INCLUDE 'torcf.h'
 C
-	PARAMETER ( BIG = 1.0D300 )
+      PARAMETER ( BIG = 1.0D300 )
 C
-	DIMENSION XL(N), XU(N), UH(N)
+      DIMENSION XL(N), XU(N), UH(N)
 C
-C  Use the machine accuracy.
-	FEPS = 0.0D0
+C     Use the machine accuracy.
+      FEPS = 0.0D0
 C
-C  Print fatal errors. 
-	IPRINT = 1
+C     Print fatal errors.
+      IPRINT = 1
 C
-C  Set lower/upper bounds to large numbers (=>no bounds).
-C  Set stepsizes to zero (=>default steps).
-	DO 10,I=1,N
-		XL(I) = -BIG
-		XU(I) =  BIG
-		UH(I) = 0.0D0
-10	CONTINUE
-C
-C  Call the main routine.
-c	call torc_enable()
-	CALL PNDLGA(F,X,N,XL,XU,UH,FEPS,IORD,IPRINT,G,NOCx,IERRx)
+C     Set lower/upper bounds to large numbers (=>no bounds).
+C     Set stepsizes to zero (=>default steps).
+      DO 10,I=1,N
+          XL(I) = -BIG
+          XU(I) =  BIG
+          UH(I) = 0.0D0
+10    CONTINUE
 
-c	call torc_task(PNDLGA, 1, 12,
-c     &      1, MPI_INTEGER, CALL_BY_VAD,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      1, MPI_INTEGER, CALL_BY_VAL,
-c     &      N, MPI_DOUBLE_PRECISION, CALL_BY_RES,
-c     &      1, MPI_INTEGER, CALL_BY_RES,
-c     &      1, MPI_INTEGER, CALL_BY_RES,
-c     &      F,X,N,XL,XU,UH,FEPS,IORD,IPRINT,G,NOCx,IERRx)
-C
-	END
+      CALL PNDLGA(F,X,N,XL,XU,UH,FEPS,IORD,IPRINT,G,NOCx,IERRx)
+
+      END SUBROUTINE PNDLG

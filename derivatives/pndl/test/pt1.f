@@ -19,9 +19,9 @@ C  Number of test points.
 	PARAMETER ( NPT = 4 )
 C
 C  Number of test functions.
-	PARAMETER ( NFUN = 1 ) 
+	PARAMETER ( NFUN = 1 )
 C
-C  Derivative computations with relative errors above 
+C  Derivative computations with relative errors above
 C  this threshold are considered "FAILed".
 	PARAMETER ( FAIL = 1.0D-6 )
 C
@@ -45,7 +45,7 @@ C  The points at which the derivatives will be tested.
 C
 c	CALL MPI_INIT_THREAD(MPI_THREAD_MULTIPLE, IPROV, IERR)
 	CALL PNDL_INIT()
-	CALL TORC_INIT()
+	CALL TORC_INITF()
 
 C	CALL MPI_COMM_RANK(MPI_COMM_WORLD, IRANK, IERR)
 	IRANK = 0
@@ -53,10 +53,10 @@ C	CALL MPI_COMM_RANK(MPI_COMM_WORLD, IRANK, IERR)
 C  The relative error in the evaluation of our test functions is
 C  in the order of the machine accuracy.
 	FEPS = 0.0D0
-C  No stepsize specified 
+C  No stepsize specified
 	UH = 0.0D0
 C
-C  NFAIL is incremented each time the relative error is above 
+C  NFAIL is incremented each time the relative error is above
 C  the "FAIL" threshold,
 	NFAIL = 0
 C
@@ -154,7 +154,7 @@ C  Loop over all available orders of accuracy.
 					END IF
 					ENDIF
 C					CALL PNDL_BARRIER()
-					
+
 					IF (IRANK.EQ.0) THEN
 					CALL RELERR(A1,GA,EA1)
 					CALL RELERR(B1,GB,EB1)
@@ -294,7 +294,7 @@ C  ---------------------------------------------------------------------
 C  ---------------------------------------------------------------------
 C
 C  Description:
-C    Assigns a name (or description/formula) to each of the test 
+C    Assigns a name (or description/formula) to each of the test
 C    functions, according to a selector (ISEL).
 C
 C  Output arguments:

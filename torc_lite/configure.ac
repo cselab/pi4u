@@ -27,7 +27,7 @@ AC_INIT(Torc-Lite, 0.1a,,Torc-Lite)
 AC_CONFIG_AUX_DIR(auxdir)
 AC_CANONICAL_SYSTEM
 
-AC_CONFIG_HEADER(include/torc_config.h)
+AC_CONFIG_HEADERS(include/torc_config.h)
 AM_INIT_AUTOMAKE
 
 AC_PROG_CC(mpicc)
@@ -40,20 +40,13 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AM_PROG_AS
 # torc_lite + some fortran support
-AC_F77_WRAPPERS	
+AC_F77_WRAPPERS
 
 #=============================================================================
 # Adjust CPPFLAGS.
 #=============================================================================
 CPPFLAGS=${CPPFLAGS}' -D_REENTRANT  '
 AC_MSG_NOTICE([CPPFLAGS=${CPPFLAGS}])
-
-#=============================================================================
-# Adjust CPPFLAGS.
-#=============================================================================
-CPPFLAGS=${CPPFLAGS}' -D_REENTRANT  '
-AC_MSG_NOTICE([CPPFLAGS=${CPPFLAGS}])
-
 
 #=============================================================================
 # Check pthread.h
@@ -75,13 +68,13 @@ AH_BOTTOM([#endif])
 # Check if -lrt is needed for we sched_yield()
 #=============================================================================
 needRT=""
-AC_CHECK_FUNCS(sched_yield, [ break ],     
-	[ AC_CHECK_LIB(rt, sched_yield, [ needRT=yes ],
-	[ AC_DEFINE_UNQUOTED(sched_yield(), 0, not found) ])
-	])
+AC_CHECK_FUNCS(sched_yield, [ break ],
+    [ AC_CHECK_LIB(rt, sched_yield, [ needRT=yes ],
+    [ AC_DEFINE_UNQUOTED(sched_yield(), 0, not found) ])
+    ])
 
 if test ".$needRT" = ".yes"; then
-	LDFLAGS="${LDFLAGS} -lrt"
+    LDFLAGS="${LDFLAGS} -lrt"
 fi
 
 #=============================================================================
@@ -90,90 +83,89 @@ fi
 syncopt=""
 mutexspin=""
 AC_ARG_WITH(sync,
-	AC_HELP_STRING([--with-sync=method], [posix synchronization mechanism (mutex, mutex_try, spin, spin_try)]),
-	[
-	case $withval in
-		mutex| mutex_try )	syncopt=$withval 
-					mutexspin="mutex" ;;
-		spin | spin_try)	syncopt=$withval 
-					mutexspin="spin" ;;
-		* ) AC_MSG_ERROR([invalid synchronization mechanism -- allowed:mutex,mutex_try,spin,spin_try]) ;;
-	esac
-	]
+    AC_HELP_STRING([--with-sync=method], [posix synchronization mechanism (mutex, mutex_try, spin, spin_try)]),
+    [
+    case $withval in
+        mutex| mutex_try )    syncopt=$withval
+                    mutexspin="mutex" ;;
+        spin | spin_try)    syncopt=$withval
+                    mutexspin="spin" ;;
+        * ) AC_MSG_ERROR([invalid synchronization mechanism -- allowed:mutex,mutex_try,spin,spin_try]) ;;
+    esac
+    ]
 )
 
 
 if test ".$syncopt" = "."; then
-	AC_MSG_NOTICE([posix synchronization method not defined - using default (mutex_try)])
-	syncopt=mutex_try
-	mutexspin=mutex
+    AC_MSG_NOTICE([posix synchronization method not defined - using default (mutex_try)])
+    syncopt=mutex_try
+    mutexspin=mutex
 fi
 
 
 if test ".$mutexspin" = ".mutex"; then
-	# Check for mutex locks
-	AC_MSG_CHECKING([for usable pthread_mutex_t])
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
-	[[	#include <pthread.h>
-		pthread_mutex_t lock;
-	]],
-	[[	pthread_mutex_init(&lock,NULL); 
-		pthread_mutex_lock(&lock);
-		pthread_mutex_unlock(&lock); 
-		pthread_mutex_trylock(&lock); 
-	]])],,
-	AC_MSG_FAILURE([pthread_mutex_t not available]))
-	AC_MSG_RESULT([yes])
+    # Check for mutex locks
+    AC_MSG_CHECKING([for usable pthread_mutex_t])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[    #include <pthread.h>
+        pthread_mutex_t lock;
+    ]],
+    [[    pthread_mutex_init(&lock,NULL);
+        pthread_mutex_lock(&lock);
+        pthread_mutex_unlock(&lock);
+        pthread_mutex_trylock(&lock);
+    ]])],,
+    AC_MSG_FAILURE([pthread_mutex_t not available]))
+    AC_MSG_RESULT([yes])
 
 elif test ".$mutexspin" = ".spin"; then
-	# Check for spin locks
-	# Usually they are available with the _XOPEN_SOURCE macro
-	AC_MSG_CHECKING([for usable pthread_spinlock_t])
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
-	[[
-	#define _XOPEN_SOURCE 600
-	
-	#include <pthread.h>
-	pthread_spinlock_t lock;
-	]],
-	[[
-	pthread_spin_init(&lock,0); 
-	pthread_spin_lock(&lock); 
-	pthread_spin_unlock(&lock); 
-	pthread_spin_trylock(&lock);
-	]])],,
-	AC_MSG_FAILURE([pthread_spinlock_t not available]))
-	AC_MSG_RESULT([yes])
+    # Check for spin locks
+    # Usually they are available with the _XOPEN_SOURCE macro
+    AC_MSG_CHECKING([for usable pthread_spinlock_t])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[
+    #define _XOPEN_SOURCE 600
+
+    #include <pthread.h>
+    pthread_spinlock_t lock;
+    ]],
+    [[
+    pthread_spin_init(&lock,0);
+    pthread_spin_lock(&lock);
+    pthread_spin_unlock(&lock);
+    pthread_spin_trylock(&lock);
+    ]])],,
+    AC_MSG_FAILURE([pthread_spinlock_t not available]))
+    AC_MSG_RESULT([yes])
 else
-	AC_MSG_FAILURE([no appropriate synchronization method found])
+    AC_MSG_FAILURE([no appropriate synchronization method found])
 fi
 
-# 
-# 
+#
+#
 
 if test ".$syncopt" = ".mutex"; then
-	(cd include; echo "#define POSIX_MUTEX_LOCK" > ps_config.h)
+    (cd include; echo "#define POSIX_MUTEX_LOCK" > ps_config.h)
 elif test ".$syncopt" = ".mutex_try"; then
-	(cd include; echo "#define POSIX_MUTEX_TRYLOCK" > ps_config.h)
+    (cd include; echo "#define POSIX_MUTEX_TRYLOCK" > ps_config.h)
 elif test ".$syncopt" = ".spin"; then
-	(cd include; echo  "#define POSIX_SPIN_LOCK" > ps_config.h)
+    (cd include; echo  "#define POSIX_SPIN_LOCK" > ps_config.h)
 elif test ".$syncopt" = ".spin_try"; then
-	(cd include; echo  "#define POSIX_SPIN_TRYLOCK" > ps_config.h)
+    (cd include; echo  "#define POSIX_SPIN_TRYLOCK" > ps_config.h)
 else
-	AC_MSG_FAILURE([no appropriate synchronization method found])
+    AC_MSG_FAILURE([no appropriate synchronization method found])
 fi
 
 
 #==============================================================================
 # Set max number of nodes (mpi processes)
 #==============================================================================
-
 NNODES="1024"
 AC_ARG_WITH(maxnodes,
-	AC_HELP_STRING([--with-maxnodes=num], [maximum number of nodes (default: 1024)]),
-	[
-	NNODES=$withval
-	]
+    AC_HELP_STRING([--with-maxnodes=num], [maximum number of nodes (default: 1024)]),
+    [
+    NNODES=$withval
+    ]
 )
 AC_SUBST(NNODES)
 
@@ -182,10 +174,10 @@ AC_SUBST(NNODES)
 #==============================================================================
 NVPS="64"
 AC_ARG_WITH(maxvps,
-	AC_HELP_STRING([--with-maxvps=num], [maximum number of virtual processors (default: 64)]),
-	[
-	NVPS=$withval
-	]
+    AC_HELP_STRING([--with-maxvps=num], [maximum number of virtual processors (default: 64)]),
+    [
+    NVPS=$withval
+    ]
 )
 AC_SUBST(NVPS)
 
@@ -193,13 +185,13 @@ AC_SUBST(NVPS)
 # Enable debugging
 #==============================================================================
 AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug], [enable debugging (default:disabled)]),
-	if eval "test x$enable_debug = xyes"; then
-		DEBUGFLAG="-g"
-	else
-		DEBUGFLAG=""
-	fi,
-	DEBUGFLAG="")
+    AC_HELP_STRING([--enable-debug], [enable debugging (default:disabled)]),
+    if eval "test x$enable_debug = xyes"; then
+        DEBUGFLAG="-g"
+    else
+        DEBUGFLAG=""
+    fi,
+    DEBUGFLAG="")
 
 AC_SUBST(DEBUG_FLAG)
 
@@ -287,15 +279,15 @@ AC_LANG_PROGRAM([
 
 
 int main(int argc, char *argv[]) {
-	FILE *fp;
-	
-	if ((fp = fopen("conftestval", "w")) == NULL)
-		exit(1);
-	fprintf(fp, "%d\n", CACHE_LINE);
-	fclose(fp);
+    FILE *fp;
+    if ((fp = fopen("conftestval", "w")) == NULL)
+        exit(1);
 
-	/* die successfully */
-	exit(0);
+    fprintf(fp, "%d\n", CACHE_LINE);
+    fclose(fp);
+
+    /* die successfully */
+    exit(0);
 }
 ])],
 [defcls=`cat conftestval`], [defcls="128"], [defcls="128"])
@@ -307,20 +299,19 @@ AC_MSG_RESULT([$defcls])
 #=============================================================================
 clsize=""
 AC_ARG_WITH(cachelinesize,
-	AC_HELP_STRING([--with-cachelinesize=value], [cache line size]),
-	[
-		clsize=$withval
-		AC_MSG_NOTICE([cache line size is set to $clsize])
-	]
+    AC_HELP_STRING([--with-cachelinesize=value], [cache line size]),
+    [
+        clsize=$withval
+        AC_MSG_NOTICE([cache line size is set to $clsize])
+    ]
 )
 
 if test ".$clsize" = "."; then
-	clsize=$defcls
-	AC_MSG_NOTICE([using default cache line size ($clsize bytes) ])
+    clsize=$defcls
+    AC_MSG_NOTICE([using default cache line size ($clsize bytes) ])
 fi
 
 AC_DEFINE_UNQUOTED(CACHE_LINE_SIZE, $clsize, [explicit cache line size])
-
 
 (cd include; echo "#define CACHE_LINE_SIZE $clsize" >> ps_config.h)
 
@@ -342,63 +333,63 @@ fi
 (cd scripts; echo "echo -L${instdir}/lib -ltorc -lpthread" > torc_libs; chmod +x torc_libs)
 
 #==============================================================================
-# Torc-Lite 
+# Torc-Lite
 # ==============================================================================
 
 # MPI installation path
-AC_ARG_WITH(mpi, 
-	[  --with-mpi=<dir>        Location of the MPI installation],
-	if test x$withval = xyes; then
-		AC_MSG_ERROR(--with-mpi must be given a pathname)
-	else
-		CFLAGS="${CFLAGS} -I${withval}/include"
-		FFLAGS="${FFLAGS} -I${withval}/include"
-		LDFLAGS="${LDFLAGS} -L${withval}/lib"
-		MPILIB="-lmpi"
-	fi)
+AC_ARG_WITH(mpi,
+    [  --with-mpi=<dir>        Location of the MPI installation],
+    if test x$withval = xyes; then
+        AC_MSG_ERROR(--with-mpi must be given a pathname)
+    else
+        CFLAGS="${CFLAGS} -I${withval}/include"
+        FFLAGS="${FFLAGS} -I${withval}/include"
+        LDFLAGS="${LDFLAGS} -L${withval}/lib"
+        MPILIB="-lmpi"
+    fi)
 
 # MPI library name
-AC_ARG_WITH(mpilib, 
-	[  --with-mpilib=<mpilib>        Name of MPI library],
-	if test x$withval = xyes; then
-		AC_MSG_WARN(--with-mpilib must be given a library. Using default: mpich)
-		MPILIB="-lmpich"
-	else
-		MPILIB="-l${withval}"
-	fi)
+AC_ARG_WITH(mpilib,
+    [  --with-mpilib=<mpilib>        Name of MPI library],
+    if test x$withval = xyes; then
+        AC_MSG_WARN(--with-mpilib must be given a library. Using default: mpich)
+        MPILIB="-lmpich"
+    else
+        MPILIB="-l${withval}"
+    fi)
 
 # MPI include directory
-AC_ARG_WITH(mpiincdir, 
-	[  --with-mpiincdir=<mpiincdir>        Directory of MPI header files],
-	if test x$withval = xyes; then
-		AC_MSG_ERROR(--with-mpiincdir must be given a directory)
-	else
-		CFLAGS="${CFLAGS} -I${withval}"
-		FFLAGS="${FFLAGS} -I${withval}"
-	fi)
+AC_ARG_WITH(mpiincdir,
+    [  --with-mpiincdir=<mpiincdir>        Directory of MPI header files],
+    if test x$withval = xyes; then
+        AC_MSG_ERROR(--with-mpiincdir must be given a directory)
+    else
+        CFLAGS="${CFLAGS} -I${withval}"
+        FFLAGS="${FFLAGS} -I${withval}"
+    fi)
 
 # MPI library directory
-AC_ARG_WITH(mpilibdir, 
-	[  --with-mpilibdir=<mpilibdir>        Directory of MPI library],
-	if test x$withval = xyes; then
-		AC_MSG_ERROR(--with-mpilibdir must be given a directory)
-	else
-		LDFLAGS="${LDFLAGS} -L${withval}"
-	fi)
+AC_ARG_WITH(mpilibdir,
+    [  --with-mpilibdir=<mpilibdir>        Directory of MPI library],
+    if test x$withval = xyes; then
+        AC_MSG_ERROR(--with-mpilibdir must be given a directory)
+    else
+        LDFLAGS="${LDFLAGS} -L${withval}"
+    fi)
 
 # Statistics
 #AC_ARG_ENABLE(stats,
-#	AC_HELP_STRING([--enable-stats], [enable statistics (default:disabled)]),
-#	if eval "test x$enable_stats = xyes"; then
-		AC_DEFINE(TORC_STATS,,[Runtime statistics])
-#	fi,)
+#    AC_HELP_STRING([--enable-stats], [enable statistics (default:disabled)]),
+#    if eval "test x$enable_stats = xyes"; then
+        AC_DEFINE(TORC_STATS,,[Runtime statistics])
+#    fi,)
 
-# Non blocking communication (useful for mpi libraries that do not provide thread safety) 
+# Non blocking communication (useful for mpi libraries that do not provide thread safety)
 #AC_ARG_ENABLE(nonblocking,
-#	AC_HELP_STRING([--enable-nonblocking], [enable nonblocking server thread (default:disabled)]),
-#	if eval "test x$enable_nonblocking = xyes"; then
-#		AC_DEFINE(NONBLOCKING,,[Non-blocking server thread])
-#	fi,)
+#    AC_HELP_STRING([--enable-nonblocking], [enable nonblocking server thread (default:disabled)]),
+#    if eval "test x$enable_nonblocking = xyes"; then
+#        AC_DEFINE(NONBLOCKING,,[Non-blocking server thread])
+#    fi,)
 
 ###########################################################################
 
@@ -408,13 +399,13 @@ AC_ARG_WITH(mpilibdir,
 dnl AC_CHECK_DECL(__GNUC__, [ echo yes ], [ echo no])
 
 AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug], [enable debugging (default:disabled)]),
-	if eval "test x$enable_debug = xyes"; then
-		DEBUGFLAG="-g"
-	else
-		DEBUGFLAG=""
-	fi,
-	DEBUGFLAG="")
+    AC_HELP_STRING([--enable-debug], [enable debugging (default:disabled)]),
+    if eval "test x$enable_debug = xyes"; then
+        DEBUGFLAG="-g"
+    else
+        DEBUGFLAG=""
+    fi,
+    DEBUGFLAG="")
 
 
 LDFLAGS="${LDFLAGS} ${MPILIB}"
@@ -431,14 +422,14 @@ mpic_enabled=""
 AC_LANG_PUSH(C)
 AC_LINK_IFELSE([
 AC_LANG_PROGRAM([
-	#include <stdio.h>
-	#include <mpi.h>
-	int main(int argc, char **argv) {
-		printf("hello\n");    
-		MPI_Init(&argc, &argv);
-		MPI_Finalize();
-		return 0;
-	}
+    #include <stdio.h>
+    #include <mpi.h>
+    int main(int argc, char **argv) {
+        printf("hello\n");
+        MPI_Init(&argc, &argv);
+        MPI_Finalize();
+        return 0;
+    }
 ]
 )
 ],
@@ -448,10 +439,10 @@ AC_LANG_POP(C)
 #echo $mpic_enabled
 
 if test ".$mpic_enabled" = ".yes"; then
-	AC_MSG_RESULT([yes])
+    AC_MSG_RESULT([yes])
 else
-	AC_MSG_RESULT([no])
-#	AC_MSG_FAILURE([MPI/C not enabled])
-fi                 
+    AC_MSG_RESULT([no])
+# AC_MSG_FAILURE([MPI/C not enabled])
+fi
 
 AC_OUTPUT(Makefile src/Makefile scripts/Makefile demo/Makefile)

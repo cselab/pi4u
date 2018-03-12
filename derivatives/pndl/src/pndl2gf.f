@@ -1,5 +1,5 @@
 C  ---------------------------------------------------------------------
-	SUBROUTINE PNDL2GF ( GRD, X, N, XL, XU, UH, FEPS, IPRINT, HES,
+      SUBROUTINE PNDL2GF ( GRD, X, N, XL, XU, UH, FEPS, IPRINT, HES,
      &                    LD, IGC )
 C     &                    LD, GW, G, IWFIX, IGC )
 C  ---------------------------------------------------------------------
@@ -50,136 +50,136 @@ C    G          Real work space of length N.
 C    IWFIX      Integer work space of length N.
 C
 C  ---------------------------------------------------------------------
-	IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	DIMENSION X(N), XL(N), XU(N), UH(N), HES(LD,N)
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      DIMENSION X(N), XL(N), XU(N), UH(N), HES(LD,N)
 C
-	DIMENSION GW(N), G(N), IWFIX(N)
+      DIMENSION GW(N), G(N), IWFIX(N)
 C
-	DIMENSION IFB(N)
-	DIMENSION HH(N)
-	DIMENSION XX(N)
-	INTEGER K
-C                                                  
-        EXTERNAL GRD, SPAWNTASKG
+      DIMENSION IFB(N)
+      DIMENSION HH(N)
+      DIMENSION XX(N)
+      INTEGER K
 C
-	LOGICAL PR2, PR3
-	CHARACTER*2 FORM
+      EXTERNAL GRD, SPAWNTASKG
 C
-	DATA ONE / 1.0D0 /
+      LOGICAL PR2, PR3
+      CHARACTER*2 FORM
 C
-	DO K=1,N
-	XX(K) = X(K)
-	END DO
+      DATA ONE / 1.0D0 /
 C
-	CON = SQRT(FEPS)
+      DO K=1,N
+      XX(K) = X(K)
+      END DO
+C
+      CON = SQRT(FEPS)
 C
 C  Analytic gradient call counter.
-	IGC = 0
+      IGC = 0
 C
-	PR2 = IPRINT.GE.2
-	PR3 = IPRINT.EQ.3
+      PR2 = IPRINT.GE.2
+      PR3 = IPRINT.EQ.3
 C
 C  Get the gradient at the given point.
-	CALL SPAWNTASKG(GRD, XX, N, G)
-	IGC = IGC + 1
+      CALL SPAWNTASKG(GRD, XX, N, G)
+      IGC = IGC + 1
 C
 C  Loop over all variables (H-columns)
-	IF (PR3) WRITE (*,30)
-	DO 100,I=1,N
+      IF (PR3) WRITE (*,30)
+      DO 100,I=1,N
 C
-		IWFIX(I) = 1
-		TI = XX(I)
-		IF (UH(I).EQ.0.0D0) THEN
-			HI = CON*MAX(ABS(TI),ONE)
-		ELSE
-			HI = UH(I)
-		ENDIF
-		HH(I) = HI
-		TIP = TI + HI
-		TIM = TI - HI
+          IWFIX(I) = 1
+          TI = XX(I)
+          IF (UH(I).EQ.0.0D0) THEN
+              HI = CON*MAX(ABS(TI),ONE)
+          ELSE
+              HI = UH(I)
+          ENDIF
+          HH(I) = HI
+          TIP = TI + HI
+          TIM = TI - HI
 C
-C  Basic case: the variable plus the differentiation step does not 
+C  Basic case: the variable plus the differentiation step does not
 C  exceed the upper bound. Use forward differences.
-		IF (TIP.LT.XU(I)) THEN 
-			XX(I) = TIP
-			CALL SPAWNTASKG(GRD, XX, N, HES(1,I))
-			IGC = IGC + 1
-			IFB(I) = 1
-			FORM = 'FD'
+          IF (TIP.LT.XU(I)) THEN
+              XX(I) = TIP
+              CALL SPAWNTASKG(GRD, XX, N, HES(1,I))
+              IGC = IGC + 1
+              IFB(I) = 1
+              FORM = 'FD'
 
 C
 C  The variable plus the differentiation step exceeds the upper bound.
 C  Check if we can use backward differences.
-		ELSE IF (TIM.GT.XL(I)) THEN 
-			XX(I) = TIM
-			CALL SPAWNTASKG(GRD, XX, N, HES(1,I))
-			IGC = IGC + 1
-			IFB(I) = -1
-			FORM = 'BD'
-		ELSE
+          ELSE IF (TIM.GT.XL(I)) THEN
+              XX(I) = TIM
+              CALL SPAWNTASKG(GRD, XX, N, HES(1,I))
+              IGC = IGC + 1
+              IFB(I) = -1
+              FORM = 'BD'
+          ELSE
 C
-C  The variable is confined in a very small interval. (An "almost fixed" 
+C  The variable is confined in a very small interval. (An "almost fixed"
 C  variable). Numerical differentiation is not possible.
-			IWFIX(I) = 0
-			IFB(I) = 0
-			FORM = '  '
-			IF (PR2) WRITE (*,70) I
-		END IF
-		XX(I) = TI
-		IF (PR3) WRITE (*,60) I, FORM, TI, HI
-100	CONTINUE
+              IWFIX(I) = 0
+              IFB(I) = 0
+              FORM = '  '
+              IF (PR2) WRITE (*,70) I
+          END IF
+          XX(I) = TI
+          IF (PR3) WRITE (*,60) I, FORM, TI, HI
+100    CONTINUE
 C
 
-c	CALL torc_enable_stealing()
-	CALL torc_waitall()
-c	CALL torc_disable_stealing()
+c    CALL torc_enable_stealing()
+      CALL torc_waitall()
+c    CALL torc_disable_stealing()
 
-C	!! ~SECOND PASS !! 
+C    !! ~SECOND PASS !!
 C  Perform division using H()
-		DO 2,J=1,N
-			IF (IFB(J).EQ.1) THEN
-				DO 21,I=1,N
-					HES(I,J) = (HES(I,J)-G(I))/HH(J)
-21				CONTINUE
-			ELSE IF (IFB(J).EQ.-1) THEN
-				DO 22,I=1,N
-					HES(I,J) = (G(I)-HES(I,J))/HH(J)
-22				CONTINUE
-			END IF
-2		CONTINUE
+          DO 2,J=1,N
+              IF (IFB(J).EQ.1) THEN
+                  DO 21,I=1,N
+                      HES(I,J) = (HES(I,J)-G(I))/HH(J)
+21                CONTINUE
+              ELSE IF (IFB(J).EQ.-1) THEN
+                  DO 22,I=1,N
+                      HES(I,J) = (G(I)-HES(I,J))/HH(J)
+22                CONTINUE
+              END IF
+2        CONTINUE
 
 
 
 C  Make sure the Hessian is symmetric. (The result is stored in
 C  the lower triangular part).
-	DO 40,J=1,N
-		IWJ = IWFIX(J)
-		DO 50,I=J,N
-			HES(I,J) = IWJ*IWFIX(I)*(HES(I,J)+HES(J,I))/2.0D0
-50		CONTINUE
-40	CONTINUE
+      DO 40,J=1,N
+          IWJ = IWFIX(J)
+          DO 50,I=J,N
+              HES(I,J) = IWJ*IWFIX(I)*(HES(I,J)+HES(J,I))/2.0D0
+50        CONTINUE
+40    CONTINUE
 C
-30	FORMAT (/' PNDL:',' Index',1X,'Formula',7X,'X_i',19X,'Step_i')
-60	FORMAT (' PNDL:',I6,3X,A,3X,1PG21.14,1X,1PG21.14)
-70	FORMAT (' PNDL: Warning: Variable ',I6,' is confined in a very ',
+30    FORMAT (/' PNDL:',' Index',1X,'Formula',7X,'X_i',19X,'Step_i')
+60    FORMAT (' PNDL:',I6,3X,A,3X,1PG21.14,1X,1PG21.14)
+70    FORMAT (' PNDL: Warning: Variable ',I6,' is confined in a very ',
      &        'small interval.'
      &        /' PNDL:          Setting derivative to zero.')
-	END
+      END
 
 C  ---------------------------------------------------------------------
-	SUBROUTINE SPAWNTASKG (GRD, XX, N, RES)
+      SUBROUTINE SPAWNTASKG (GRD, XX, N, RES)
 C  ---------------------------------------------------------------------
-	IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-	EXTERNAL GRD
-	DIMENSION XX(N), RES(N)
-	include 'torcf.h'
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      EXTERNAL GRD
+      DIMENSION XX(N), RES(N)
+      INCLUDE 'torcf.h'
 
-	call torc_task(GRD, 0, 3,
-     &	    N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
-     &      1, MPI_INTEGER, CALL_BY_VAL,
-     &      N, MPI_DOUBLE_PRECISION, CALL_BY_RES,
-     &      XX, N, RES)
+      CALL torc_taskf(GRD, 0, 3,
+     &                N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
+     &                1, MPI_INTEGER,          CALL_BY_VAL,
+     &                N, MPI_DOUBLE_PRECISION, CALL_BY_RES,
+     &                XX, N, RES)
 
-	RETURN
-	END
+      RETURN
+      END
 
