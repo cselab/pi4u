@@ -20,6 +20,9 @@ engine_ss1: engine_ss1.cpp ss_db.cpp auxil.o fitfun.c
 engine_ss2: engine_ss2.cpp ss_db.cpp auxil.o fitfun.c
 	$(CPP) $(CFLAGS) -o engine_ss2 engine_ss2.cpp ss_db.cpp auxil.o $(LDFLAGS)
 
+auxil.o: auxil.cpp
+	$(CPP) $(CFLAGS) -c auxil.cpp
+
 clean:
 	rm -f engine_ss1 engine_ss2 *.o
 

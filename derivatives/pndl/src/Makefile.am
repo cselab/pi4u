@@ -1,7 +1,7 @@
 pndllibdir = $(libdir)
 pndllib_LIBRARIES = libpndl.a
 
-AM_FFLAGS = @DEBUG_FLAG@ -I../../torc_lite/include -I. $(FFLAGS)
+AM_FFLAGS = @DEBUG_FLAG@ -I../../../torc_lite/include -I. $(FFLAGS)
 AM_CFLAGS = @DEBUG_FLAG@ -I. 
 
 libpndl_a_SOURCES = pndl1f.f pndl1n.f pndl1q.f \

@@ -85,6 +85,8 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 	f = log(mixedmvnpdf(x, N));
 #endif
 
+#if DEBUG
 	usleep(100*1000);
+#endif
 	return f;
 }

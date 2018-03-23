@@ -81,11 +81,10 @@ opt.Display	0
 opt.Step	1e-4
 
 # Dumping of current and full generation files
-icdump		0
+icdump		1
 ifdump		0
 
 # SN-TMCMC specific options
-diffstep	1e-4
 posdef		4
 
 

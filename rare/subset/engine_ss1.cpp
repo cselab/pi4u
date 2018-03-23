@@ -20,8 +20,9 @@ using namespace std;
 extern "C"
 {
 #include <torc.h>
-#include "engine_ss.h"
+//#include "engine_ss.h"
 }
+#include "engine_ss.h"
 
 
 /**********************************************/
@@ -142,7 +143,7 @@ void read_data()
 
 			if ((line[0] == '#')||(strlen(line)==0)) continue;
 
-			char bound[8];
+			char bound[16];
 			sprintf(bound, "B%d", i);
 			if (strstr(line, bound) != NULL) {
 				sscanf(line, "%*s %lf %lf", &data.lowerbound[i], &data.upperbound[i]);

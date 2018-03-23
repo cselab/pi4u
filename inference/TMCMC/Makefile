@@ -1,5 +1,5 @@
 use_torc?=0
-use_omp?=1
+use_omp?=0
 
 CC = gcc
 CFLAGS = -g -ggdb -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE

@@ -20,8 +20,8 @@ using namespace std;
 extern "C"
 {
 #include <torc.h>
-#include "engine_ss.h"
 }
+#include "engine_ss.h"
 
 /**********************************************/
 // DB

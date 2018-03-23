@@ -717,7 +717,9 @@ void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int cha
     winfo[2] = step_id;
     winfo[3] = 0;
 
+#if VERBOSE
     printf("running on worker %d\n", worker_id);
+#endif
     taskfun(point, &dim, &F, winfo);
 
     *Fval = F;
@@ -1709,6 +1711,7 @@ int main(int argc, char *argv[])
 
 end:
     /* making a copy of last curgen_db file */
+    if (data.icdump)
     {
         printf("lastgen = %d\n", runinfo.Gen);
         char cmd[256];
