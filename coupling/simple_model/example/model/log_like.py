@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import numpy as np
+import numpy as np 
 import scipy
 
 
@@ -7,7 +7,7 @@ def log_like( sigma_data ):
 
 	sigma_data2 = np.power(sigma_data,2)
 
-	data = np.loadtxt('./data.txt')
+	data = np.loadtxt('./data.dat')
 	data = data[:,1]
 
 	model = np.loadtxt('./result.txt')

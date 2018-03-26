@@ -5,6 +5,6 @@ rr=result.txt
 
 module load python
 
-python   my_model.py   params.txt data.txt
+python   my_model.py   params.txt  data.dat
 
 python   log_like.py    params.txt 4
