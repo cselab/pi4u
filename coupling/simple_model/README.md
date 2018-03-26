@@ -9,5 +9,7 @@ For each model evaluation needed from TMCMC a folder is created (tmp_dir.\*). Th
 
 At the end of the model evaluation the tmp_dir.\* is not being deleted. If you want to remove
 it you have to recompile the code with
+```
 	#define REMOVEDIRS  1
+```
 in the source/fitfun.c
