@@ -25,7 +25,7 @@ void loglike_theta_fast_initialize() {
    		printf("\n %s  does not exist. Exiting...\n", filename);
   		exit(1);
    	}
-	printf("\nData file %s succesfully opened \n",filename);
+	printf("\nInitialize loglike: Data file %s succesfully opened \n",filename);
 
 	// read the number of lines of data file
 	char ch;
@@ -43,7 +43,7 @@ void loglike_theta_fast_initialize() {
 		fscanf( fp, "%lf", &datay[i]);
 	}
 
-	printf("\n%d data succesfully read from %s \n",Nd,filename);
+	printf("%d data succesfully read from %s \n\n",Nd,filename);
 
 	fclose(fp);
 }

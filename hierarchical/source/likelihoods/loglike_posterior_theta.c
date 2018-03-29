@@ -1,5 +1,5 @@
 #include "loglike_posterior_theta.h"
-#include "../fitfun.h"
+#include "../TMCMC/fitfun.h"
 #include "priors.h"
 #include <stdio.h>
 #include <stdlib.h>

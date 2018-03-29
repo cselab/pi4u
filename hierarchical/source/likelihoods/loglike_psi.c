@@ -1,5 +1,5 @@
 #include "loglike_psi.h"
-
+#include "../TMCMC/engine_tmcmc.h"
 
 #define DATABASE  "../../data/theta"
 #define THETAFILE1 "theta_"
@@ -28,11 +28,7 @@ static ffdata_t *ffdata[N_IND];
 static double logEv[N_IND];
 
 
-
-
-#include "../engine_tmcmc.h"
 extern data_t data;
-
 
 
 

@@ -17,6 +17,3 @@ fi
 cp ${EXEC_FILE}    ${RUN_DIR}
 
 cp ${PAR_FILE}     ${RUN_DIR}/tmcmc.par
-
-
-

@@ -8,11 +8,11 @@ TARGET2 := sample_theta_fast
 TARGET3 := sample_psi
 TARGET4 := sample_posterior_theta_fast
 
-COMMON_SRC =  	TMCMC0/engine_tmcmc.c \
-				TMCMC0/tmcmc_stats.c \
-				TMCMC0/tmcmc_db.c \
-				TMCMC0/auxil.c \
-				TMCMC0/spawner.c
+COMMON_SRC =  	TMCMC/engine_tmcmc.c \
+				TMCMC/tmcmc_stats.c \
+				inference/TMCMC/tmcmc_db.c \
+				inference/TMCMC/auxil.c \
+				inference/TMCMC/spawner.c
 
 SRC1 := $(COMMON_SRC)	likelihoods/fitfun_theta.c		likelihoods/loglike_theta.c
 SRC2 := $(COMMON_SRC)	likelihoods/fitfun_theta_fast.c	likelihoods/loglike_theta_fast.c
