@@ -7,19 +7,19 @@
 Nth		4
 
 # Max number of generations
-MaxStages	20
+MaxStages	40
 
 # Population size
-PopSize		100
+PopSize		40000
 
 # Chain lengths:
 # 1) TMCMC (biased): min=0, max>=PopSize
 # 2) BASIS (unbiased): min=max=1
-MinChainLength	1
+#MinChainLength	1
 MaxChainLength	1
 
 # Desired coefficient of variation (=std/mean) of the weights
-TolCOV	1
+TolCOV	0.8
 
 
 #------------------------ PRIOR OPTIONS ---------------------------------------
@@ -32,12 +32,16 @@ prior_type  0
 # Parameters of the uniform prior
 # Bdef: same boundaries in each dimension
 # Bi: boundaries in i-th dimension, e.g. B0 -1 1
-# Note: Bi overwrites Bdef 
+# Note: Bi overwrites Bdef
 #Bdef		-15	15
-B0	0.	5.
-B1	0.	10.
-B2	0.	6.2832
-B3	0.	5.
+B0   0.   5.
+B1   0.   10.
+B2   -3.14  3.14
+B3   0.   5.
+
+
+
+
 
 # Parameters of the Gaussian prior
 # Note: prior_mu size is 1 x Nth, prior_sigma size is Nth x Nth
@@ -58,11 +62,10 @@ C1		1	0	1
 use_local_cov   0
 
 # Scaling for the global proposal covariance
-bbeta		    0.04
+bbeta		    0.01
 
 # Use or not CMA-style proposal in MCMC (experimental)
 use_proposal_cma 0
-
 
 #---------------------------- OTHER OPTIONS -----------------------------------
 # RNG seed
@@ -77,7 +80,7 @@ opt.Step	1e-4
 # Online plotting of data, useful for 2D data and debugging
 iplot		0
 icdump		1
-ifdump		1
+ifdump		0
 
 # SN-TMCMC specific options
 diffstep	1e-4

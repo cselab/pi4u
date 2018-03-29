@@ -10,7 +10,7 @@ Nth		8
 MaxStages	40
 
 # Population size
-PopSize		50000
+PopSize		40000
 
 # Chain lengths:
 # 1) TMCMC (biased): min=0, max>=PopSize
@@ -19,7 +19,7 @@ MinChainLength	1
 MaxChainLength	1
 
 # Desired coefficient of variation (=std/mean) of the weights
-TolCOV	1
+TolCOV	0.7
 
 
 #------------------------ PRIOR OPTIONS ---------------------------------------
@@ -34,14 +34,14 @@ prior_type  0
 # Bi: boundaries in i-th dimension, e.g. B0 -1 1
 # Note: Bi overwrites Bdef
 #Bdef		-15	15
-B0	 0.   1.
-B1	 0.  	0.4
-B2	 0.9  1.3
+B0	 1.   3.
+B1	 0.   1
+B2	 2.5  3.5
 B3	 0.	  0.2
-B4	-2.	  2.
-B5	 0.   3.
-B6	-3.	  0.
-B7	 0.	  1.
+B4	0.5	  1.5
+B5	 0.   1.
+B6	 0.2	0.6
+B7	 0.	  0.4
 
 
 
@@ -66,7 +66,7 @@ C1		1	0	1
 use_local_cov   0
 
 # Scaling for the global proposal covariance
-bbeta		    0.005
+bbeta		    0.1
 
 # Use or not CMA-style proposal in MCMC (experimental)
 use_proposal_cma 0

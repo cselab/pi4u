@@ -9,8 +9,8 @@ SAVE_DIR="${CURRENT_DIR}/data/theta"
 export TORC_WORKERS=2
 
 
+#Ilist=(1)
 Ilist=(1 2 3 4 5)
-
 
 
 if [ ! -d "$BASE_DIR" ]; then

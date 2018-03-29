@@ -1,5 +1,6 @@
-#include "fitfun.h"
-
+#include "../fitfun.h"
+#include "../spawner.h"
+#include "loglike_theta.h"
 
 static pthread_mutex_t fork_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int flag[4096];  // MAX_WORKERS
@@ -14,16 +15,21 @@ static int flag[4096];  // MAX_WORKERS
 //#include "engine_tmcmc.h"
 //extern data_t data;
 
-void fitfun_initialize() {
+void loglike_theta_initialize() {
 }
 
 
 
 
 
+void loglike_finalize() {
+}
 
 
-double fitfun(double *x, int n, void *output, int *winfo) {
+
+
+
+double loglike_theta(double *x, int n, void *output, int *winfo) {
     char workdir[BUFLEN], bindir[BUFLEN];
     double t, loglike;
     int i;
@@ -112,5 +118,9 @@ double fitfun(double *x, int n, void *output, int *winfo) {
 }
 
 
-void fitfun_finalize() {
+
+
+
+double loglike_(double *x, int n, void *output, int *winfo){
+	return loglike_theta( x, n, output, winfo );
 }

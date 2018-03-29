@@ -1,40 +1,93 @@
-CC = mpicc
-CPP = mpic++
-MPIF90 = mpif90
-
-
-CFLAGS = -O3 -std=c99
-CFLAGS += -Wall -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
-
-
+#==============================================================================
+#	PATHS AND SOURCE FILES
+#==============================================================================
 GSLROOT=/usr/local
-CFLAGS  += -I${GSLROOT}/include
 
+TARGET1 := sample_theta
+TARGET2 := sample_theta_fast
+TARGET3 := sample_psi
+TARGET4 := sample_posterior_theta_fast
+
+COMMON_SRC =  engine_tmcmc.c  tmcmc_stats.c  tmcmc_db.c  auxil.c  spawner.c
+
+SRC1 := $(COMMON_SRC)	likelihoods/fitfun_theta.c		likelihoods/loglike_theta.c
+SRC2 := $(COMMON_SRC)	likelihoods/fitfun_theta_fast.c	likelihoods/loglike_theta_fast.c
+SRC3 := $(COMMON_SRC)	likelihoods/fitfun_psi.c \
+						likelihoods/loglike_psi.c \
+						likelihoods/priors.c
+SRC4 := $(COMMON_SRC)	likelihoods/fitfun_posterior_theta.c \
+						likelihoods/loglike_posterior_theta.c \
+						likelihoods/loglike_theta_fast.c \
+						likelihoods/priors.c
+
+ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4)
+TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4)
+
+OBJDIR = .o
+OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
+OBJ2:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC2)) )
+OBJ3:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC3)) )
+OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
+
+#==============================================================================
+#	COMPILERS AND FLAGS
+#==============================================================================
+
+
+CC := mpicc
+LD := mpicc
+
+CFLAGS += -O3 -std=c99
+CFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+CFLAGS += -Wall -Wno-unused-function
+CFLAGS += -I${GSLROOT}/include
+CFLAGS += `torc_cflags`
 
 LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
-
-CFLAGS += `torc_cflags`
 LDFLAGS += `torc_libs` -lpthread -lm
 
-TARGETS = sample_theta  sample_theta_fast  sample_psi
 
+COMPILE.c = $(CC) $(CFLAGS) -c -o $@
+LINK.o    = $(LD) $(LDFLAGS) $(LDLIBS) -o $@
+
+
+$(shell mkdir -p $(OBJDIR) )
+
+#==============================================================================
+#	RULES
+#==============================================================================
 all: $(TARGETS)
 
+sample_theta: $(OBJ1)
+	$(LINK.o) $^
 
-sample_theta: engine_tmcmc.c engine_tmcmc.h spawner.h tmcmc_stats.c tmcmc_db.c auxil.c fitfun.h
-	$(CC) $(CFLAGS) -o sample_theta engine_tmcmc.c tmcmc_stats.c tmcmc_db.c auxil.c spawner.c fitfun_theta.c $(LDFLAGS)
+sample_theta_fast: $(OBJ2)
+	$(LINK.o) $^
+
+sample_psi: $(OBJ3)
+	$(LINK.o) $^
+
+sample_posterior_theta_fast: $(OBJ4)
+	$(LINK.o) $^
 
 
-sample_theta_fast: engine_tmcmc.c engine_tmcmc.h spawner.h tmcmc_stats.c tmcmc_db.c auxil.c fitfun.h
-	$(CC) $(CFLAGS) -o sample_theta_fast engine_tmcmc.c tmcmc_stats.c tmcmc_db.c auxil.c spawner.c fitfun_theta_fast.c $(LDFLAGS)
+$(OBJDIR)/%.o: %.c
+	@mkdir -p "$(@D)"
+	$(COMPILE.c) $<
 
 
-sample_psi: engine_tmcmc.c engine_tmcmc.h spawner.h tmcmc_stats.c tmcmc_db.c auxil.c fitfun.h
-	$(CC) $(CFLAGS) -o sample_psi   engine_tmcmc.c tmcmc_stats.c tmcmc_db.c auxil.c spawner.c fitfun_psi.c $(LDFLAGS)
+ctags:
+	@rm .tags .tags1 tags
+	@ctags $(ALL_SRC)
+
+
+print:
+	@echo $(OBJ1)
 
 
 clean:
-	rm -f sample_theta sample_theta_fast sample_psi  *.o
+	rm -rf  $(TARGETS) $(OBJDIR)
+
 
 clear:
-	rm -rf *.txt
+	rm -rf .tags* tags

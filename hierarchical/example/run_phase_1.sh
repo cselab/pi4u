@@ -9,7 +9,8 @@ SAVE_DIR="${CURRENT_DIR}/data/theta"
 export TORC_WORKERS=24
 
 
-Ilist=(1 2 3 4 5)
+Ilist=(1)
+# Ilist=(1 2 3 4 5)
 
 
 

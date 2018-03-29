@@ -1,4 +1,4 @@
-#include "fitfun.h"
+#include "loglike_theta_fast.h"
 
 
 #define DATABASE  "."
@@ -6,18 +6,13 @@
 
 #define BUFLEN 1024
 
-#define NREC 10000
-
-
-
-
 
 // number of data in data file
 static int Nd=0;
 static double *datax, *datay;
 
 
-void fitfun_initialize() {
+void loglike_theta_fast_initialize() {
 
 	FILE *fp;
 
@@ -34,7 +29,6 @@ void fitfun_initialize() {
 
 	// read the number of lines of data file
 	char ch;
-
  	while (!feof(fp)) {
    		ch = fgetc(fp);
    		if (ch == '\n')  Nd++;
@@ -50,20 +44,26 @@ void fitfun_initialize() {
 	}
 
 	printf("\n%d data succesfully read from %s \n",Nd,filename);
-	
-	
-	fclose(fp);
 
+	fclose(fp);
 }
 
 
 
-void fitfun_finalize() {
-    
+
+
+
+void loglike_theta_fast_finalize() {
+
 	free(datax);
 	free(datay);
 
 }
+
+
+
+
+
 
 
 void my_model(double *x, double *y, double *c, double n){
@@ -74,19 +74,7 @@ void my_model(double *x, double *y, double *c, double n){
 }
 
 
-
-
-double fitfun(double *x, int n, void *output, int *info) {
-
-
-	
-	/*
-	x[0]=2.;
-	x[1]=3.;
-	x[2]=1.;
-	x[3]=0.5;
-	*/
-
+double loglike_theta_fast(double *x, int n, void *output ) {
     double res;
     double sigma2 = pow(x[n-1],2);
 
@@ -102,18 +90,10 @@ double fitfun(double *x, int n, void *output, int *info) {
 	res = Nd*log(2*M_PI) + Nd*log(sigma2) + ssn/sigma2;
 	res *= -0.5;
 
-	/*
-	printf("\n Nd = %d \n",Nd);
-	printf("\n datay(1) = %lf \n",datay[0]);
-	printf("\n datay(Nd) = %lf \n",datay[Nd-1]);
-	printf("\n y(1) = %lf \n",y[0]);
-	printf("\n y(Nd) = %lf \n",y[Nd-1]);
-	printf("\n %lf \n",res);
-	exit(1);
-	*/
-
     return res;
 }
 
 
-
+double loglike_(double *x, int n, void *output, int *info ) {
+	return loglike_theta_fast( x, n, output );
+}

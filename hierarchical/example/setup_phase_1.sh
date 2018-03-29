@@ -12,7 +12,7 @@ LL_FILE="model/log_like.py"
 
 
 
-Ilist=(1 2 3 4 5)
+Ilist=(1)
 
 
 
