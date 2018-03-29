@@ -169,7 +169,6 @@ void loglike_posterior_theta_initialize( ) {
     // double t1 = omp_get_wtime();
     // printf("\nSuccesfull computation of the denominator in %f seconds.\n\n", t1-t0);
 	printf("\nSuccesfull computation of the denominator.\n\n");
-
 }
 
 
@@ -181,9 +180,6 @@ void loglike_posterior_theta_initialize( ) {
 
 void loglike_posterior_theta_finalize(){
 }
-
-
-
 
 
 
@@ -209,13 +205,6 @@ double loglike_posterior_theta(double *theta, int n, void *output, int *info) {
 	out = loglike_theta - logev_theta + log(sum);
 
 	if (isinf(out) || isnan(out)) out = -1e12;
-
-
-	// printf("posterior_theta: ( ");
-	// for (int i = 0; i < n; ++i)
-	// 	printf("%.16f ", theta[i]);
-	// printf(") = {%.16f, %.16f, %.16f}\n", loglike_theta, -logev_theta, log(sum));
-
 
 
 	return out;
