@@ -32,10 +32,13 @@ OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-
+use_torc?=0
+use_omp?=0
 
 CC := mpicc
 LD := mpicc
+
+
 
 CFLAGS += -O3 -std=c99
 CFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
