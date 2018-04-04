@@ -24,4 +24,4 @@
 	Checkpoint restart for CMAES
 	Local covariance matrix in TMCMC
 
-0.6:
+0.6:	Multiobjective optimization (NSGA-II)
