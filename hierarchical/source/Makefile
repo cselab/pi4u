@@ -42,13 +42,17 @@ CFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall -Wno-unused-function
 CFLAGS += -I${GSLROOT}/include
 CFLAGS += `torc_cflags`
+#CFLAGS += -I/cluster/home/garampat/usr/include -D_REENTRANT
 
 LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
-LDFLAGS += `torc_libs` -lpthread -lm
+LDFLAGS +=  -lm
+#LDFLAGS += `torc_libs`
+LDFLAGS += -L/cluster/home/garampat/usr/lib -ltorc -lpthread
 
 
 COMPILE.c = $(CC) $(CFLAGS) -c -o $@
-LINK.o    = $(LD) $(LDFLAGS) $(LDLIBS) -o $@
+#LINK.o    = $(LD) $(LDFLAGS) $(LDLIBS) -o $@
+LINK.o    = $(LD)  -o $@  
 
 
 $(shell mkdir -p $(OBJDIR) )
@@ -58,17 +62,23 @@ $(shell mkdir -p $(OBJDIR) )
 #==============================================================================
 all: $(TARGETS)
 
+
+
+
 sample_theta: $(OBJ1)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDFLAGS)
 
 sample_theta_fast: $(OBJ2)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDFLAGS)
 
 sample_psi: $(OBJ3)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDFLAGS)
 
 sample_posterior_theta_fast: $(OBJ4)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDFLAGS)
+
+
+
 
 
 $(OBJDIR)/%.o: %.c
