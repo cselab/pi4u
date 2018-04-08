@@ -30,7 +30,7 @@ static double logEv[N_IND];
 
 
 
-#include "../engine_tmcmc.h"
+#include "../TMCMC/engine_tmcmc.h"
 extern data_t data;
 
 

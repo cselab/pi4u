@@ -7,27 +7,47 @@ TARGET1 := sample_theta
 TARGET2 := sample_theta_fast
 TARGET3 := sample_psi
 TARGET4 := sample_posterior_theta_fast
+TARGET5 := optimize_theta
+TARGET6 := optimize_theta_fast
 
-COMMON_SRC =  engine_tmcmc.c  tmcmc_stats.c  tmcmc_db.c  auxil.c  spawner.c
 
-SRC1 := $(COMMON_SRC)	likelihoods/fitfun_theta.c		likelihoods/loglike_theta.c
-SRC2 := $(COMMON_SRC)	likelihoods/fitfun_theta_fast.c	likelihoods/loglike_theta_fast.c
-SRC3 := $(COMMON_SRC)	likelihoods/fitfun_psi.c \
+TMCMC_SRC =	TMCMC/engine_tmcmc.c \
+			TMCMC/tmcmc_stats.c \
+			TMCMC/tmcmc_db.c \
+			TMCMC/auxil.c \
+			TMCMC/spawner.c
+
+CMAES_SRC = CMAES/engine_cmaes.c \
+		  	CMAES/cmaes.c
+
+SRC1 := $(TMCMC_SRC)	likelihoods/fitfun_theta.c \
+						likelihoods/loglike_theta.c
+SRC2 := $(TMCMC_SRC)	likelihoods/fitfun_theta_fast.c	\
+						likelihoods/loglike_theta_fast.c
+SRC3 := $(TMCMC_SRC)	likelihoods/fitfun_psi.c \
 						likelihoods/loglike_psi.c \
 						likelihoods/priors.c
-SRC4 := $(COMMON_SRC)	likelihoods/fitfun_posterior_theta.c \
+SRC4 := $(TMCMC_SRC)	likelihoods/fitfun_posterior_theta.c \
 						likelihoods/loglike_posterior_theta.c \
 						likelihoods/loglike_theta_fast.c \
 						likelihoods/priors.c
+SRC5 := $(CMAES_SRC)	likelihoods/fitfun_theta.c \
+						likelihoods/loglike_theta.c
+SRC6 := $(CMAES_SRC)	likelihoods/fitfun_theta_fast.c	\
+						likelihoods/loglike_theta_fast.c
 
-ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4)
-TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4)
+
+
+ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5) $(SRC6)
+TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6)
 
 OBJDIR = .o
 OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
 OBJ2:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC2)) )
 OBJ3:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC3)) )
 OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
+OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
+OBJ6:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC6)) )
 
 #==============================================================================
 #	COMPILERS AND FLAGS
@@ -74,7 +94,11 @@ sample_psi: $(OBJ3)
 sample_posterior_theta_fast: $(OBJ4)
 	$(LINK.o) $^ $(LDFLAGS)
 
+optimize_theta: $(OBJ5)
+	$(LINK.o) $^ $(LDFLAGS)
 
+optimize_theta_fast: $(OBJ6)
+	$(LINK.o) $^ $(LDFLAGS)
 
 
 

@@ -1,11 +1,11 @@
-#include "../fitfun.h"
-#include "../spawner.h"
+#include "../TMCMC/fitfun.h"
+#include "../TMCMC/spawner.h"
 #include "loglike_theta.h"
 
 static pthread_mutex_t fork_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int flag[4096];  // MAX_WORKERS
 
-#define REMOVEDIRS  1
+#define REMOVEDIRS  0
 #define PREFIX      "."  // "/scratch"
 #define FAIL        -1e12
 #define BUFLEN      1024
