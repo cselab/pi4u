@@ -42,16 +42,13 @@ CFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall -Wno-unused-function
 CFLAGS += -I${GSLROOT}/include
 CFLAGS += `torc_cflags`
-#CFLAGS += -I/cluster/home/garampat/usr/include -D_REENTRANT
 
 LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
 LDFLAGS +=  -lm
-#LDFLAGS += `torc_libs`
-LDFLAGS += -L/cluster/home/garampat/usr/lib -ltorc -lpthread
+LDFLAGS += `torc_libs`
 
 
 COMPILE.c = $(CC) $(CFLAGS) -c -o $@
-#LINK.o    = $(LD) $(LDFLAGS) $(LDLIBS) -o $@
 LINK.o    = $(LD)  -o $@  
 
 
