@@ -50,7 +50,7 @@ OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
 OBJ2:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC2)) )
 OBJ3:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC3)) )
 OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
-OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
+#OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
 OBJ6:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC6)) )
 
 #==============================================================================
