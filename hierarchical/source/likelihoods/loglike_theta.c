@@ -1,5 +1,5 @@
 #include <fitfun.h>
-#include <spawner.h>
+#include "spawner.h"
 #include "loglike_theta.h"
 
 static pthread_mutex_t fork_mutex = PTHREAD_MUTEX_INITIALIZER;

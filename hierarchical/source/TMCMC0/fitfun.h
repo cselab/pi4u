@@ -12,7 +12,6 @@
 #include <sys/wait.h>
 #include <errno.h>
 
-#include "spawner.h"
 #include "torc.h"
 #include "engine_tmcmc.h"
 

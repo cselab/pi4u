@@ -6,17 +6,25 @@ GSLROOT=/usr/local
 TARGET1 := sample_theta
 TARGET2 := sample_theta_fast
 TARGET3 := sample_psi
-TARGET4 := sample_posterior_theta_fast
+TARGET4 := sample_posterior_theta
+TARGET5 := optimize_theta
+TARGET6 := optimize_theta_fast
 
 TMCMC := TMCMC
 COMMON_SRC =  	$(TMCMC)/engine_tmcmc.c \
 				$(TMCMC)/tmcmc_stats.c \
 				$(TMCMC)/tmcmc_db.c \
 				$(TMCMC)/auxil.c \
-				$(TMCMC)/spawner.c
 
-SRC1 := $(COMMON_SRC)	likelihoods/fitfun_theta.c		likelihoods/loglike_theta.c
-SRC2 := $(COMMON_SRC)	likelihoods/fitfun_theta_fast.c	likelihoods/loglike_theta_fast.c
+CMAES_SRC = CMAES/engine_cmaes.c \
+			CMAES/cmaes.c
+
+
+SRC1 := $(COMMON_SRC)	likelihoods/fitfun_theta.c \
+						likelihoods/loglike_theta.c \
+						likelihoods/spawner.c
+SRC2 := $(COMMON_SRC)	likelihoods/fitfun_theta_fast.c \
+						likelihoods/loglike_theta_fast.c
 SRC3 := $(COMMON_SRC)	likelihoods/fitfun_psi.c \
 						likelihoods/loglike_psi.c \
 						likelihoods/priors.c
@@ -24,15 +32,23 @@ SRC4 := $(COMMON_SRC)	likelihoods/fitfun_posterior_theta.c \
 						likelihoods/loglike_posterior_theta.c \
 						likelihoods/loglike_theta_fast.c \
 						likelihoods/priors.c
+SRC5 := $(CMAES_SRC)    likelihoods/fitfun_theta.c \
+						likelihoods/loglike_theta.c \
+						likelihoods/spawner.c
+SRC6 := $(CMAES_SRC)    likelihoods/fitfun_theta_fast.c \
+						likelihoods/loglike_theta_fast.c
 
-ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4)
-TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4)
+
+ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5)  $(SRC6)
+TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6)
 
 OBJDIR = .o
 OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
 OBJ2:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC2)) )
 OBJ3:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC3)) )
 OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
+OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
+OBJ6:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC6)) )
 
 #==============================================================================
 #	COMPILERS AND FLAGS
@@ -77,6 +93,7 @@ $(shell mkdir -p $(OBJDIR) )
 #==============================================================================
 all: $(TARGETS)
 
+
 sample_theta: $(OBJ1)
 	$(LINK.o) $^ $(LDLIBS)
 
@@ -86,8 +103,19 @@ sample_theta_fast: $(OBJ2)
 sample_psi: $(OBJ3)
 	$(LINK.o) $^ $(LDLIBS)
 
-sample_posterior_theta_fast: $(OBJ4)
+sample_posterior_theta: $(OBJ4)
 	$(LINK.o) $^ $(LDLIBS)
+
+sample_posterior_theta_fast: $(OBJ5)
+	$(LINK.o) $^ $(LDLIBS)
+
+optimize_theta: $(OBJ5)
+	$(LINK.o) $^ $(LDLIBS)
+
+optimize_theta_fast: $(OBJ6)
+	$(LINK.o) $^ $(LDLIBS)
+
+
 
 
 $(OBJDIR)/%.o: %.c
@@ -101,8 +129,6 @@ ctags:
 
 
 print:
-	@echo $(notdir $(basename  $(SRC1)))
-	@echo $(notdir asdasd/asdadad/asdads.txt ewerwer/werwerwrew/werwer.xtt)
 
 
 clean:
