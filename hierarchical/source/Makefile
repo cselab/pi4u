@@ -38,15 +38,15 @@ SRC6 := $(CMAES_SRC)	likelihoods/fitfun_theta_fast.c	\
 
 
 
-ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5) $(SRC6)
-TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6)
+ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC6)
+TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET6)
 
 OBJDIR = .o
 OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
 OBJ2:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC2)) )
 OBJ3:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC3)) )
 OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
-OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
+#OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
 OBJ6:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC6)) )
 
 #==============================================================================
