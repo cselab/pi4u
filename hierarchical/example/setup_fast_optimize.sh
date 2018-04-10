@@ -6,8 +6,8 @@ DATA_FILE_PREFIX=
 
 EXEC_FILE="../source/optimize_theta_fast"
 
-#Ilist=(1)
-Ilist=(1 2 3 4 5)
+Ilist=(1)
+#Ilist=(1 2 3 4 5)
 
 
 

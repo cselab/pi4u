@@ -74,6 +74,9 @@ void my_model(double *x, double *y, double *c, double n){
 }
 
 
+
+
+
 double loglike_theta_fast(double *x, int n, void *output ) {
     double res;
     double sigma2 = pow(x[n-1],2);
@@ -92,6 +95,9 @@ double loglike_theta_fast(double *x, int n, void *output ) {
 
     return res;
 }
+
+
+
 
 
 double loglike_(double *x, int n, void *output, int *info ) {

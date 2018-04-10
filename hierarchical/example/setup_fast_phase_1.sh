@@ -7,8 +7,8 @@ DATA_FILE_PREFIX=
 EXEC_FILE="../source/sample_theta_fast"
 PAR_FILE="./theta.par"
 
-#Ilist=(1)
-Ilist=(1 2 3 4 5)
+Ilist=(1)
+#Ilist=(1 2 3 4 5)
 
 
 
