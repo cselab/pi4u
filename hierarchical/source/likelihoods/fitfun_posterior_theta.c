@@ -1,4 +1,4 @@
-#include "../TMCMC/fitfun.h"
+#include <fitfun.h>
 #include "loglike_posterior_theta.h"
 
 

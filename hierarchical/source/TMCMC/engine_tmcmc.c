@@ -1374,7 +1374,8 @@ int main(int argc, char *argv[])
 
     data_init();
 
-    fitfun_initialize(NULL);
+    fitfun_initialize( );
+    //fitfun_initialize(NULL);
 
 #if defined(_USE_TORC_)
     torc_init(argc, argv, MODE_MS);

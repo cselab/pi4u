@@ -1,4 +1,4 @@
-#include "../TMCMC/fitfun.h"
+#include <fitfun.h>
 #include "loglike_theta_fast.h"
 
 void fitfun_initialize() {

@@ -8,11 +8,12 @@ TARGET2 := sample_theta_fast
 TARGET3 := sample_psi
 TARGET4 := sample_posterior_theta_fast
 
-COMMON_SRC =  	TMCMC0/engine_tmcmc.c \
-				TMCMC0/tmcmc_stats.c \
-				TMCMC0/tmcmc_db.c \
-				TMCMC0/auxil.c \
-				TMCMC0/spawner.c
+TMCMC := TMCMC
+COMMON_SRC =  	$(TMCMC)/engine_tmcmc.c \
+				$(TMCMC)/tmcmc_stats.c \
+				$(TMCMC)/tmcmc_db.c \
+				$(TMCMC)/auxil.c \
+				$(TMCMC)/spawner.c
 
 SRC1 := $(COMMON_SRC)	likelihoods/fitfun_theta.c		likelihoods/loglike_theta.c
 SRC2 := $(COMMON_SRC)	likelihoods/fitfun_theta_fast.c	likelihoods/loglike_theta_fast.c
@@ -36,7 +37,7 @@ OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-use_torc?=0
+use_torc?=1
 use_omp?=0
 
 CC := mpicc
@@ -45,12 +46,12 @@ LD := mpicc
 ifeq ($(use_torc),1)
 	CC = mpicc
 	CFLAGS += -D_USE_TORC_=1 `torc_cflags`
-	LDFLAGS += `torc_libs`
+	LDLIBS += `torc_libs`
 endif
 
 ifeq ($(use_omp),1)
 	CFLAGS += -D_USE_OPENMP_=1 -fopenmp
-	LDFLAGS += -fopenmp
+	LDLIBS += -fopenmp
 endif
 
 
@@ -60,14 +61,13 @@ CFLAGS += -O3 -std=c99
 CFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall -Wno-unused-function
 CFLAGS += -I${GSLROOT}/include
-CFLAGS += `torc_cflags`
+CFLAGS += -I./$(TMCMC)
 
-LDFLAGS += -L${GSLROOT}/lib -lgsl -lgslcblas
-LDFLAGS += `torc_libs` -lm
+LDLIBS += -L${GSLROOT}/lib -lgsl -lgslcblas -lm
 
 
 COMPILE.c = $(CC) $(CFLAGS) -c -o $@
-LINK.o    = $(LD) $(LDFLAGS) $(LDLIBS) -o $@
+LINK.o    = $(LD) $(LDFLAGS) -o $@
 
 
 $(shell mkdir -p $(OBJDIR) )
@@ -78,16 +78,16 @@ $(shell mkdir -p $(OBJDIR) )
 all: $(TARGETS)
 
 sample_theta: $(OBJ1)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDLIBS)
 
 sample_theta_fast: $(OBJ2)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDLIBS)
 
 sample_psi: $(OBJ3)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDLIBS)
 
 sample_posterior_theta_fast: $(OBJ4)
-	$(LINK.o) $^
+	$(LINK.o) $^ $(LDLIBS)
 
 
 $(OBJDIR)/%.o: %.c

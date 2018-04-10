@@ -1,8 +1,28 @@
 #ifndef _FITFUN_H_
 #define _FITFUN_H_
 
-void fitfun_initialize(char *name);
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <fcntl.h>
+#include <ftw.h>
+#include <math.h>
+
+#include <unistd.h>
+#include <sys/wait.h>
+#include <errno.h>
+
+#include "spawner.h"
+#include "torc.h"
+#include "engine_tmcmc.h"
+
+
+
+
+void fitfun_initialize();
+
+double fitfun(double *x, int n, void *output, int *info);
+
 void fitfun_finalize();
-double fitfun(double *x, int N, void *output, int *info);
 
 #endif
