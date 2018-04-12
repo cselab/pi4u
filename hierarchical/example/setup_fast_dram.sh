@@ -5,7 +5,7 @@ DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
 EXEC_FILE="../source/dram_theta_fast"
-#PAR_FILE="./posterior_theta.par"
+PAR_FILE="./dram.par"
 
  Ilist=(1)
 #Ilist=(1 2 3 4 5)
@@ -39,6 +39,6 @@ do
 	cp ${DATA_FILE} "$RUN_DIR/data.txt"
 
 	cp ${EXEC_FILE}    ${RUN_DIR}
-#	cp ${PAR_FILE}     ${RUN_DIR}/tmcmc.par
+	cp ${PAR_FILE}     ${RUN_DIR}/dram.par
 
 done
