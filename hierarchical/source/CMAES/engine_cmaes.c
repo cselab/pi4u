@@ -76,8 +76,6 @@ int main(int argn, char **args)
     int info[4];    /* gen, chain, step, task */
     /* peh - end */
 
-	fitfun_initialize();
-
 #if defined(_USE_TORC_)
     torc_register_task(taskfun);
 
@@ -95,6 +93,10 @@ int main(int argn, char **args)
     arFunvals = cmaes_init(&evo, 0, NULL, NULL, 0, 0, "cmaes_initials.par");
     printf("%s\n", cmaes_SayHello(&evo));
     cmaes_ReadSignals(&evo, "cmaes_signals.par");  /* write header and initial values */
+
+    char str[12];
+    sprintf(str, "%d", evo.sp.N);
+    fitfun_initialize(str);
 
     dim = cmaes_Get(&evo, "dim");
     lower_bound = malloc(dim*sizeof(double));

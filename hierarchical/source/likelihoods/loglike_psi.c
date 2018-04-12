@@ -1,5 +1,4 @@
 #include "loglike_psi.h"
-#include "../TMCMC/engine_tmcmc.h"
 
 #define DATABASE  "../../data/theta"
 #define THETAFILE1 "theta_"
@@ -28,13 +27,8 @@ static ffdata_t *ffdata[N_IND];
 static double logEv[N_IND];
 
 
-extern data_t data;
 
-
-
-void loglike_psi_initialize() {
-
-    int nn = data.Nth;
+void loglike_psi_initialize(int nn) {
 
     printf("\nReading %d data from theta database for individuals: \n", NREC);
     for (int i = 0; i < N_IND; i++)

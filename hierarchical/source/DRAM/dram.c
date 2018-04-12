@@ -200,9 +200,6 @@ void init_options()
 
 int main(int argc, char *argv[])
 {
-	fitfun_initialize( );
-	gsl_rand_init(1);
-
 	const int npar    = 4;     // dimension of the target
 	double drscale    = 20;     // DR shrink factor
 	double adascale   = 2.4/sqrt(npar); // scale for adaptation
@@ -216,6 +213,12 @@ int main(int argc, char *argv[])
 	// 100  ->  5 000 000 ?
 
 	double c = 10;  // cond number of the target covariance 
+
+	char str[12];
+	sprintf(str, "%d", npar);
+	fitfun_initialize(str);
+
+	gsl_rand_init(1);
 
 	double *a = (double *)malloc(npar*sizeof(double));
 	for (int i = 0; i < npar; i++)

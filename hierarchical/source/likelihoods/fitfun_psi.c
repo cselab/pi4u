@@ -1,11 +1,14 @@
+#include <stdlib.h>
 #include <fitfun.h>
 #include "loglike_psi.h"
 
 
 
-void fitfun_initialize() {
+void fitfun_initialize(char *s) {
 
-	loglike_psi_initialize();
+	int n;
+	n = atoi(s);
+	loglike_psi_initialize(n);
 
 }
 

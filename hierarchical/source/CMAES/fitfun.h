@@ -18,7 +18,7 @@
 
 
 
-void fitfun_initialize();
+void fitfun_initialize(char *s);
 
 double fitfun(double *x, int n, void *output, int *info);
 

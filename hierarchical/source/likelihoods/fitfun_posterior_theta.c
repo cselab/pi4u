@@ -3,7 +3,7 @@
 
 
 
-void fitfun_initialize() {
+void fitfun_initialize(char *s) {
 
 	loglike_posterior_theta_initialize();
 
