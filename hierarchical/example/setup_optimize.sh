@@ -47,7 +47,7 @@ do
 	cp ${MODEL_FILE}   ${MODEL_DIR}
 	cp ${MODEL_SCRIPT} ${MODEL_DIR}
 	cp ${LL_FILE}      ${MODEL_DIR}
-	cp cmaes_bounds.txt       ${RUN_DIR}/cmaes_bounds.txt
+	cp cmaes_bounds.par       ${RUN_DIR}/cmaes_bounds.par
 	cp cmaes_initials.par     ${RUN_DIR}/cmaes_initials.par
 	cp cmaes_signals.par      ${RUN_DIR}/cmaes_signals.par
 

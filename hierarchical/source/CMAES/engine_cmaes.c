@@ -104,9 +104,9 @@ int main(int argn, char **args)
         upper_bound[i] = +6;
     }
 
-    FILE *f = fopen("cmaes_bounds.txt", "r");
+    FILE *f = fopen("cmaes_bounds.par", "r");
     if (f != NULL) {
-      printf("Reading the bounds from cmaes_bounds.txt\n");
+      printf("Reading the bounds from cmaes_bounds.par\n");
 
       char line[256];
       int found;
