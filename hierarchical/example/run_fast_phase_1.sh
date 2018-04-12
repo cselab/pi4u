@@ -5,6 +5,7 @@ BASE_DIR="runs"
 CURRENT_DIR=$(pwd)
 
 SAVE_DIR="${CURRENT_DIR}/data/theta"
+mkdir -p $SAVE_DIR
 
 export TORC_WORKERS=2
 
@@ -38,7 +39,7 @@ do
 		FNAME="${SAVE_DIR}/theta_${II}.txt"
 		cp final.txt $FNAME
 
-		FNAME="${SAVE_DIR}//evidence_${II}.txt"
+		FNAME="${SAVE_DIR}/evidence_${II}.txt"
 		cp fitness.txt $FNAME
 
         cd $CURRENT_DIR
