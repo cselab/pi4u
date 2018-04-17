@@ -1,0 +1,9 @@
+# This file has the priors.
+# First we define the number of priors to be read
+
+N 4
+
+normal 		1 		2
+exp 		0.5
+uniform 	-2  	-1
+gamma   	9.0		0.5
