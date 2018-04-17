@@ -10,6 +10,7 @@ TARGET4 := sample_posterior_theta
 TARGET5 := optimize_theta
 TARGET6 := optimize_theta_fast
 TARGET7 := dram_theta_fast
+TARGET8 := dram_psi
 
 TMCMC := TMCMC
 
@@ -21,7 +22,8 @@ TMCMC_SRC =  	$(TMCMC)/engine_tmcmc.c \
 CMAES_SRC = CMAES/engine_cmaes.c \
 			CMAES/cmaes.c
 
-DRAM_SRC = 	DRAM/dram.c \
+DRAM_SRC = 	DRAM/run_dram.c \
+			DRAM/dram.c \
 			DRAM/auxil.c
 
 
@@ -46,9 +48,12 @@ SRC6 := $(CMAES_SRC)    likelihoods/fitfun_theta_fast.c \
 SRC7 := $(DRAM_SRC)		likelihoods/fitfun_theta_fast.c \
 						likelihoods/loglike_theta_fast.c 
 
+SRC8 := $(DRAM_SRC)	likelihoods/fitfun_psi.c \
+						likelihoods/loglike_psi.c \
+						likelihoods/priors.c
 
-ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5)  $(SRC6)  $(SRC7)
-TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7)
+ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5)  $(SRC6)  $(SRC7)  $(SRC8)
+TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8)
 
 OBJDIR = .o
 OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
@@ -58,6 +63,7 @@ OBJ4:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC4)) )
 OBJ5:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC5)) )
 OBJ6:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC6)) )
 OBJ7:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC7)) )
+OBJ8:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC8)) )
 
 #==============================================================================
 #	COMPILERS AND FLAGS
@@ -125,6 +131,9 @@ optimize_theta_fast: $(OBJ6)
 	$(LINK.o) $^ $(LDLIBS)
 
 dram_theta_fast: $(OBJ7)
+	$(LINK.o) $^ $(LDLIBS)
+
+dram_psi: $(OBJ8)
 	$(LINK.o) $^ $(LDLIBS)
 
 
