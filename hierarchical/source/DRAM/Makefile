@@ -5,11 +5,11 @@ LDFLAGS=-lgsl -lgslcblas -lm
 all: dram
 
 
-dram: dram.c dramrun.c fitfun.c auxil.c auxil.h
-	$(CC) $(CFLAGS) -o    dram    dram.c  auxil.c  fitfun.c $(LDFLAGS)
+dram: run_dram.c dram.c fitfun.c auxil.c auxil.h
+	$(CC) $(CFLAGS) -o dram run_dram.c dram.c auxil.c fitfun.c $(LDFLAGS)
 
 clean:
 	rm -f dram
 
 clear:
-	rm -f *test_chain.txt
+	rm -f chain.txt
