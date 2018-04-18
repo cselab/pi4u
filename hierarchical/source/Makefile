@@ -40,8 +40,11 @@ SRC4 := $(TMCMC_SRC)	likelihoods/fitfun_posterior_theta.c \
 SRC5 := $(CMAES_SRC)    likelihoods/fitfun_theta.c \
 						likelihoods/loglike_theta.c \
 						likelihoods/spawner.c
+
 SRC6 := $(CMAES_SRC)    likelihoods/fitfun_theta_fast.c \
-						likelihoods/loglike_theta_fast.c
+						likelihoods/loglike_theta_fast.c\
+						priors/priors.c \
+						priors/myrand.c
 
 SRC7 := $(DRAM_SRC)		likelihoods/fitfun_theta_fast.c \
 						likelihoods/loglike_theta_fast.c 

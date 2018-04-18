@@ -28,7 +28,7 @@ double eval_random( Density d ){
 }
 
 
-double print_density( Density d ){
+void print_density( Density d ){
 	
 	if( strcmp(d.name,"uniform")==0 )
 		printf("%s: %lf  -  %lf \n", d.name, d.par[0],d.par[1]);
@@ -42,7 +42,7 @@ double print_density( Density d ){
 }
 
 
-double print_priors( Density *d, int N){
+void print_priors( Density *d, int N){
 	printf("==============================\n");
 	printf("===  Prior Distribution    ===\n");
 	printf("==============================\n");
@@ -56,22 +56,26 @@ double print_priors( Density *d, int N){
 
 
 
-double prior_pdf( Density *d, int N, double x){
+double prior_pdf( Density *d, int N, double *x){
 
 	double res=1.;
 	
 	for(int i=0; i<N; i++)
-		res *= eval_density( d[i], x);
+		res *= eval_density( d[i], x[i] );
+	
+	return res;
 }
 
 
 
-double prior_log_pdf( Density *d, int N, double x){
+double prior_log_pdf( Density *d, int N, double *x){
 
 	double res=0.;
 	
 	for(int i=0; i<N; i++)
-		res += eval_log_density( d[i], x);
+		res += eval_log_density( d[i], x[i] );
+	
+	return res;
 }
 
 
@@ -92,7 +96,7 @@ void read_priors( Density **p_priors, int *p_N ){
 	int N=-1;	
 
 
-	size_t bufsize = 1024, nchar=1;
+	size_t bufsize = 1024;
 	char * buffer = (char *)malloc(bufsize * sizeof(char));	
 	int cnt = 0;
 

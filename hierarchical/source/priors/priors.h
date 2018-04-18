@@ -17,11 +17,11 @@ double eval_density(Density d, double x);
 double eval_log_density(Density d, double x);
 double eval_random( Density d );
 
-double print_density( Density d );
-double print_priors( Density *d, int N);
+void  print_density( Density d );
+void  print_priors( Density *d, int N);
 
-double prior_pdf( Density *d, int N, double x);
-double prior_log_pdf( Density *d, int N, double x);
+double prior_pdf( Density *d, int N, double *x);
+double prior_log_pdf( Density *d, int N, double *x);
 
 void read_priors( Density **p_priors, int *p_N );
 

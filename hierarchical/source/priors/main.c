@@ -56,7 +56,15 @@ void test_suite( Density *p, int N){
 	}
 
 	printf("-----------\n");
+	printf("Prior: \n");
 	
+	double x[4]={1,1,1,1};
+	double v1 = prior_pdf( p, N, x);
+	double v2 = prior_log_pdf( p, N, x);
+	printf("	%lf - %lf \n", v1, exp(v2));
+
+	printf("-----------\n");
+
 	int Ns = 1e6;
 	double rnd[Ns], mean, std, meanx, stdx;
 	

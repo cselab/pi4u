@@ -96,7 +96,7 @@ double normal_pdf(double x, double *p){
 double normal_log_pdf(double x, double *p){
 
 	double res  =  -0.5*log(2*M_PI)
-		   		   -log(p[1]);
+		   		   -log(p[1]) 
 	       		   -0.5 * pow( (x-p[0])/p[1], 2);
 
 	return res;
