@@ -1,3 +1,0 @@
-pndlc.o: pndlc.c pndl_config.h
-
-pndl_config.h:
