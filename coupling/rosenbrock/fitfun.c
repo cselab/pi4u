@@ -95,6 +95,7 @@ retry:
 		}
 		else {
 			printf("give up\n");
+			pthread_mutex_trylock(&fork_mutex);
 			rmrf(taskname);
 			return -1.0e6;
 		}
