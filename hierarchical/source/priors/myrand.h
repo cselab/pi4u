@@ -20,5 +20,14 @@ double gamma_pdf(double x, double *p);
 double gamma_log_pdf(double x, double *p);
 double gamma_rnd( double *p );
 
+
+
+
+
+double normalrand(double mu, double sigma);
+double uniformrand(double a, double b);
+
+
+
 #endif
 

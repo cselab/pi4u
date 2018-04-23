@@ -20,7 +20,6 @@
 
 #include <gsl/gsl_roots.h>
 
-/* NDL */
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_vector_double.h>

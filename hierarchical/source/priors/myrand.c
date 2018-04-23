@@ -37,7 +37,7 @@
 		#include <omp.h>
 		static int torc_i_worker_id() { return omp_get_thread_num(); }
 		static int torc_i_num_workers() { return omp_get_max_threads(); }
-		#else
+	#else
 		static int torc_i_worker_id() { return 0; }
 		static int torc_i_num_workers() { return 1; }
 	#endif
@@ -60,7 +60,6 @@ void gsl_rand_init(int seed){
 
     int i, local_workers = torc_i_num_workers();
     gsl_rng_env_setup();
-
     T = gsl_rng_default;
     r = (gsl_rng **)malloc(local_workers*sizeof(gsl_rng *));
     for (i = 0; i < local_workers; i++) {
@@ -208,3 +207,40 @@ double gamma_rnd( double *p ){
 
     return res;
 }
+
+
+
+
+
+
+
+
+
+
+//======================================================================================
+//
+//    
+//
+
+// normal distribution random number N(mu,sigma^2) 
+double normalrand(double mu, double sigma){
+
+	int 	me 	= torc_i_worker_id();
+    double	res = gsl_ran_gaussian( r[me], sigma );
+
+	return res;
+}
+
+
+
+// uniform distribution random number between a and b
+double uniformrand(double a, double b){
+
+	int 	me 	= torc_i_worker_id();
+    double	res = gsl_ran_flat( r[me], a, b );
+
+	return res;
+}
+
+
+

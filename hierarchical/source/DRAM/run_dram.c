@@ -15,18 +15,23 @@
 #include "fitfun.h"
 
 
-void fitfun_init()
-{
+void fitfun_init( ){
 	char str[12];
 	sprintf(str, "%d", options.Npar);
 	fitfun_initialize(str);
 }
 
 
-int main(int argc, char *argv[])
-{
+
+
+int main(int argc, char *argv[]){
+
+
 	dram_init();
+
+
 	fitfun_init();
+
 
 	dram();
 

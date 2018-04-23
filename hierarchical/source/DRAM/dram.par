@@ -4,19 +4,19 @@
 
 #------------------------ GENERAL OPTIONS -------------------------------------
 # Problem dimension
-Npar		4
+Npar		2
 
 # Chain length
 Nsim		100000
 
 # DR shrink factor
-DRscale		20
+DRscale		4
 
 # Time interval for the adaptation
-AMinterv	500
+AMinterv	100
 
 # Initial covariance matrix: diag(Co)
-Co		5
+Co		1
 
 
 #------------------------ PRIOR OPTIONS ---------------------------------------
@@ -26,16 +26,8 @@ Co		5
 #   10   ->  10 000
 #   20   ->  500 000
 #   100  ->  5 000 000
-B0		-10000000000	10000000000
-B1		-10000000000	10000000000
-B2		-10000000000	10000000000
-B3		-10000000000	10000000000
-B4		-10000000000	10000000000
-B5		-10000000000	10000000000
-B6		-10000000000	10000000000
-B7		-10000000000	10000000000
-B8		-10000000000	10000000000
-B9		-10000000000	10000000000
+B0	-100 100
+B1  -100 100
 
 # Print info on screen every this many steps
-printfreq	2000
+printfreq	1

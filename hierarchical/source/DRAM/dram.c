@@ -6,23 +6,30 @@
  *  Copyright 2014 ETH Zurich. All rights reserved.
  *
  */
-
+#include <stdio.h>
 #include <math.h>
 #include <string.h>
 
-#include "gsl_headers.h"
-#include "auxil.h"
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_linalg.h>
 
 #include "dram.h"
 #include "fitfun.h"
 
+#include "../priors/priors.h"
+#include "../priors/myrand.h"
+
+
+
 #ifndef min
-#define min(a,b) (a)<(b)?(a):(b)
+	#define min(a,b) (a)<(b)?(a):(b)
 #endif
 
 
-void dram_finalize()
-{
+
+
+
+void dram_finalize(){
 }
 
 
@@ -36,10 +43,9 @@ void print_error(char *var)
 void init_options()
 {
 	/* DEFAULT VALUES */
-    	options.Npar		= -1;
-    	options.Nsim		= -1;
-
-    	options.DRscale		= -1;
+	options.Npar		= -1;
+	options.Nsim		= -1;
+	options.DRscale		= -1;
 
 	options.AMinterv	= -1;
 	options.AMscale		= -1;
@@ -53,59 +59,58 @@ void init_options()
 	double Co;
 
 	/* USER-DEFINED VALUES */
-    	FILE *f = fopen("dram.par", "r");
-    	if (f == NULL) {
-	    fprintf(stderr, "No dram.par file available.\n");
-    	    exit(1);
-    	}
+	FILE *f = fopen("dram.par", "r");
+	if (f == NULL) {
+		fprintf(stderr, "No dram.par file available.\n");
+    	exit(1);
+    }
 
-    	char line[256];
-    	int line_no = 0;
-    	while (fgets(line, 256, f)!= NULL) {
-    	    line_no++;
-    	    if ((line[0] == '#')||(strlen(line)==0)) {
-    	        continue;
-    	    }
+    char line[256];
+    int line_no = 0;
+    while (fgets(line, 256, f)!= NULL) {
+        line_no++;
+        if ((line[0] == '#')||(strlen(line)==0)) {
+            continue;
+        }
 
-    	    if (strstr(line, "Npar")) {
-    	        sscanf(line, "%*s %d", &options.Npar);
-		options.AMscale = 2.4/sqrt(options.Npar);
-    	    }
-    	    else if (strstr(line, "Nsim")) {
-    	        sscanf(line, "%*s %d", &options.Nsim);
-    	    }
-    	    else if (strstr(line, "DRscale")) {
-    	        sscanf(line, "%*s %lf", &options.DRscale);
-    	    }
-    	    else if (strstr(line, "AMinterv")) {
-    	        sscanf(line, "%*s %d", &options.AMinterv);
-    	    }
-    	    else if (strstr(line, "Co")) {
-    	        sscanf(line, "%*s %lf", &Co);
-    	    }
-    	    else if (strstr(line, "printfreq")) {
-    	        sscanf(line, "%*s %d", &options.printfreq);
-    	    }
-    	}
+   	    if (strstr(line, "Npar")) {
+   	        sscanf(line, "%*s %d", &options.Npar);
+			options.AMscale = 2.4/sqrt(options.Npar);
+   		}
+   	    else if (strstr(line, "Nsim")) {
+   	        sscanf(line, "%*s %d", &options.Nsim);
+   	    }
+   	    else if (strstr(line, "DRscale")) {
+   	        sscanf(line, "%*s %lf", &options.DRscale);
+   	    }
+   	    else if (strstr(line, "AMinterv")) {
+   	        sscanf(line, "%*s %d", &options.AMinterv);
+   	    }
+   	    else if (strstr(line, "Co")) {
+   	        sscanf(line, "%*s %lf", &Co);
+   	    }
+   	    else if (strstr(line, "printfreq")) {
+   	        sscanf(line, "%*s %d", &options.printfreq);
+   	    }
+   	}
 
 	/* Check if user has provided all necessary parameters */
-    	if (options.Npar == -1)		print_error("Npar");
-    	if (options.Nsim == -1)		print_error("Nsim");
-    	if (options.DRscale == -1)	print_error("DRscale");
+   	if (options.Npar == -1)		print_error("Npar");
+   	if (options.Nsim == -1)		print_error("Nsim");
+   	if (options.DRscale == -1)	print_error("DRscale");
 	if (options.AMinterv == -1)	print_error("AMinterv");
 	if (options.AMscale == -1)	print_error("Npar");
 
 	options.qcov = (double *)malloc(options.Npar*options.Npar*sizeof(double));
 	for (int i = 0; i < options.Npar; i++)
 	for (int j = 0; j < options.Npar; j++)
-        	if (i == j) options.qcov[i*options.Npar+j] = Co;
-        	else options.qcov[i*options.Npar+j] = 0.0;
+	if (i == j) options.qcov[i*options.Npar+j] = Co;
+	else options.qcov[i*options.Npar+j] = 0.0;
 
 
-	if (options.verbose) {
+	if (options.verbose){
 		printf("\noptions.qcov:\n");
-		for (int i = 0; i < options.Npar; i++)
-		{
+		for (int i = 0; i < options.Npar; i++){
 			for (int j = 0; j < options.Npar; j++)
 				printf("%6.3f", options.qcov[i*options.Npar+j]);
 			printf("\n");
@@ -117,13 +122,16 @@ void init_options()
 }
 
 
+
+
+
 void init_params()
 {
 	/* DEFAULT VALUES */
 	params.par0 	= NULL;
 	params.sigma2 	= 1; 	// val.
-	params.n0 	= -1;	// val.
-	params.n 	= 0;	// val.
+	params.n0 		= -1;	// val.
+	params.n 		= 0;	// val.
 
 	params.lbounds = NULL;
 	params.ubounds = NULL;
@@ -134,16 +142,16 @@ void init_params()
 	/* USER-DEFINED VALUES */
 
 	/* Read the lower and upper bounds for each parameter */
-    	params.lbounds = (double *)malloc(options.Npar*sizeof(double));
-    	params.ubounds = (double *)malloc(options.Npar*sizeof(double));
+    params.lbounds = (double *)malloc(options.Npar*sizeof(double));
+    params.ubounds = (double *)malloc(options.Npar*sizeof(double));
 
 	FILE *f = fopen("dram.par", "r");
-    	if (f == NULL) {
-	    fprintf(stderr, "No dram.par file available.\n");
-    	    exit(1);
-    	}
+    if (f == NULL) {
+		fprintf(stderr, "No dram.par file available.\n");
+		exit(1);
+	}
 
-    	char line[256];
+	char line[256];
 	int line_no = 0;
 	int found;
 
@@ -167,13 +175,24 @@ void init_params()
 
 	params.par0 = (double *)malloc(options.Npar*sizeof(double));
 	for (int i = 0; i < options.Npar; i++)
-		params.par0[i] = (params.lbounds[i]+params.ubounds[i])/2.; // initial value
+		params.par0[i] = 1.0;
+		//params.par0[i] = (params.lbounds[i]+params.ubounds[i])/2.; // initial value
 
 
 	/* Check if user has provided all necessary parameters */
-    	if (params.lbounds == NULL) 	print_error("Lower/Upper bounds");
-    	if (params.ubounds == NULL) 	print_error("Lower/Upper bounds");
-    	if (params.par0 == NULL) 	print_error("Lower/Upper bounds");
+    if (params.lbounds == NULL) 	print_error("Lower/Upper bounds");
+    if (params.ubounds == NULL) 	print_error("Lower/Upper bounds");
+    if (params.par0 == NULL) 		print_error("Lower/Upper bounds");
+
+
+	int Ntmp;
+	read_priors( &params.prior, &Ntmp );
+	if( Ntmp  != options.Npar ){
+		printf("\nNumber of parameters in 'priors.par' is different than dram.par \n");
+		exit(1);
+	}
+
+	if(options.verbose) print_priors( params.prior, options.Npar );
 
 
 	fclose(f);
@@ -199,8 +218,8 @@ void print_params()
 }
 
 
-void dram_init()
-{
+void dram_init(){
+
 	gsl_rand_init(1);
 	init_options(); //Must be initialized before params!!
 	init_params();
@@ -208,16 +227,16 @@ void dram_init()
 }
 
 
-double priorfun(double *x, int n)
-{
-	return 0;
+double priorfun(double *x, int n, Density *d){
+	
+	return -2. * prior_log_pdf( d, n, x);
 }
 
 
-double ssfun(double *x, int n)
-{
-	double s = -fitfun(x, n, NULL, NULL);
-	return s;
+double ssfun(double *x, int n){
+
+	double res = fitfun(x, n, NULL, NULL);
+	return  -2. * res;
 }
 
 
@@ -401,9 +420,11 @@ void dram()
  */
 
 	// parameters for the simulation model
-	int npar	= options.Npar;
-	int nsimu  	= options.Nsim;
-	double *par0 	= params.par0;
+	int npar	 = options.Npar;
+	int nsimu	 = options.Nsim;
+	double *par0 = params.par0;
+
+	Density *prior = params.prior;
 
 	double *lbounds	= params.lbounds;
 	double *ubounds	= params.ubounds;
@@ -472,7 +493,7 @@ void dram()
 	memcpy(oldpar, par0, npar*sizeof(double)); // first row of the chain
 
 	double oldss    = ssfun(oldpar, npar); // first sum-of-squares
-	double oldprior = priorfun(oldpar, npar);
+	double oldprior = priorfun( oldpar, npar, prior );
 
 #if DEBUG
 	printf("oldss = %f\n", oldss);
@@ -526,8 +547,8 @@ void dram()
 		}
 		else // inside bounds, check if accepted
 		{
-			newss  = ssfun(newpar,npar); // sum-of-squares
-			newprior = priorfun(newpar,npar); // prior ss
+			newss  = ssfun(newpar,npar);
+			newprior = priorfun(newpar,npar,prior);
 			alpha12 = min(1,exp(-0.5*(newss-oldss)/sigma2-0.5*(newprior-oldprior)));
 			double r = uniformrand(0,1);
 			if (r < alpha12) // we accept
@@ -569,7 +590,7 @@ void dram()
 			else // inside bounds
 			{
 				newss2    = ssfun(newpar2,npar);
-				newprior2 = priorfun(newpar2,npar);
+				newprior2 = priorfun(newpar2,npar,prior);
 				double alpha32 = min(1,exp(-0.5*(newss-newss2)/sigma2 -0.5*(newprior-newprior2)));
 				double l2 = exp(-0.5*(newss2-oldss)/sigma2 - 0.5*(newprior2-oldprior));
 				//double q1 = exp(-0.5*(norm((newpar2-newpar)*iR)^2-norm((oldpar-newpar)*iR)^2));

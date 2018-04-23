@@ -5,8 +5,8 @@ LDFLAGS=-lgsl -lgslcblas -lm
 all: dram
 
 
-dram: run_dram.c dram.c fitfun.c auxil.c auxil.h
-	$(CC) $(CFLAGS) -o dram run_dram.c dram.c auxil.c fitfun.c $(LDFLAGS)
+dram: run_dram.c dram.c fitfun.c ../priors/priors.c  ../priors/myrand.c
+	$(CC) $(CFLAGS) -o dram run_dram.c dram.c ../priors/priors.c  ../priors/myrand.c fitfun.c $(LDFLAGS)
 
 clean:
 	rm -f dram

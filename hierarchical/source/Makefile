@@ -23,8 +23,10 @@ CMAES_SRC = CMAES/engine_cmaes.c \
 			CMAES/cmaes.c
 
 DRAM_SRC = 	DRAM/run_dram.c \
-			DRAM/dram.c \
-			DRAM/auxil.c
+			DRAM/dram.c
+						
+PRIORS = 	priors/priors.c \
+			priors/myrand.c
 
 
 SRC1 := $(TMCMC_SRC)	likelihoods/fitfun_theta.c \
@@ -43,13 +45,11 @@ SRC5 := $(CMAES_SRC)    likelihoods/fitfun_theta.c \
 						likelihoods/loglike_theta.c \
 						likelihoods/spawner.c
 
-SRC6 := $(CMAES_SRC)    likelihoods/fitfun_theta_fast.c \
-						likelihoods/loglike_theta_fast.c\
-						priors/priors.c \
-						priors/myrand.c
+SRC6 := $(CMAES_SRC) $(PRIORS)		likelihoods/fitfun_theta_fast.c \
+									likelihoods/loglike_theta_fast.c\
 
-SRC7 := $(DRAM_SRC)		likelihoods/fitfun_theta_fast.c \
-						likelihoods/loglike_theta_fast.c 
+SRC7 := $(DRAM_SRC) $(PRIORS)		likelihoods/fitfun_theta_fast.c \
+									likelihoods/loglike_theta_fast.c 
 
 SRC8 := $(DRAM_SRC)	likelihoods/fitfun_psi.c \
 						likelihoods/loglike_psi.c \
@@ -71,7 +71,7 @@ OBJ8:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC8)) )
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-use_torc?=1
+use_torc?=0
 use_omp?=0
 
 CC := mpicc
