@@ -1,5 +1,5 @@
 /*
- *  engine_tmcmc.h
+ *  tmcmc_engine.h
  *  Pi4U
  *
  *  Created by Panagiotis Hadjidoukas on 1/1/14.
@@ -10,11 +10,17 @@
 #ifndef _ENGINE_TMCMC_H_
 #define _ENGINE_TMCMC_H_
 
+
+
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
+
+
 
 #if defined(_USE_TORC_)
 	#include <mpi.h>
@@ -33,11 +39,14 @@
 	#include <pthread.h>
 #endif
 
-#include <unistd.h>
 
-#include "gsl_headers.h"
 
 #define EXPERIMENTAL_RESULTS    0
+
+
+
+
+
 
 /*** HELPER STRUCTS ***/
 typedef struct data_s {
@@ -72,10 +81,8 @@ typedef struct data_s {
         double  Step;
     } options;
 
-#if 1
     int    prior_type;     /* 0: uniform, 1: gaussian, 3: composite */
     int    load_from_file;
-#endif
 
     int    icdump;
     int    ifdump;
@@ -94,6 +101,10 @@ typedef struct data_s {
     int restart;
 } data_t;
 
+
+
+
+
 typedef struct runinfo_s {
     int     Gen;
     double    *CoefVar;        /*[MAXGENS];*/
@@ -105,11 +116,16 @@ typedef struct runinfo_s {
     double    **meantheta;         /*[MAXGENS][PROBDIM]*/
 } runinfo_t;
 
+
+
+
 typedef struct {
     int idx;
     int nsel;
     double F;
 } sort_t;
+
+
 
 /*** DATABASES ***/
 typedef struct cgdbp_s {
@@ -120,17 +136,17 @@ typedef struct cgdbp_s {
     int counter;    /* not used (?)*/
     int nsel;    /* for selection of leaders only*/
     int queue;    /* for submission of leaders only*/
-#if 1   // NN
     int surrogate;
     double error;
-#endif
 } cgdbp_t;
+
 
 typedef struct cgdb_s {
     cgdbp_t *entry; /*[MAX_DB_ENTRIES];*/
     int entries;
     pthread_mutex_t m;
 } cgdb_t;
+
 
 typedef struct dbp_s {
     double *point; /*[PROBDIM];*/
@@ -160,6 +176,8 @@ typedef struct resdb_s {
 } resdb_t;
 /*** END HELPER STRUCTS ***/
 
+
+
 /*** DATABASE INSTANCES ***/
 extern data_t data;
 extern runinfo_t runinfo;
@@ -167,66 +185,41 @@ extern cgdb_t curgen_db;
 extern db_t full_db;
 extern resdb_t curres_db;
 
-void update_full_db(double point[], double F, double *G, int n, int surrogate);
-void init_full_db();
 
-void update_curgen_db(double point[], double F, double prior);
-void init_curgen_db();
 
-void update_curres_db(double point[], double F);
-void init_curres_db();
-void print_full_db();
-void print_curgen_db();
-void dump_curgen_db(int Gen);
-void dump_curres_db(int Gen);
-void dump_full_db(int Gen);
-void display_curgen_db(int Gen);
-int load_curgen_db(int Gen);
 
-/*** UTILS ***/
-double compute_sum(double *x, int n);
-double compute_mean(double *x, int n);
-double compute_std(double *x, int n, double mean);
-double compute_min(double *x, int n);
-int compute_min_idx_i(int *v, int n);
-double compute_max(double *x, int n);
-void print_matrix(char *name, double *x, int n);
-void print_matrix_i(char *name, int *x, int n);
-void print_matrix_2d(char *name, double **x, int n1, int n2);
 
-/*** RNG ***/
-void gsl_rand_init(int seed);
-double normalrand(double mu, double var);
-double uniformrand(double a, double b);
-void multinomialrand(size_t K, unsigned int N, double q[], unsigned int nn[]);
-void shuffle(int *perm, int N);
-int mvnrnd(double *mean, double *var, double *res, int n);
-double mvnpdf(int n, double *xv, double *mv, double *vm);
-double logmvnpdf(int n, double *xv, double *mv, double *vm);
 
-double truncated_normal_pdf (double x, double mu, double sigma, double a, double b);
-double truncated_normal_rand (double mu, double sigma, double a, double b);
-double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b);
+void read_data();
+void data_init();
+void save_runinfo();
+int load_runinfo();
+void check_for_exit();
+void torc_update_full_db_task(double point[], double *pF, int *psurrogate);
+void torc_update_full_db_task_p5(double point[], double *pF, double *G, int *pn, int *psurrogate);
+void torc_update_full_db(double point[], double F, double *G, int n, int surrogate);
+void torc_update_curgen_db_task(double point[], double *pF, double *pprior);
+void torc_update_curgen_db(double point[], double F, double prior);
+void torc_update_curres_db_task(double point[EXPERIMENTAL_RESULTS], double *pF);
+void torc_update_curres_db(double point[EXPERIMENTAL_RESULTS], double F);
 
-/*** STATISTICS ***/
-void calculate_statistics(double flc[], unsigned int n, int nselections, int gen, unsigned int sel[]);
+/*** TASK MANAGEMENT ***/
+void taskfun(double /*const*/ *x, int *pN, double *res, int winfo[4]);
+double F(double *TP, int *pn);    /* for PNDL */
+void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int chain_id, int step_id, int ntasks);
+void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[4]);
+static int in_rect(double *v1, double *v2, double *diam, double sc, int D);
+void precompute_chain_covariances(const cgdbp_t* leader,double** init_mean, double** chain_cov, int newchains);
+int compute_candidate(double candidate[], double chain_mean[], double var);
+int compute_candidate_cov(double candidate[], double chain_mean[], double chain_cov[]);
+void chaintask(double in_tparam[], int *pdim, int *pnsteps, double *out_tparam, int winfo[4],double *init_mean, double *chain_cov);
+int compar_desc(const void* p1, const void* p2);
+int prepare_newgen(int nchains, cgdbp_t *leaders);
 
-/*** PROBLEM FUNCTIONS ***/
-double likelihood(double *x, int N);
-double posterior(double *theta, int n, double LH);
-double logpriorpdf(double *theta, int n);
 
-/*** AUX ***/
-void inc_nfc();
-void get_nfc_task(int *);
-int get_nfc();
-void reset_nfc_task();
-void reset_nfc();
-int get_tfc();
 
-/*** POSDEF ***/
-void compute_mat_product_vect(double *mat/*2D*/, double vect[], double res_vect[], double coef, int PROBDIM);
-double compute_dot_product(double row_vector[], double vector[], int PROBDIM);
-int inv_matrix(double coef, double *current_hessian/*2D*/, double *inv_current_hessian/*2D*/, int PROBDIM);
+
+
+
 
 #endif

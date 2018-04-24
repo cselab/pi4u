@@ -8,81 +8,76 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
-#include "engine_tmcmc.h"
 #include <time.h>
 
-#if !defined(_USE_TORC_)
-#include <sys/time.h>
-static double torc_gettime()
-{
-        struct timeval t;
-        gettimeofday(&t, NULL);
-        return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
-}
-#endif
 
-int display = 0;
+#include <gsl/gsl_multimin.h>
+
+
+#include "tmcmc_aux.h"
+#include "tmcmc_engine.h"
+#include "tmcmc_stats.h"
+
+
+
+
+
+//#define _USE_FMINCON_
+#define _USE_FMINSEARCH_
+#define _USE_FZEROFIND_
+
 #define LARGE_SCALE_POPS
 
-/** OBJLOGP FUNCTION **/
-double Objlogp(double x, double *fj, int fn, double pj, double tol)
-{
+
+int display = 0;
+
+
+
+
+
+// Objective functions
+double Objlogp(double x, double *fj, int fn, double pj, double tol){
 	int i;
 	double fjmax = compute_max(fj, fn);
 
-#ifdef LARGE_SCALE_POPS
-	double *weight = (double *)malloc(fn*sizeof(double));
-#else
-	double weight[fn];
-#endif
+	#ifdef LARGE_SCALE_POPS
+		double *weight = (double *)malloc(fn*sizeof(double));
+	#else
+		double weight[fn];
+	#endif
+
 	for (i = 0; i < fn; i++)
 		weight[i] = exp((fj[i]-fjmax)*(x-pj));
 
 	double sum_weight = compute_sum(weight, fn);
 
-#ifdef LARGE_SCALE_POPS
-	double *q = (double *)malloc(fn*sizeof(double));
-#else
-	double q[fn];
-#endif
+	#ifdef LARGE_SCALE_POPS
+		double *q = (double *)malloc(fn*sizeof(double));
+	#else
+		double q[fn];
+	#endif
 
 	for (i = 0; i < fn; i++)
 		q[i] = weight[i]/sum_weight;
 
 	double mean_q = compute_mean(q, fn);
-	double std_q = compute_std(q, fn, mean_q);
+	double std_q  = compute_std(q, fn, mean_q);
 
 	double CoefVar = pow(std_q/mean_q-tol, 2);	/* result */
 
-#ifdef LARGE_SCALE_POPS
-	free(weight);
-	free(q);
-#endif
+	#ifdef LARGE_SCALE_POPS
+		free(weight);
+		free(q);
+	#endif
 	return CoefVar;
 }
 
-typedef struct fparam_s {
-	double *fj;
-	int     fn;
-	double  pj;
-	double  tol;
-} fparam_t;
 
-fparam_t *sfp;
 
-double Objlogp_s(double *x, int n)
-{
-	double *fj = sfp->fj;
-	int fn = sfp->fn;
-	double pj = sfp->pj;
-	double tol = sfp->tol;
 
-	return Objlogp(x[0], fj, fn, pj, tol);
-}
-
-double Objlogp_gsl(double x, void *param)
-{
+double Objlogp_gsl(double x, void *param){
 	fparam_t *fp = (fparam_t *) param;
 
 	double *fj = fp->fj;
@@ -94,6 +89,8 @@ double Objlogp_gsl(double x, void *param)
 	return res;
 }
 
+
+
 double Objlogp_gsl2(const gsl_vector *v, void *param)
 {
 	double x;
@@ -102,7 +99,10 @@ double Objlogp_gsl2(const gsl_vector *v, void *param)
 	return Objlogp_gsl(x, param);
 }
 
-/*** OPTIMIZATION ***/
+
+
+
+// Optimization functions
 int fzerofind(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
 {
 	size_t iter = 0;
@@ -225,6 +225,13 @@ retry:
 }
 
 
+
+
+
+
+
+
+
 int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
 {
 	const gsl_multimin_fminimizer_type *T;
@@ -315,6 +322,13 @@ int fminsearch(double *fj, int fn, double pj, double tol, double *xmin, double *
 
 	return conv;
 }
+
+
+
+
+
+
+
 
 int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmin)
 {
@@ -444,15 +458,17 @@ int fmincon(double *fj, int fn, double pj, double tol, double *xmin, double *fmi
 }
 
 
-/*** STATISTICS ***/
-
-#define _USE_FMINCON_
-#define _USE_FMINSEARCH_
-#define _USE_FZEROFIND_
 
 
-#include "posdef.c" 	/* peh */
 
+
+
+
+
+
+// Calculate statistics 
+//
+//
 void calculate_statistics(double flc[], unsigned int n, int nselections, int gen, unsigned int sel[])
 {
 	int Display = data.options.Display;
@@ -461,31 +477,32 @@ void calculate_statistics(double flc[], unsigned int n, int nselections, int gen
 	double *CoefVar = runinfo.CoefVar;
 	double *p = runinfo.p;
 	int *Num = data.Num;
-/*	int *currentuniques = runinfo.currentuniques;*/
 	double *logselection = runinfo.logselection;
 	double Step = data.options.Step;
 	double fmin = 0, xmin = 0;
 	int conv = 0;
 
-#if defined(_USE_FMINCON_)
-	conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
-	if (Display)
-		printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
-#endif
-#if defined(_USE_FMINSEARCH_)
-	if (!conv) {
-		conv = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
+	#if defined(_USE_FMINCON_)
+		conv = fmincon(flc, n, p[gen], tolCOV, &xmin, &fmin);
 		if (Display)
-			printf("fminsearch: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
-	}
-#endif
-#if defined(_USE_FZEROFIND_)
-	if (!conv) {
-		conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
-		if (Display)
-			printf("fzerofind: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
-	}
-#endif
+			printf("fmincon: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
+	#endif
+	
+	#if defined(_USE_FMINSEARCH_)
+		if (!conv){
+			conv = fminsearch(flc, n, p[gen], tolCOV, &xmin, &fmin);
+			if (Display)
+				printf("fminsearch: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
+		}
+	#endif
+	
+	#if defined(_USE_FZEROFIND_)
+		if (!conv) {
+			conv = fzerofind(flc, n, p[gen], tolCOV, &xmin, &fmin);
+			if (Display)
+				printf("fzerofind: conv=%d xmin=%.16lf fmin=%.16lf\n", conv, xmin, fmin);
+		}
+	#endif
 
 
 	/* gen: next generation number */
@@ -515,7 +532,6 @@ void calculate_statistics(double flc[], unsigned int n, int nselections, int gen
 
 	double fjmax= compute_max (flcp,n );
 	double *weight = (double *)malloc(n*sizeof(double));
-	/*PA weight[i] = exp((flc[i]-fjmax)*(p[j]-p[j-1])); 23/06 */
 	for (i = 0; i < n; i++)
 		weight[i] = exp( flcp[i] - fjmax );
 
@@ -531,16 +547,13 @@ void calculate_statistics(double flc[], unsigned int n, int nselections, int gen
 	if (display)
 		print_matrix((char *)"runinfo_q", q, n);
 
-	/*double sum_q = compute_sum(q, n);*/
-
-	/*logselection[gen] = log(sum_weight/currentuniques[gen])+fjmax*(p[gen+1]-p[gen]); PA definition change for all types of resampling 23/06/15*/
 	logselection[gen]= log(sum_weight) + fjmax -log(n);
 
 	if (display)
 		print_matrix((char *)"logselection", logselection, gen+1);
 
 	double mean_q = compute_mean(q, n);
-	double std_q = compute_std(q, n, mean_q);
+	double std_q  = compute_std(q, n, mean_q);
 
 	CoefVar[gen] = std_q/mean_q;
 
@@ -557,7 +570,6 @@ void calculate_statistics(double flc[], unsigned int n, int nselections, int gen
 
 	if (nselections == 0) nselections = samples; /* n;*/
 	N = nselections;
-	/*gsl_ran_multinomial (r, K, N, q, nn);*/
 	multinomialrand (K, N, q, nn);
 	for (i = 0; i < K; i++) sel[i]+=nn[i];
 
@@ -599,14 +611,16 @@ void calculate_statistics(double flc[], unsigned int n, int nselections, int gen
 		}
 	}
 
-#if 1	/* peh:check this */
-	{
-	int fixed = make_posdef(runinfo.SS[0], PROBDIM, 2);
-	if (fixed) {
-		printf("WARNING: runinfo.SS was forced to become positive definite\n");
-	}
-	}
-#endif
+// XXX shoule we check for positive deffinitnes here?
+//#if 1	/* peh:check this */
+//	{
+//	int fixed = make_posdef(runinfo.SS[0], PROBDIM, 2);
+//	if (fixed) {
+//		printf("WARNING: runinfo.SS was forced to become positive definite\n");
+//	}
+//	}
+//#endif
+
 
 	if (display)
 		print_matrix_2d((char *)"runinfo.SS", runinfo.SS, PROBDIM, PROBDIM);
@@ -616,6 +630,18 @@ void calculate_statistics(double flc[], unsigned int n, int nselections, int gen
 	free(q);
 	free(nn);
 }
+
+
+
+
+
+
+
+
+//=============================================================================
+//
+//	prior functions: to be removed and linked with priors.c
+
 
 double logpriorpdf(double *theta, int n)
 {
@@ -671,3 +697,7 @@ double logpriorpdf(double *theta, int n)
 
 	return res;
 }
+
+
+
+

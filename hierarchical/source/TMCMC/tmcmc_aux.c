@@ -1,5 +1,5 @@
 /*
- *  auxil.c
+ *  tmcmc_aux.c
  *  Pi4U
  *
  *  Created by Panagiotis Hadjidoukas on 1/1/14.
@@ -10,9 +10,75 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#include <torc.h>
 
-#include "gsl_headers.h"
+
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_eigen.h>
+#include <gsl/gsl_blas.h>
+
+
+
+
+#include "tmcmc_aux.h"
+#include "tmcmc_engine.h"
+
+
+
+
+
+
+
+
+#if defined(_USE_TORC_)
+	
+	#include <mpi.h>
+
+	#ifdef __cplusplus
+		extern "C"
+		{
+	#endif
+
+	#include <torc.h>
+
+	#ifdef __cplusplus
+		}
+	#endif
+
+#else
+
+	#include <pthread.h>
+	int torc_node_id() { return 0; }
+	int torc_num_nodes() { return 1; }
+
+	#if defined(_USE_OPENMP_)
+		#include <omp.h>
+		int torc_i_worker_id() { return omp_get_thread_num(); }
+		int torc_i_num_workers() { return omp_get_max_threads(); }
+		int torc_worker_id() { return omp_get_thread_num(); }
+	#else
+		int torc_i_worker_id() { return 0; }
+		int torc_i_num_workers() { return 1; }
+		int torc_worker_id() { return 0; }
+	#endif
+
+	#include <sys/time.h>
+	double torc_gettime(){
+    	struct timeval t;
+    	gettimeofday(&t, NULL);
+    	return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
+	}
+
+#endif
+
+
+
+
+
+
+
+
+
 
 /**********************************************/
 /* Function call counters */
@@ -37,12 +103,16 @@ void reset_nfc_task()
 
 void reset_nfc()
 {
+#if defined(_USE_TORC_)
     int i;
 
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, (void *)reset_nfc_task, 0);
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())reset_nfc_task, 0);
     }
     torc_waitall();
+#else
+    reset_nfc_task();
+#endif
 }
 
 void get_nfc_task(int *x)
@@ -55,20 +125,24 @@ int get_nfc()
     int i;
     int c[1024]; /* MAX_NODES*/
 
+#if defined(_USE_TORC_)
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, (void *)get_nfc_task, 1,
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())get_nfc_task, 1,
                 1, MPI_INT, CALL_BY_RES, &c[i]);
     }
     torc_waitall();
+#else
+    get_nfc_task(&c[0]);
+#endif
 
     unsigned int s = 0;
-    printf("get_nfc:");
+    //printf("get_nfc:");
     for (i = 0; i < torc_num_nodes(); i++) {
-        s += c[i];
-        printf("+%d", c[i]);
+		s += c[i];
+    	// printf("+%d", c[i]);
     }
     g_nfeval = s;
-    printf("=%d\n", s);
+    //printf("=%d\n", s);
 
     t_nfeval += g_nfeval;
     return g_nfeval;
@@ -218,6 +292,7 @@ double compute_std(double *v, int n, double mean)
 /**********************************************/
 const gsl_rng_type *T;
 gsl_rng **r;
+int *local_seed;
 
 void gsl_rand_init(int seed)
 {
@@ -225,16 +300,23 @@ void gsl_rand_init(int seed)
     gsl_rng_env_setup();
 
     T = gsl_rng_default;
-    r = malloc(local_workers*sizeof(gsl_rng *));
+    r = (gsl_rng **)malloc(local_workers*sizeof(gsl_rng *));
     for (i = 0; i < local_workers; i++) {
         r[i] = gsl_rng_alloc (T);
     }
+
+    if (seed == 0) seed = time(0);
 
     for (i = 0; i < local_workers; i++) {
 #if VERBOSE
         printf("node %d: initializing rng %d with seed %d\n", torc_node_id(), i, seed+i+local_workers*torc_node_id());
 #endif
         gsl_rng_set(r[i], seed+i+local_workers*torc_node_id());
+    }
+
+    local_seed = (int *)malloc(local_workers*sizeof(int));
+    for (i = 0; i < local_workers; i++) {
+        local_seed[i] = seed+i+local_workers*torc_node_id();
     }
 }
 
@@ -366,8 +448,8 @@ int mvnrnd_cboet(gsl_rng * rng, const gsl_vector * mean, gsl_matrix * covar, gsl
     gsl_vector_memcpy(&diagonal.vector, eval);
     for(i=0;i<n;i++)
     {
-        gsl_vector_set( &diagonal.vector, 
-                i,  
+        gsl_vector_set( &diagonal.vector,
+                i,
                 sqrt( gsl_vector_get(&diagonal.vector, i) )
                 );
     }
@@ -377,9 +459,9 @@ int mvnrnd_cboet(gsl_rng * rng, const gsl_vector * mean, gsl_matrix * covar, gsl
     /* evec * matrix(diag(eval)) * transpose(evec)  */
     /*    gsl_blas_dsymm (CblasLeft, CblasUpper, 1.0, evec, eval_mx, 0.0, x_M);*/
 
-    gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 
+    gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
             1.0, evec, eval_mx, 0.0, x_M);
-    gsl_blas_dgemm (CblasNoTrans, CblasTrans, 
+    gsl_blas_dgemm (CblasNoTrans, CblasTrans,
             1.0, x_M, evec, 0.0, x_M_x);
 
 
@@ -390,9 +472,9 @@ int mvnrnd_cboet(gsl_rng * rng, const gsl_vector * mean, gsl_matrix * covar, gsl
 
     gsl_vector * rnorms = gsl_vector_alloc(n);
     for(i=0;i<n;i++)
-    { 
-        gsl_vector_set 
-            ( rnorms, i, 
+    {
+        gsl_vector_set
+            ( rnorms, i,
               gsl_ran_gaussian_ziggurat(rng, 1)
             );
     }
@@ -432,8 +514,10 @@ int mvnrnd(double *mean, double *sigma, double *out, int N)
 #if 1
 void aux_init()
 {
-    torc_register_task(reset_nfc_task);
-    torc_register_task(get_nfc_task);
+#if defined(_USE_TORC_)
+    torc_register_task((void *)reset_nfc_task);
+    torc_register_task((void *)get_nfc_task);
+#endif
 }
 #endif
 
@@ -533,3 +617,133 @@ double logmvnpdf(int n, double *xv, double *mv, double *vm)
     double result = gsl_dmvnorm(n, xv, mv, vm, 1);
     return result;
 }
+
+
+#include "thirdparty/truncated_normal.c"
+
+/******************************************************************************/
+double truncated_normal_pdf (double x, double mu, double sigma, double a, double b)
+{
+    double pdf;
+
+    pdf = truncated_normal_ab_pdf(x, mu, sigma, a, b);
+
+    return pdf;
+}
+
+/******************************************************************************/
+double truncated_normal_rand (double mu, double sigma, double a, double b)
+{
+    int me = torc_i_worker_id();
+
+    double x = truncated_normal_ab_sample(mu, sigma, a, b, &local_seed[me]);
+
+    return x;
+}
+
+/******************************************************************************/
+double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b)
+{
+    double pdf;
+
+    pdf = log_normal_truncated_ab_pdf(x, mu, sigma, a, b);
+
+    return pdf;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------------
+//
+//
+void call_gsl_rand_init()
+{
+    // printf("CALLING gsl_rand_init() on node %d\n", torc_node_id()); fflush(0);
+    gsl_rand_init(data.seed);
+}
+
+
+
+void spmd_gsl_rand_init()
+{
+	#if defined(_USE_TORC_)
+    	int i;
+    	for (i = 0; i < torc_num_nodes(); i++) {
+        	torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_gsl_rand_init, 0);
+    	}
+    	torc_waitall();
+	#else
+		call_gsl_rand_init();
+	#endif
+}
+
+
+
+void call_print_matrix_2d()
+{
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    print_matrix_2d((char *)"runinfo.SS", runinfo.SS, data.Nth, data.Nth);
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+}
+
+
+
+void spmd_print_matrix_2d()
+{
+	#if defined(_USE_TORC_)
+		int i;
+		for (i = 0; i < torc_num_nodes(); i++) {
+			torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_print_matrix_2d, 0);
+		}
+		torc_waitall();
+	#else
+		call_print_matrix_2d();
+	#endif
+}
+
+
+
+void call_update_gdata()    /* step for p[j]*/
+{
+	#if defined(_USE_TORC_)
+		MPI_Bcast(runinfo.SS[0], data.Nth*data.Nth, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+		MPI_Bcast(runinfo.p, data.MaxStages, MPI_DOUBLE, 0, MPI_COMM_WORLD);    /* just p[Gen]*/
+		MPI_Bcast(&runinfo.Gen, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	#endif
+}
+
+
+
+void spmd_update_gdata()    /* step*/
+{
+	#if defined(_USE_TORC_)
+		int i;
+		if (torc_num_nodes() == 1) return;
+		for (i = 0; i < torc_num_nodes(); i++) {
+			torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())call_update_gdata, 0);
+		}
+		torc_waitall();
+	#endif
+}
+
+
+
+
+
+
+
+
+

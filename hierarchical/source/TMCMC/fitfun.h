@@ -1,22 +1,6 @@
 #ifndef _FITFUN_H_
 #define _FITFUN_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <fcntl.h>
-#include <ftw.h>
-#include <math.h>
-
-#include <unistd.h>
-#include <sys/wait.h>
-#include <errno.h>
-
-#include "engine_tmcmc.h"
-
-
-
-
 void fitfun_initialize(char *s);
 
 double fitfun(double *x, int n, void *output, int *info);

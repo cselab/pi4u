@@ -7,7 +7,16 @@
  *
  */
 
-#include "engine_tmcmc.h"
+
+
+
+#include<stdio.h>
+
+#include "tmcmc_engine.h"
+#include "tmcmc_db.h"
+
+
+
 
 void update_full_db(double point[], double F, double *G, int n, int surrogate)
 {
@@ -28,12 +37,17 @@ void update_full_db(double point[], double F, double *G, int n, int surrogate)
 	full_db.entry[pos].surrogate = surrogate;
 }
 
+
+
+
 void init_full_db()
 {
 	pthread_mutex_init(&full_db.m, NULL);
 	full_db.entries = 0;
 	full_db.entry = (dbp_t *)calloc(1, data.MaxStages*data.PopSize*sizeof(dbp_t));	
 }
+
+
 
 
 void update_curgen_db(double point[], double F, double prior)
@@ -54,12 +68,16 @@ void update_curgen_db(double point[], double F, double prior)
 }
 
 
+
+
 void init_curgen_db()
 {
 	pthread_mutex_init(&curgen_db.m, NULL);
 	curgen_db.entries = 0;
 	curgen_db.entry = (cgdbp_t *)calloc(1, (data.MinChainLength+1)*data.PopSize*sizeof(cgdbp_t));
 }
+
+
 
 
 void update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
@@ -80,12 +98,16 @@ void update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
 	curres_db.entry[pos].F = F;	
 }
 
+
+
 void init_curres_db()
 {
 	pthread_mutex_init(&curres_db.m, NULL);
 	curres_db.entries = 0;
 	curgen_db.entry = (cgdbp_t *)calloc(1, (data.MinChainLength+1)*data.PopSize*sizeof(cgdbp_t));
 }
+
+
 
 
 void print_full_db()
@@ -105,6 +127,9 @@ void print_full_db()
 	printf("=======\n");
 }
 
+
+
+
 void dump_full_db(int Gen)
 {
 	int PROBDIM = data.Nth;
@@ -123,6 +148,11 @@ void dump_full_db(int Gen)
 	}
 	fclose(fp);
 }
+
+
+
+
+
 
 
 void dump_curgen_db(int Gen)
@@ -147,6 +177,11 @@ void dump_curgen_db(int Gen)
 	}
 	fclose(fp);
 }
+
+
+
+
+
 
 int load_curgen_db(int Gen)
 {
@@ -184,6 +219,10 @@ int load_curgen_db(int Gen)
 
 	return 0;
 }
+
+
+
+
 
 void dump_curres_db(int Gen)
 {

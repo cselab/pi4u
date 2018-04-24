@@ -12,12 +12,16 @@ TARGET6 := optimize_theta_fast
 TARGET7 := dram_theta_fast
 TARGET8 := dram_psi
 
+
 TMCMC := TMCMC
 
-TMCMC_SRC =  	$(TMCMC)/engine_tmcmc.c \
+
+TMCMC_SRC =  	$(TMCMC)/tmcmc_run.c \
+				$(TMCMC)/tmcmc_engine.c \
 				$(TMCMC)/tmcmc_stats.c \
 				$(TMCMC)/tmcmc_db.c \
-				$(TMCMC)/auxil.c \
+				$(TMCMC)/tmcmc_aux.c \
+
 
 CMAES_SRC = CMAES/engine_cmaes.c \
 			CMAES/cmaes.c
@@ -52,8 +56,8 @@ SRC7 := $(DRAM_SRC) $(PRIORS)		likelihoods/fitfun_theta_fast.c \
 									likelihoods/loglike_theta_fast.c 
 
 SRC8 := $(DRAM_SRC)	likelihoods/fitfun_psi.c \
-						likelihoods/loglike_psi.c \
-						likelihoods/priors.c
+					likelihoods/loglike_psi.c \
+					likelihoods/priors.c
 
 ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5)  $(SRC6)  $(SRC7)  $(SRC8)
 TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8)
@@ -71,7 +75,7 @@ OBJ8:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC8)) )
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-use_torc?=0
+use_torc?=1
 use_omp?=0
 
 CC := mpicc
