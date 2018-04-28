@@ -148,6 +148,9 @@ typedef struct cgdb_s {
 } cgdb_t;
 
 
+
+
+
 typedef struct dbp_s {
     double *point; /*[PROBDIM];*/
     double F;
@@ -161,6 +164,11 @@ typedef struct db_s {
     int entries;
     pthread_mutex_t m;
 } db_t;
+
+
+
+
+
 
 typedef struct resdbp_s {
     double *point;    /*[EXPERIMENTAL_RESULTS+1]; // +1 for the result (F)*/
@@ -179,11 +187,11 @@ typedef struct resdb_s {
 
 
 /*** DATABASE INSTANCES ***/
-extern data_t data;
-extern runinfo_t runinfo;
-extern cgdb_t curgen_db;
-extern db_t full_db;
-extern resdb_t curres_db;
+extern data_t		data;
+extern runinfo_t 	runinfo;
+extern cgdb_t 		curgen_db;
+extern db_t 		full_db;
+extern resdb_t 		curres_db;
 
 
 
@@ -207,7 +215,12 @@ void torc_update_curres_db(double point[EXPERIMENTAL_RESULTS], double F);
 void taskfun(double /*const*/ *x, int *pN, double *res, int winfo[4]);
 double F(double *TP, int *pn);    /* for PNDL */
 void evaluate_F(double point[], double *Fval, int worker_id, int gen_id, int chain_id, int step_id, int ntasks);
+
+
 void initchaintask(double in_tparam[], int *pdim, double *out_tparam, int winfo[4]);
+
+
+
 static int in_rect(double *v1, double *v2, double *diam, double sc, int D);
 void precompute_chain_covariances(const cgdbp_t* leader,double** init_mean, double** chain_cov, int newchains);
 int compute_candidate(double candidate[], double chain_mean[], double var);

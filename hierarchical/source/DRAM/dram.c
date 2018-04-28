@@ -170,19 +170,20 @@ void init_params()
 	            break;
 	        }
 	    }
-	    if (!found) print_error("Lower/Upper bounds");
+	    if (!found) print_error("Lower/Upper bounds 0");
 	}
 
+	//TODO: read initial point from file 'dram.par' 
 	params.par0 = (double *)malloc(options.Npar*sizeof(double));
 	for (int i = 0; i < options.Npar; i++)
-		params.par0[i] = 1.0;
+		params.par0[i] = i+1;
 		//params.par0[i] = (params.lbounds[i]+params.ubounds[i])/2.; // initial value
 
 
 	/* Check if user has provided all necessary parameters */
-    if (params.lbounds == NULL) 	print_error("Lower/Upper bounds");
-    if (params.ubounds == NULL) 	print_error("Lower/Upper bounds");
-    if (params.par0 == NULL) 		print_error("Lower/Upper bounds");
+    if (params.lbounds == NULL) 	print_error("Lower/Upper bounds 1");
+    if (params.ubounds == NULL) 	print_error("Lower/Upper bounds 2");
+    if (params.par0 == NULL) 		print_error("Lower/Upper bounds 3");
 
 
 	int Ntmp;
@@ -250,9 +251,7 @@ double norm(double *a, int n)
 }
 
 
-#if 1
-void covupd(double *x, int start, int end, int npar, double w, double *xcov, double *xmean, double *wsum)
-{
+void covupd(double *x, int start, int end, int npar, double w, double *xcov, double *xmean, double *wsum){
 	int n = end - start;
 	int p = npar;
 
@@ -344,7 +343,11 @@ void covupd(double *x, int start, int end, int npar, double w, double *xcov, dou
 		}
 	}
 }
-#endif
+
+
+
+
+
 
 void inv(double *Ainv, double *A, int n)
 {
@@ -412,6 +415,13 @@ int check_bounds(double *x, double *lbounds, double *ubounds, int n)
 }
 
 
+
+
+
+
+
+
+
 void dram()
 {
 /* Metropolis-Hastings MCMC with adaptive delayed rejection (DRAM)
@@ -475,7 +485,9 @@ void dram()
 		inv(iR, R, npar);
 	}
 
-	double *chain = (double *)calloc(1, nsimu*npar*sizeof(double));	// we store the chain here
+	double *chain 	 = (double *)calloc(1, nsimu*npar*sizeof(double));
+	double *loglike  = (double *)calloc(1, nsimu*sizeof(double));
+	double *logprior = (double *)calloc(1, nsimu*sizeof(double));
 
 	double s20 = 0;
 	double *s2chain;
@@ -499,17 +511,16 @@ void dram()
 	printf("oldss = %f\n", oldss);
 #endif
 
-	int acce         = 1; //  how many accepted moves
+	int acce = 1; //  how many accepted moves
 
-	memcpy(&chain[0*npar], oldpar, npar*sizeof(double)); 
+	memcpy( &chain[0*npar], oldpar, npar*sizeof(double) ); 
+	loglike[0]  = oldss;
+	logprior[0] = oldprior;
 
 	if (s20>0)
-	{
 		s2chain[0] = sigma2;
-	}
 
 
-#if 1
 	// covariance update uses these to store previous values
 	double chaincov[npar*npar];
 	double chainmean[npar];
@@ -545,50 +556,43 @@ void dram()
 			newprior = 0;
 			alpha12 = 0;
 		}
-		else // inside bounds, check if accepted
-		{
+		else{ // inside bounds, check if accepted
 			newss  = ssfun(newpar,npar);
 			newprior = priorfun(newpar,npar,prior);
 			alpha12 = min(1,exp(-0.5*(newss-oldss)/sigma2-0.5*(newprior-oldprior)));
 			double r = uniformrand(0,1);
-			if (r < alpha12) // we accept
-			{
+			if (r < alpha12){ // we accept
 				accept   = 1;
 				acce     = acce+1;
-#if DEBUG
+				#if DEBUG
 				printf("accepting (%f<%f): from [%f %f]=(%f) to [%f %f]=(%f)\n", r, alpha12, oldpar[0], oldpar[1], oldss, newpar[0], newpar[1], newss); 
-#endif
+				#endif
 				memcpy(oldpar, newpar, npar*sizeof(double));
 				oldss    = newss;
 				oldprior = newprior;
 			}
-			else
-			{
-#if DEBUG
-				printf("not accepting (%f>%f): from [%f %f]=(%f) to [%f %f]=(%f)\n", r, alpha12, oldpar[0], oldpar[1], oldss, newpar[0], newpar[1], newss); 
-#endif
+			else{
+				#if DEBUG
+				printf("not accepting (%f>%f): from [%f %f]=(%f) to [%f %f]=(%f)\n", r, alpha12, oldpar[0], oldpar[1], oldss, newpar[0], newpar[1],newss);
+				#endif
 			}
 		}
 
-		if (accept == 0 && dodr) // we reject, but make a new try (DR)
-		{
+		if (accept == 0 && dodr){ // we reject, but make a new try (DR)
 			// a new try
 			double newpar2[npar];
-			for (int i = 0; i < npar; i++)
-			{
+			for (int i = 0; i < npar; i++){
 				newpar2[i] = oldpar[i];
 				for (int j = 0; j < npar; j++)
 					newpar2[i] += normalrand(0,1)*R2[i*npar+j]; 
 			}
 
 			double newss2, newprior2;
-			if (check_bounds(newpar2, lbounds, ubounds, npar))
-			{
+			if (check_bounds(newpar2, lbounds, ubounds, npar)){
 				newss2 = DBL_MAX; //+Inf;
 				newprior2 = 0;
 			}
-			else // inside bounds
-			{
+			else{ // inside bounds
 				newss2    = ssfun(newpar2,npar);
 				newprior2 = priorfun(newpar2,npar,prior);
 				double alpha32 = min(1,exp(-0.5*(newss-newss2)/sigma2 -0.5*(newprior-newprior2)));
@@ -617,8 +621,7 @@ void dram()
 				}
 
 				double alpha13 = l2*q1*(1-alpha32)/(1-alpha12);
-				if (uniformrand(0,1) < alpha13) // we accept
-				{
+				if (uniformrand(0,1) < alpha13){ // we accept
 					accept = 1;
 					acce     = acce+1;
 					memcpy(oldpar, newpar2, npar*sizeof(double)); // oldpar = newpar2;
@@ -629,19 +632,21 @@ void dram()
  		}
   
 		memcpy(&chain[isimu*npar], oldpar, npar*sizeof(double));
+		loglike[isimu]  = oldss;
+		logprior[isimu] = oldprior;
+
+
 		// update the error variance sigma2
-		if (s20 > 0)
-		{
+		// TODO: what is going on here?
+		if (s20 > 0){
 			//sigma2  = 1./gammar_mt(1,1,(n0+n)./2,2./(n0*s20+oldss));
 			//s2chain(isimu,:) = sigma2;
 		}
   
-		if (adaptint>0 && ((isimu+1)%adaptint == 0))
-		{
+		if (adaptint>0 && ((isimu+1)%adaptint == 0)){
 			// adapt the proposal covariances
 			if (verbosity) printf("adapting\n");
 
-#if 1
 			// update covariance and mean of the chain
 			covupd(&chain[lasti*npar], lasti, isimu, npar, 1, chaincov, chainmean, &wsum);
 			lasti = isimu;
@@ -658,51 +663,54 @@ void dram()
 			double Ra[npar*npar];
 			int is = chol(Ra, chaincov_tmp, npar);
 
-			if (is) // singular cmat
-			{
+			if(is){ // singular cmat
 				printf("Warning cmat singular, not adapting\n");
 			}
-			else
-			{
+			else{
 				for (int i = 0; i < npar; i++)
 				for (int j = 0; j < npar; j++)
 					R[i*npar+j] = Ra[i*npar+j]*adascale;
 
-				if (dodr)
-				{  
+				if (dodr){  
 					for (int i = 0; i < npar*npar; i++) R2[i] = R[i]/drscale; // second proposal for DR try
 					inv(iR, R, npar);
 				}
 			}
-#endif
 		}
 	}
-#endif
 
 
 	printf("acceptance = %d\n", (int)((100.0*acce)/nsimu));
 	FILE *fp = fopen(params.filename, "w");
-	for (int isimu=0; isimu<nsimu; isimu++)
-	{
+	for (int isimu=0; isimu<nsimu; isimu++){
+
 		for( int j=0; j<npar; j++)
 			fprintf(fp, "%lf \t ", chain[isimu*npar+j] );
 
-		fprintf(fp, "\n");
+		fprintf(fp, "%lf \t ", -loglike[isimu]/2. );
+		fprintf(fp, "%lf \n ", -logprior[isimu]/2. );
 	}
 	fclose(fp);
 
-	printf("lasti: %d\n", lasti);
-	printf("isim: %d\n", isimu);
+
+
+
+
+	//---------------------------------------------------------------------------------
+	//	TODO: delete this part?	
+	//
+	//printf("lasti: %d\n", lasti);
+	//printf("isim: %d\n", isimu);
 
 	covupd(&chain[lasti*npar], lasti, isimu, npar, 1, chaincov, chainmean, &wsum);
 
-	for (int i = 0; i < npar; i++)
-		printf("chainmean[%d]=%.4f\n", i, chainmean[i]);
+	//for (int i = 0; i < npar; i++)
+	//	printf("chainmean[%d]=%.4f\n", i, chainmean[i]);
 
-	for (int i = 0; i < npar; i++)
-	for (int j = 0; j < npar; j++)
-		printf("chaincov[%d,%d]=%.4f\n", i, j, chaincov[i*npar+j]);
+	//for (int i = 0; i < npar; i++)
+	//for (int j = 0; j < npar; j++)
+	//	printf("chaincov[%d,%d]=%.4f\n", i, j, chaincov[i*npar+j]);
 
-	printf("wsum = %f\n", wsum);
-
+	//printf("wsum = %f\n", wsum);
+	//---------------------------------------------------------------------------------
 }

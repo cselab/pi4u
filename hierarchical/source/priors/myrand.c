@@ -51,9 +51,9 @@
 //
 
 
-const gsl_rng_type   *T;
-gsl_rng   **r;
-int   *local_seed;
+const gsl_rng_type   	*T;
+gsl_rng   				**r;
+int   					*local_seed;
 
 
 void gsl_rand_init(int seed){
@@ -61,9 +61,13 @@ void gsl_rand_init(int seed){
     int i, local_workers = torc_i_num_workers();
     gsl_rng_env_setup();
     T = gsl_rng_default;
-    r = (gsl_rng **)malloc(local_workers*sizeof(gsl_rng *));
+    
+	r = (gsl_rng **)malloc(local_workers*sizeof(gsl_rng *));
+
+
     for (i = 0; i < local_workers; i++) {
         r[i] = gsl_rng_alloc (T);
+		//printf("...... %p \n", r[i] );
     }
 
     if (seed == 0) seed = time(0);

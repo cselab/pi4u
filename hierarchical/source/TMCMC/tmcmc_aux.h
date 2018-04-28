@@ -11,6 +11,8 @@
 
 
 
+void multinomialrand(size_t K, unsigned int N, double q[], unsigned int nn[]);
+int mvnrnd(double *mean, double *sigma, double *out, int N);
 
 
 /*** UTILS ***/
@@ -23,21 +25,6 @@ double compute_max(double *x, int n);
 void print_matrix(char *name, double *x, int n);
 void print_matrix_i(char *name, int *x, int n);
 void print_matrix_2d(char *name, double **x, int n1, int n2);
-
-/*** RNG ***/
-void gsl_rand_init(int seed);
-double normalrand(double mu, double var);
-double uniformrand(double a, double b);
-void multinomialrand(size_t K, unsigned int N, double q[], unsigned int nn[]);
-void shuffle(int *perm, int N);
-int mvnrnd(double *mean, double *var, double *res, int n);
-double mvnpdf(int n, double *xv, double *mv, double *vm);
-double logmvnpdf(int n, double *xv, double *mv, double *vm);
-
-double truncated_normal_pdf (double x, double mu, double sigma, double a, double b);
-double truncated_normal_rand (double mu, double sigma, double a, double b);
-double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b);
-
 
 
 /*** AUX ***/
@@ -93,6 +80,9 @@ void spmd_update_gdata();
 #endif
 
 
+#include <gsl/gsl_rng.h>
+extern gsl_rng   				**r;
+extern int   					*local_seed;
 
 
 

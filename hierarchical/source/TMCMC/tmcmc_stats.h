@@ -2,8 +2,6 @@
 #ifndef _TMCMC_STATS_H_
 #define _TMCMC_STATS_H_
 
-double logpriorpdf(double *theta, int n);
-
 void calculate_statistics(double flc[], unsigned int n, int nselections, int gen, unsigned int sel[]);
 
 

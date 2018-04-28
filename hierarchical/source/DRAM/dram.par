@@ -4,7 +4,7 @@
 
 #------------------------ GENERAL OPTIONS -------------------------------------
 # Problem dimension
-Npar		2
+Npar		4
 
 # Chain length
 Nsim		100000
@@ -28,6 +28,8 @@ Co		1
 #   100  ->  5 000 000
 B0	-100 100
 B1  -100 100
+B2  -100 100
+B3  -100 100
 
 # Print info on screen every this many steps
-printfreq	1
+printfreq	100

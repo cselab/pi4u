@@ -10,22 +10,27 @@ TMCMC := .
 
 
 TMCMC_SRC =  	$(TMCMC)/tmcmc_run.c \
-				$(TMCMC)/tmcmc_engine.c \
 				$(TMCMC)/tmcmc_stats.c \
 				$(TMCMC)/tmcmc_db.c \
-				$(TMCMC)/tmcmc_aux.c
+				$(TMCMC)/tmcmc_aux.c \
+				$(TMCMC)/tmcmc_engine.c \
 
-SRC1 := $(TMCMC_SRC)	fitfun.c
+PRIORS	= 	../priors/priors.c\
+			../priors/myrand.c
+
+SRC1 := $(TMCMC_SRC) $(PRIORS) fitfun.c
+
 
 ALL_SRC := $(SRC1) 
 TARGETS := $(TARGET1)
 
 OBJDIR = .o
-OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(SRC1)) )
+TMP=$(subst ../,,$(SRC1))
+OBJ1:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(TMP)))
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-use_torc?=0
+use_torc?=1
 use_omp?=0
 
 CC := mpicc
@@ -51,6 +56,7 @@ CFLAGS += -Wall -Wno-unused-function
 CFLAGS += -I${GSLROOT}/include
 CFLAGS += -I./$(TMCMC)
 
+
 LDLIBS += -L${GSLROOT}/lib -lgsl -lgslcblas -lm
 
 
@@ -59,6 +65,7 @@ LINK.o    = $(LD) $(LDFLAGS) -o $@
 
 
 $(shell mkdir -p $(OBJDIR) )
+
 
 #==============================================================================
 #	RULES
@@ -77,12 +84,18 @@ $(OBJDIR)/%.o: %.c
 	$(COMPILE.c) $<
 
 
+$(OBJDIR)/priors/%.o: ../priors/%.c
+	@mkdir -p "$(@D)"
+	$(COMPILE.c) $<
+
+
 tmp:
-	$(COMPILE.c) tmcmc_aux.c
+	@echo $(OBJ1)
+
 
 ctags:
 	@rm -f .tags .tags1 tags
-	@ctags $(ALL_SRC)
+	@ctags $(ALL_SRC)  ../priors/*.c  ../priors/*.h
 
 
 print:
@@ -93,4 +106,4 @@ clean:
 
 
 clear:
-	rm -rf .tags* tags
+	rm -rf .tags* tags *.txt

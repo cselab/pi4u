@@ -10,13 +10,13 @@ restarts 0                    # read by example_restarts.c, remark that restarts
 ## --- OBLIGATORY SETTINGS
 # these settings, if read, overwrite the input values to cmaes_init 
 
- N 2        # Problem dimension, overwrites parameter in cmaes_init
- initialX 2:   # Initial search point. Syntax: 1==read one number, see also end of file. 
-   0.0 0.0       #    these are the read value(s)!
- typicalX 2:   # Typical search point (useful for restarts, cave: boundaries), overwritten by initialX 
-   0.0 0.0        #    these are the read value(s)
- initialStandardDeviations  2:   #  1==read only one number for all coordinates
-   3.0 3.0                           #  numbers should not differ by orders of magnitude
+ N 4        # Problem dimension, overwrites parameter in cmaes_init
+ initialX 4:   # Initial search point. Syntax: 1==read one number, see also end of file. 
+   0.0 0.0 0.0 0.0      #    these are the read value(s)!
+ typicalX 4:   # Typical search point (useful for restarts, cave: boundaries), overwritten by initialX 
+   0.0 0.0 0.0 0.0       #    these are the read value(s)
+ initialStandardDeviations  4:   #  1==read only one number for all coordinates
+   3.0  3.0  3.0  3.0                        #  numbers should not differ by orders of magnitude
                                  #  should be roughly 1/4 of the search interval
                                  #  this number essentially influences the global 
                                  #  search ability (ie. the horizon where to search
