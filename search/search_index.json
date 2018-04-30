@@ -2,12 +2,12 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Welcome to Pi4U\n\n\nPi4U is a HPC framework for Bayesian uncertainty quantification of large scale computational models.\n\n\nModules and algorithms\n\n\nInference\n\n\nTMCMC\n\n\nABC-Subsim\n\n\nDRAM\n\n\nSingle-objective optimization\n\n\nCMAES\n\n\nAmalgam\n\n\nHierarchical Bayesian inference\n\n\nMulti-objective optimization\n\n\nNSGA-II\n\n\nMOCMAES\n\n\nMOEAD\n\n\nRare event estimation\n\n\nSubset simulation\n\n\nImplementations\n\n\nParallel\n\n\nSequential", 
+            "text": "Welcome to Pi4U\n\n\nPi4U is an HPC framework for Bayesian uncertainty quantification of large scale computational models.\n\n\nModules and algorithms\n\n\nInference\n\n\nTMCMC\n\n\nABC-Subsim\n\n\nDRAM\n\n\nSingle-objective optimization\n\n\nCMAES\n\n\nAmalgam\n\n\nMulti-objective optimization\n\n\nNSGA-II\n\n\nMOCMAES\n\n\nMOEAD\n\n\nImplementations\n\n\nParallel\n\n\nSequential", 
             "title": "Home"
         }, 
         {
             "location": "/#welcome-to-pi4u", 
-            "text": "Pi4U is a HPC framework for Bayesian uncertainty quantification of large scale computational models.", 
+            "text": "Pi4U is an HPC framework for Bayesian uncertainty quantification of large scale computational models.", 
             "title": "Welcome to Pi4U"
         }, 
         {
@@ -26,19 +26,9 @@
             "title": "Single-objective optimization"
         }, 
         {
-            "location": "/#hierarchical-bayesian-inference", 
-            "text": "", 
-            "title": "Hierarchical Bayesian inference"
-        }, 
-        {
             "location": "/#multi-objective-optimization", 
             "text": "NSGA-II  MOCMAES  MOEAD", 
             "title": "Multi-objective optimization"
-        }, 
-        {
-            "location": "/#rare-event-estimation", 
-            "text": "Subset simulation", 
-            "title": "Rare event estimation"
         }, 
         {
             "location": "/#implementations", 
@@ -162,22 +152,22 @@
         }, 
         {
             "location": "/about/", 
-            "text": "Pi4U - High Performance UQ+OPT Framework\n\n\nPi4U  is our HPC framework for Bayesian uncertainty quantification of large scale computational models.\n\n\nSoftware\n\n\nYou can find the latest version of Pi4U here: \nhttps://github.com/cselab/pi4u\n\n\n\n\nAdditional documentation\n\n\n\n\n\n\n\nPoster about Pi4U: \npdf\n\n\nPresentation at the Europar 2015 conference: \npdf\n\n\n\n\nRelated publications\n\n\nPi4U framework\n\n\n\n\nHadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015\n(\ndoi\n,\npdf\n)\n\n\nHadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532\n(\ndoi\n,\npdf\n)\n\n\n\n\nApplications\n\n\n\n\n\n\nKulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016\n(\ndoi\n, \npdf\n)\n\n\n\n\n\n\nHadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014\n(\ndoi\n,\npdf\n)\n\n\n\n\n\n\nTORC: Task-Based Runtime Library\n\n\n\n\nHadjidoukas P.E., Lappas E., Dimakopoulos V.V: A Runtime Library for Platform-Independent Task Parallelism. PDP 2012: 229-236\n(\ndoi\n)", 
+            "text": "Pi4U - High Performance UQ+OPT Framework\n\n\nPi4U  is an HPC framework for Bayesian uncertainty quantification of large scale computational models.\n\n\nSoftware\n\n\n\n\nThe latest version of the Pi4U framework can be downloaded from here:\n\npi4u_0.4.1.tar.gz\n (22.03.2016)\n\n\nPrevious public version: \npi4u_0.2.tar.gz\n\n\n\n\nAdditional documentation\n\n\n\n\nTutorial: \npdf\n\n\nPoster about Pi4U: \npdf\n\n\nPresentation at the Europar 2015 conference: \npdf\n\n\n\n\nRelated publications\n\n\nPi4U framework\n\n\n\n\nHadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015\n(\ndoi\n,\npdf\n)\n\n\nHadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532\n(\ndoi\n,\npdf\n)\n\n\n\n\nApplications\n\n\n\n\n\n\nKulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016\n(\ndoi\n, \npdf\n)\n\n\n\n\n\n\nHadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014\n(\ndoi\n,\npdf\n)\n\n\n\n\n\n\nTORC: Task-Based Runtime Library\n\n\n\n\nHadjidoukas P.E., Lappas E., Dimakopoulos V.V: A Runtime Library for Platform-Independent Task Parallelism. PDP 2012: 229-236\n(\ndoi\n)", 
             "title": "About"
         }, 
         {
             "location": "/about/#pi4u-high-performance-uqopt-framework", 
-            "text": "Pi4U  is our HPC framework for Bayesian uncertainty quantification of large scale computational models.", 
+            "text": "Pi4U  is an HPC framework for Bayesian uncertainty quantification of large scale computational models.", 
             "title": "Pi4U - High Performance UQ+OPT Framework"
         }, 
         {
             "location": "/about/#software", 
-            "text": "You can find the latest version of Pi4U here:  https://github.com/cselab/pi4u", 
+            "text": "The latest version of the Pi4U framework can be downloaded from here: pi4u_0.4.1.tar.gz  (22.03.2016)  Previous public version:  pi4u_0.2.tar.gz", 
             "title": "Software"
         }, 
         {
             "location": "/about/#additional-documentation", 
-            "text": "Poster about Pi4U:  pdf  Presentation at the Europar 2015 conference:  pdf", 
+            "text": "Tutorial:  pdf  Poster about Pi4U:  pdf  Presentation at the Europar 2015 conference:  pdf", 
             "title": "Additional documentation"
         }, 
         {
