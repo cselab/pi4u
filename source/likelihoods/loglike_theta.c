@@ -12,8 +12,23 @@ static int flag[4096];  // MAX_WORKERS
 
 
 
-//#include "engine_tmcmc.h"
-//extern data_t data;
+#if defined(_USE_TORC_)
+    #include <torc.h>
+#else
+
+    #include <pthread.h>
+
+    #if defined(_USE_OPENMP_)
+        #include <omp.h>
+        static int torc_worker_id() { return omp_get_thread_num(); }
+    #else
+        static int torc_worker_id() { return 0; }
+    #endif
+
+#endif
+
+
+
 
 void loglike_theta_initialize() {
 }

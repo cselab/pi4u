@@ -1,7 +1,7 @@
 #==============================================================================
 #	PATHS AND SOURCE FILES
 #==============================================================================
-GSLROOT=/usr/local
+GSLROOT=$(HOME)/usr/gsl
 
 TARGET1 := sample_theta
 TARGET2 := sample_theta_fast
@@ -86,14 +86,15 @@ OBJ8:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(TMP)) )
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-use_torc?=1
-use_omp?=0
+use_torc?=0
+use_omp?=1
 
-CC := mpicc
-LD := mpicc
+CC := gcc
+LD := gcc
 
 ifeq ($(use_torc),1)
-	CC = mpicc
+	CC := mpicc
+	LD := mpicc
 	CFLAGS += -D_USE_TORC_=1 `torc_cflags`
 	LDLIBS += `torc_libs`
 endif
@@ -112,7 +113,7 @@ CFLAGS += -Wall -Wno-unused-function
 CFLAGS += -I${GSLROOT}/include
 CFLAGS += -I./$(SRC)/TMCMC
 
-LDLIBS += -L${GSLROOT}/lib -lgsl -lgslcblas -lm
+LDLIBS += -L${GSLROOT}/lib -lgsl -lgslcblas -lm -lpthread
 
 
 COMPILE.c = $(CC) $(CFLAGS) -c -o $@

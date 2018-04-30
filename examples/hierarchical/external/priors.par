@@ -3,7 +3,8 @@
 
 N 4
 
-normal 		1 		2
-exp 		0.5
-uniform 	-2  	2
-gamma   	9.0		0.5
+uniform  0 5
+uniform  0 10 
+uniform -3.14 3.14
+uniform  0 5
+

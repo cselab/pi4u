@@ -4,8 +4,8 @@ BASE_DIR="runs"
 DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
-EXEC_FILE="../source/optimize_theta"
-PAR_FILE="./theta.par"
+EXEC_FILE="../../../build/optimize_theta"
+
 MODEL_FILE="model/my_model.py"
 MODEL_SCRIPT="model/doall.sh"
 LL_FILE="model/log_like.py"
@@ -50,5 +50,6 @@ do
 	cp cmaes_bounds.par       ${RUN_DIR}/cmaes_bounds.par
 	cp cmaes_initials.par     ${RUN_DIR}/cmaes_initials.par
 	cp cmaes_signals.par      ${RUN_DIR}/cmaes_signals.par
+	cp priors.par  		      ${RUN_DIR}/priors.par
 
 done

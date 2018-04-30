@@ -17,7 +17,7 @@
 #include <fcntl.h>
 
 #include <pthread.h>
-#include <torc.h>
+//#include <torc.h>
 
 
 double my_gettime();
