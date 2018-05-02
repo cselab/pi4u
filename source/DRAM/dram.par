@@ -18,6 +18,9 @@ AMinterv	100
 # Initial covariance matrix: diag(Co)
 Co		1
 
+# Print info on screen every this many steps
+printfreq	100
+
 
 #------------------------ PRIOR OPTIONS ---------------------------------------
 # Bi: boundaries in i-th dimension, e.g. B0 -1 1
@@ -31,5 +34,8 @@ B1  -100 100
 B2  -100 100
 B3  -100 100
 
-# Print info on screen every this many steps
-printfreq	100
+# Ii: initial point of the chain. e.g. I0 0.0
+I0	0.
+I1	0.
+I2	0.
+I3	0.
