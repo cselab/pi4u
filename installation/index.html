@@ -57,6 +57,27 @@
     <a class="current" href="./">Installation</a>
     <ul class="subnav">
             
+    <li class="toctree-l2"><a href="#software-components">SOFTWARE COMPONENTS</a></li>
+    
+
+    <li class="toctree-l2"><a href="#prerequisites">PREREQUISITES</a></li>
+    
+
+    <li class="toctree-l2"><a href="#installation-steps">INSTALLATION STEPS</a></li>
+    
+
+    <li class="toctree-l2"><a href="#testing">TESTING</a></li>
+    
+
+    <li class="toctree-l2"><a href="#visualization">VISUALIZATION</a></li>
+    
+
+    <li class="toctree-l2"><a href="#coupling-with-external-software">COUPLING WITH EXTERNAL SOFTWARE</a></li>
+    
+
+    <li class="toctree-l2"><a href="#notes">NOTES</a></li>
+    
+
     </ul>
 	    </li>
           
@@ -112,17 +133,19 @@
           <div role="main">
             <div class="section">
               
-                <p>I. SOFTWARE COMPONENTS</p>
+                <h1 id="software-components">SOFTWARE COMPONENTS</h1>
 <p>You will find the following software packages:</p>
 <ul>
 <li>torc_lite: a tasking library that allows us to write platform-independent code</li>
 <li>pndl: parallel numerical differentiation library, built on top of torc_lite</li>
 <li>engines: the UQ framework built on top of torc_lite. </li>
 </ul>
-<p>II. PREREQUISITES
-- An MPI implementation must be installed on your system (preferably with full thread safety)
-- GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system</p>
-<p>III. INSTALLATION STEPS</p>
+<h1 id="prerequisites">PREREQUISITES</h1>
+<ul>
+<li>An MPI implementation must be installed on your system (preferably with full thread safety)</li>
+<li>GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system</li>
+</ul>
+<h1 id="installation-steps">INSTALLATION STEPS</h1>
 <p>1) First we start with torc_lite. We assume that the MPI compiler is named mpicc.
     cd torc_lite
     ./configure CC=mpicc --prefix=$HOME/usr/torc
@@ -145,7 +168,7 @@ make
     - make use_torc=1       # builds the TORC-based version 
     - make use_omp=0 use_torc=0 # builds the serial version
     - make              # default option is use_omp=1</p>
-<p>IV. TESTING</p>
+<h1 id="testing">TESTING</h1>
 <p>1) inference/TMCMC</p>
 <p>The TMCMC sampling algorithm</p>
 <p>a) build engine_tmcmc</p>
@@ -214,7 +237,7 @@ make
 <p>5) inference/abc-subsim</p>
 <p>ABC-SUBSIM</p>
 <p>Please check the README-ABC.txt file in the corresponding folder</p>
-<p>V) VISUALIZATION</p>
+<h1 id="visualization">VISUALIZATION</h1>
 <p>The display_gen tool, available in the display directority,  can visualize 2D slices of multidimensional data using gnuplot. </p>
 <p>To build it:
     cd display
@@ -228,7 +251,7 @@ make
 Example:
 ./display_gen ../inference/TMCMC/curgen_db 4 2 1 2
 </code></pre>
-<p>VI) COUPLING WITH EXTERNAL SOFTWARE</p>
+<h1 id="coupling-with-external-software">COUPLING WITH EXTERNAL SOFTWARE</h1>
 <p>The coupling/ folder includes examples that demonstrate how external software can be called within a fitness function (fitfun)
    and coupled with any of the engines and tools available in the Pi4U framework.
    External software can include any kind of sequential or parallel code (OpenMP, MPI), 
@@ -237,7 +260,7 @@ Example:
 <p>a) coupling/rosenbrock:
     A simple example; the Rosenbrock function now runs within the external sequential software.
     Passing of parameters is performed through the automatically created params.dat file</p>
-<p>VII) NOTES</p>
+<h1 id="notes">NOTES</h1>
 <p>Do not hesitate to ask for help and report any problems at:
 - chatzidp AT ethz.ch
 - garampat AT ethz.ch</p>
