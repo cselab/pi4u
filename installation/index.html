@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Installation - Pi4U</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Installation";
+    var mkdocs_page_input_path = "installation.md";
+    var mkdocs_page_url = "/installation/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Pi4U</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Installation</a>
+    <ul class="subnav">
+            
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../examples/">Examples</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../developing/">Developing</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../post/">Postprocessing</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../hpc/">Performance and Scalability</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Pi4U</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Installation</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>I. SOFTWARE COMPONENTS</p>
+<p>You will find the following software packages:</p>
+<ul>
+<li>torc_lite: a tasking library that allows us to write platform-independent code</li>
+<li>pndl: parallel numerical differentiation library, built on top of torc_lite</li>
+<li>engines: the UQ framework built on top of torc_lite. </li>
+</ul>
+<p>II. PREREQUISITES
+- An MPI implementation must be installed on your system (preferably with full thread safety)
+- GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system</p>
+<p>III. INSTALLATION STEPS</p>
+<p>1) First we start with torc_lite. We assume that the MPI compiler is named mpicc.
+    cd torc_lite
+    ./configure CC=mpicc --prefix=$HOME/usr/torc
+    make; make install
+    export PATH=$HOME/usr/torc/bin:$PATH</p>
+<p>If configure reports missing files, you will need to execute the autoreconf command (autoreconf) before executing ./configure </p>
+<p>In $HOME/usr/torc/bin there are two files (torc_cflags, torc_libs) that facilitate the development of torc-based programs.
+   That's why we have added this directory to the PATH environment variable using the export (bash) command. </p>
+<p>After finishing this step, you must be able to run successfully at least one of the demo examples, available in torc/examples</p>
+<p>2) We then proceed with the compilation of the various engines (algorithms) of our Uncertainty Quantification and Optimization framework.
+   For example, to build the code that implements the TMCMC algorithm:</p>
+<pre><code>cd inference/TMCMC
+make
+</code></pre>
+<p>If there are compilation issues then some directories in Makefile might need to be revised.
+   For example, the exact location of the GSL library must be specificed.
+   Moreover on some platforms, the MPI compiler can be named differently (e.g. CC=cc on Piz Daint).</p>
+<p>The following compilation options are supported:
+    - make use_omp=1        # builds the OpenMP version
+    - make use_torc=1       # builds the TORC-based version 
+    - make use_omp=0 use_torc=0 # builds the serial version
+    - make              # default option is use_omp=1</p>
+<p>IV. TESTING</p>
+<p>1) inference/TMCMC</p>
+<p>The TMCMC sampling algorithm</p>
+<p>a) build engine_tmcmc</p>
+<pre><code>cd inference/TMCMC
+make
+</code></pre>
+<p>b) Run the engine
+    ./engine_tmcmc</p>
+<p>By default, this runs TMCMC for the rosenbrock function in 2D, as defined in fitfun.c 
+   This is expected to run and produce some output files (curgen_db_000.txt, curgen_db_001.txt, ...)</p>
+<p>The output files can be visualized with the display_gen tool, available in the display directory, using the following command:
+    ./display_gen curgen_db 5 2
+    5: number of the last generation (curgen_db_000.txt to curgen_db_005.txt will be displayed)
+    2: problem dimension</p>
+<pre><code>The runtime options for this engine can be set in the configuration file tmcmc.par
+</code></pre>
+<p>2) singleopt/CMAES</p>
+<p>The CMAES stochastic optimization algorithm</p>
+<p>a) Build the engine_cmaes</p>
+<pre><code>cd singleopt/CMAES
+make
+</code></pre>
+<p>b) Run the engine
+    ./engine_cmaes</p>
+<p>Optimization of the rosenbrock function in 2D.
+   More information about the generated output files can be found in the documentation of CMAES.</p>
+<p>3) rare/subset</p>
+<p>Subset simulation </p>
+<p>a) Build the two engines</p>
+<pre><code>cd rare/subset
+make
+</code></pre>
+<p>b) Run engine_ss1
+    ./engine_ss1</p>
+<p>Subset simulation for predefined levels
+   This is expected to run and produce some output files (samples_000.txt etc)</p>
+<p>The output files can be displayed with the display_gen tool, using the following command:
+    ./display_gen samples 8 2
+    8: number of the last generation (samples_000.txt to samples_008.txt will be displayed)
+    2: problem dimension</p>
+<p>The runtime options for this engine can be set in the configuration file subset.par</p>
+<p>c) Run engine_ss2</p>
+<pre><code>./engine_ss2
+</code></pre>
+<p>Same as before but for subset simulation with adaptive levels</p>
+<p>4) Numerical differentiation</p>
+<p>a) Build the parallel numerical differentiation library (PNDL).</p>
+<pre><code>cd derivatives/pndl
+./configure CC=mpicc F90=mpif90 
+make
+</code></pre>
+<p>A README file with more detailed instructions is available along with the source code of PNDL. </p>
+<p>b) Build the tools </p>
+<pre><code>cd derivatives/tools
+make
+</code></pre>
+<p>c) Run the tools</p>
+<pre><code>./fd_grad
+./fd_deriv
+./sa_deriv
+</code></pre>
+<p>fd_grad: Calculation of the most suitable differentiation step per dimension using gradients and Romberg extrapolation <br />
+   fd_deriv: Calculation of the gradient vector and Hessian matrix using PNDL 
+   sa_deriv: Stochastic approximation of the Hessian matrix (experimental code)</p>
+<p>Configuration file for all tools: grad.par</p>
+<p>5) inference/abc-subsim</p>
+<p>ABC-SUBSIM</p>
+<p>Please check the README-ABC.txt file in the corresponding folder</p>
+<p>V) VISUALIZATION</p>
+<p>The display_gen tool, available in the display directority,  can visualize 2D slices of multidimensional data using gnuplot. </p>
+<p>To build it:
+    cd display
+    make</p>
+<p>The syntax can invoked as follows:
+    ./display_gen <datafile> <last gen> <dimension> [var1] [var2]</p>
+<pre><code>- The full name of the file is in the form: &lt;datafile&gt;_&lt;gen&gt;.txt, where gen = 000, 001, ..., &lt;last gen&gt;
+- &lt;dimension&gt; is the number of parameters. This means that the datafile has &lt;dimension&gt;+1 columns, the last containing the result of the function evaluation
+- [var1] and [var2] are optional arguments that specify the indices of the two parameters that will be displayed
+
+Example:
+./display_gen ../inference/TMCMC/curgen_db 4 2 1 2
+</code></pre>
+<p>VI) COUPLING WITH EXTERNAL SOFTWARE</p>
+<p>The coupling/ folder includes examples that demonstrate how external software can be called within a fitness function (fitfun)
+   and coupled with any of the engines and tools available in the Pi4U framework.
+   External software can include any kind of sequential or parallel code (OpenMP, MPI), 
+   and be implemented in any possible programming language and environment (C/C++, Fortran, Python, Matlab). </p>
+<p>Currently the following examples are included:</p>
+<p>a) coupling/rosenbrock:
+    A simple example; the Rosenbrock function now runs within the external sequential software.
+    Passing of parameters is performed through the automatically created params.dat file</p>
+<p>VII) NOTES</p>
+<p>Do not hesitate to ask for help and report any problems at:
+- chatzidp AT ethz.ch
+- garampat AT ethz.ch</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../examples/" class="btn btn-neutral float-right" title="Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/require.js"></script>
+      <script src="../search/search.js"></script>
+
+</body>
+</html>
