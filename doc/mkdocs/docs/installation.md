@@ -1,4 +1,4 @@
-I. SOFTWARE COMPONENTS
+# SOFTWARE COMPONENTS
 
 You will find the following software packages:
 
@@ -7,12 +7,12 @@ You will find the following software packages:
 - engines: the UQ framework built on top of torc_lite. 
 
 
-II. PREREQUISITES
+# PREREQUISITES
 - An MPI implementation must be installed on your system (preferably with full thread safety)
 - GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system
 
 
-III. INSTALLATION STEPS
+# INSTALLATION STEPS
 
 1) First we start with torc_lite. We assume that the MPI compiler is named mpicc.
 	cd torc_lite
@@ -44,7 +44,7 @@ III. INSTALLATION STEPS
 	- make				# default option is use_omp=1
 
 
-IV. TESTING
+# TESTING
 
 1) inference/TMCMC
 
@@ -146,7 +146,7 @@ c) Run the tools
    Please check the README-ABC.txt file in the corresponding folder
 
 
-V) VISUALIZATION
+# VISUALIZATION
 
    The display_gen tool, available in the display directority,  can visualize 2D slices of multidimensional data using gnuplot. 
 
@@ -165,7 +165,7 @@ V) VISUALIZATION
 	./display_gen ../inference/TMCMC/curgen_db 4 2 1 2
 
 
-VI) COUPLING WITH EXTERNAL SOFTWARE
+# COUPLING WITH EXTERNAL SOFTWARE
 
    The coupling/ folder includes examples that demonstrate how external software can be called within a fitness function (fitfun)
    and coupled with any of the engines and tools available in the Pi4U framework.
@@ -179,7 +179,7 @@ a) coupling/rosenbrock:
 	Passing of parameters is performed through the automatically created params.dat file
 
 
-VII) NOTES
+# NOTES
 
 Do not hesitate to ask for help and report any problems at:
 - chatzidp AT ethz.ch
