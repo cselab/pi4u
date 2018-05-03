@@ -1,9 +1,9 @@
 site_name: Pi4U
 pages:
   - Home: index.md
-  - Python: python.md
-  - Matlab: matlab.md
-  - R: rlib.md
-  - C/C++: hpc.md
-  - About: about.md
+  - Installation: installation.md
+  - Examples: examples.md
+  - Developing: developing.md
+  - Postprocessing: post.md
+  - Performance and Scalability: hpc.md
 theme: readthedocs
