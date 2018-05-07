@@ -95,7 +95,7 @@ int main(int argn, char **args)
 	// Initialize prior distributions
 	Density *priors;
 	int Nprior;
-	read_priors( &priors, &Nprior );
+	read_priors( "priors.par", &priors, &Nprior );
 
 	if( Nprior != dim ){
 		printf("The dimension of the prior is different from the dimension of the problem. Exit...");

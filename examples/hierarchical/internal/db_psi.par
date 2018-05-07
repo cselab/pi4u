@@ -1,0 +1,11 @@
+
+folder			../../data/theta
+theta_prefix	theta_
+theta_suffix	.txt
+logev_prefix	evidence_
+logev_suffix	.txt
+
+Nrec		5000
+ 
+Nind		5
+ind_list	1 2 3 4 5 

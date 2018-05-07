@@ -7,10 +7,11 @@ TARGET1 := sample_theta
 TARGET2 := sample_theta_fast
 TARGET3 := sample_psi
 TARGET4 := sample_posterior_theta
-TARGET5 := optimize_theta
-TARGET6 := optimize_theta_fast
-TARGET7 := dram_theta_fast
-TARGET8 := dram_psi
+TARGET5 := sample_posterior_theta_fast
+TARGET6 := optimize_theta
+TARGET7 := optimize_theta_fast
+TARGET8 := dram_theta_fast
+TARGET9 := dram_psi
 
 
 SRC := ../source
@@ -41,29 +42,31 @@ SRC2 := $(TMCMC_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_theta_fast.c \
 
 SRC3 := $(TMCMC_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_psi.c \
 									$(SRC)/likelihoods/loglike_psi.c \
-									$(SRC)/likelihoods/priors.c
 
 SRC4 := $(TMCMC_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_posterior_theta.c \
 									$(SRC)/likelihoods/loglike_posterior_theta.c \
-									$(SRC)/likelihoods/loglike_theta_fast.c \
-									$(SRC)/likelihoods/priors.c
-
-SRC5 := $(CMAES_SRC) $(PRIORS)    	$(SRC)/likelihoods/fitfun_theta.c \
 									$(SRC)/likelihoods/loglike_theta.c \
 									$(SRC)/likelihoods/spawner.c
 
-SRC6 := $(CMAES_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_theta_fast.c \
+SRC5 := $(TMCMC_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_posterior_theta.c \
+									$(SRC)/likelihoods/loglike_posterior_theta.c \
+									$(SRC)/likelihoods/loglike_theta_fast.c \
+
+SRC6 := $(CMAES_SRC) $(PRIORS)    	$(SRC)/likelihoods/fitfun_theta.c \
+									$(SRC)/likelihoods/loglike_theta.c \
+									$(SRC)/likelihoods/spawner.c
+
+SRC7 := $(CMAES_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_theta_fast.c \
 									$(SRC)/likelihoods/loglike_theta_fast.c\
 
-SRC7 := $(DRAM_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_theta_fast.c \
+SRC8 := $(DRAM_SRC) $(PRIORS)		$(SRC)/likelihoods/fitfun_theta_fast.c \
 									$(SRC)/likelihoods/loglike_theta_fast.c 
 
-SRC8 := $(DRAM_SRC)	$(PRIORS)		$(SRC)/likelihoods/fitfun_psi.c \
+SRC9 := $(DRAM_SRC)	$(PRIORS)		$(SRC)/likelihoods/fitfun_psi.c \
 									$(SRC)/likelihoods/loglike_psi.c \
-									$(SRC)/likelihoods/priors.c
 
-ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5)  $(SRC6)  $(SRC7)  $(SRC8)
-TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8)
+ALL_SRC := $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC5)  $(SRC6)  $(SRC7)  $(SRC8)  $(SRC9) 
+TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9)
 
 OBJDIR = .o
 TMP=$(subst ../,,$(SRC1))
@@ -82,12 +85,14 @@ TMP=$(subst ../,,$(SRC7))
 OBJ7:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(TMP)) )
 TMP=$(subst ../,,$(SRC8))
 OBJ8:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(TMP)) )
+TMP=$(subst ../,,$(SRC9))
+OBJ9:= $(patsubst %,$(OBJDIR)/%.o,$(basename  $(TMP)) )
 
 #==============================================================================
 #	COMPILERS AND FLAGS
 #==============================================================================
-use_torc?=0
-use_omp?=1
+use_torc?=1
+use_omp?=0
 
 CC := gcc
 LD := gcc
@@ -143,16 +148,16 @@ sample_posterior_theta: $(OBJ4)
 sample_posterior_theta_fast: $(OBJ5)
 	$(LINK.o) $^ $(LDLIBS)
 
-optimize_theta: $(OBJ5)
+optimize_theta: $(OBJ6)
 	$(LINK.o) $^ $(LDLIBS)
 
-optimize_theta_fast: $(OBJ6)
+optimize_theta_fast: $(OBJ7)
 	$(LINK.o) $^ $(LDLIBS)
 
-dram_theta_fast: $(OBJ7)
+dram_theta_fast: $(OBJ8)
 	$(LINK.o) $^ $(LDLIBS)
 
-dram_psi: $(OBJ8)
+dram_psi: $(OBJ9)
 	$(LINK.o) $^ $(LDLIBS)
 
 
@@ -167,7 +172,6 @@ ctags:
 
 
 print:
-	@echo $(OBJ6)
 
 
 clean:

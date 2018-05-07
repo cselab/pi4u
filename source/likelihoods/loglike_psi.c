@@ -1,87 +1,248 @@
-#include "loglike_psi.h"
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <string.h>
 
-#define DATABASE  "../../data/theta"
-#define THETAFILE1 "theta_"
-#define THETAFILE2 ".txt"
-#define LOGEVFILE1 "evidence_"
-#define LOGEVFILE2 ".txt"
+#include "loglike_psi.h"
+#include "../priors/priors.h"
 
 #define BUFLEN 1024
 
-#define NREC 1000
-
-#define N_IND 5
-
-static int ind_list[N_IND] = {1, 2, 3, 4, 5};
+#define BLANKS " \t\n"
 
 
+typedef struct theta_database_s{
+    char folder[128];
+    char theta_prefix[128];
+    char theta_suffix[128];
+    char logev_prefix[128];
+    char logev_suffix[128];
+    int  Nrec;
+    
+    int Nind;
+    int *ind_list;
+}theta_database;
 
-typedef struct ffdata_s {
+
+typedef struct theta_data_s{
     double *x;
     double loglik;
     double logprior;
-} ffdata_t;
-
-
-static ffdata_t *ffdata[N_IND];
-static double logEv[N_IND];
+} theta_data_t;
 
 
 
-void loglike_psi_initialize(int nn) {
+static theta_database  theta_db;
 
-    printf("\nReading %d data from theta database for individuals: \n", NREC);
-    for (int i = 0; i < N_IND; i++)
-        printf("%d  -  ", ind_list[i]);
+static theta_data_t **theta_data;
+static double *logEv;
+
+static Density *prior_theta=NULL;
+static int Npr=0;
+
+
+
+
+
+
+
+
+
+//=============================================================================
+//
+//
+int count_lines(FILE *fp){
+
+    char ch;
+    int lines = 0;
+    
+    rewind(fp);
+    
+    while (!feof(fp)) {
+        ch = fgetc(fp);
+        if (ch == '\n')
+            lines++;
+    }
+    
+    rewind(fp);
+
+    return lines;
+
+}
+
+
+
+
+//=============================================================================
+//
+//
+void read_theta_file( const char *file  ){
+
+    FILE *fp = fopen( file, "r" );
+    if(fp==NULL){
+        printf("\n%s could not be opened. Exit...\n", file );
+        exit(EXIT_FAILURE);
+    }
+
+    
+    size_t bufsize = 1024;
+    char * buffer = (char *)malloc(bufsize * sizeof(char)); 
+
+    while(  -1 != getline( &buffer, &bufsize, fp) ){
+            
+        char * pch = strtok (buffer, BLANKS );
+        while( pch != NULL ){
+            
+            if( pch[0]=='#' || pch[0]=='\n' ) //go to the next line. 
+                break;
+            
+            if( strcmp(pch,"folder")==0 ){
+                pch = strtok (NULL, BLANKS );
+                strcpy( theta_db.folder, pch );
+                break;
+            }
+
+            if( strcmp(pch,"theta_prefix")==0 ){
+                pch = strtok (NULL, BLANKS );
+                strcpy( theta_db.theta_prefix, pch );
+                break;
+            }
+
+            if( strcmp(pch,"theta_suffix")==0 ){
+                pch = strtok (NULL, BLANKS );
+                strcpy( theta_db.theta_suffix, pch );
+                break;
+            }
+
+            if( strcmp(pch,"logev_prefix")==0 ){
+                pch = strtok (NULL, BLANKS );
+                strcpy( theta_db.logev_prefix, pch );
+                break;
+            }
+
+            if( strcmp(pch,"logev_suffix")==0 ){
+                pch = strtok (NULL, BLANKS );
+                strcpy( theta_db.logev_suffix, pch );
+                break;
+            }
+
+            if( strcmp(pch,"Nrec")==0 ){
+                pch = strtok (NULL, BLANKS );
+                theta_db.Nrec = atoi( pch );
+                break;
+            }
+
+            if( strcmp(pch,"Nind")==0 ){
+                pch = strtok (NULL, BLANKS );
+                theta_db.Nind = atoi( pch );
+                theta_db.ind_list = (int *) malloc( theta_db.Nind*sizeof(int) );
+                break;
+            }
+
+            if( strcmp(pch,"ind_list")==0 ){
+                if( theta_db.Nind==0 || theta_db.ind_list==NULL  ){
+                    printf("Define 'Nind' before 'ind_list' in %s. Exit...",file);
+                    exit(EXIT_FAILURE);
+                }
+                
+                for(int i=0; i<theta_db.Nind; i++){ //XXX: more checks here
+                    pch = strtok (NULL, BLANKS );
+                    theta_db.ind_list[i] = atoi( pch );
+                }
+                break;
+            }
+
+            puts(buffer);
+            printf("\nSomething went wrong while reading the theta database file %s. Exit...\n",file);
+            exit(EXIT_FAILURE);
+
+        }
+    }
+
+    fclose(fp);
+    free(buffer);
+
+}
+
+
+
+
+//=============================================================================
+//
+//
+void print_theta_file( const char *file ){
+    
+    printf("================================\n");
+    printf("contents of %s\n",file);
+
+    printf("data base folder        : %s \n",theta_db.folder);
+    printf("theta files             : %s*%s \n",theta_db.theta_prefix, theta_db.theta_suffix);
+    printf("logev files             : %s*%s \n",theta_db.logev_prefix, theta_db.logev_suffix);
+    printf("Number of samples       : %d \n", theta_db.Nrec );
+    printf("Number of individuals   : %d \n", theta_db.Nind );
+    printf("Individuals             : ");
+    for(int i=0; i<theta_db.Nind; i++)
+        printf("%d -  ",theta_db.ind_list[i]);  
+    
+    printf("\n================================\n");
+
+}
+
+
+
+
+//=============================================================================
+//
+//
+void loglike_psi_initialize( int nn ){
+
+    read_priors( "priors_theta.par", &prior_theta, &Npr );
+
+    read_theta_file( "db_psi.par" );
+    print_theta_file( "db_psi.par" );
+
+
+    printf("\nReading %d data from theta database for individuals: \n", theta_db.Nrec);
+    for (int i = 0; i < theta_db.Nind; i++)
+        printf("%d  -  ", theta_db.ind_list[i]);
     printf("\n");
+    
+    theta_data = (theta_data_t**) malloc( theta_db.Nind*sizeof(theta_data_t*) );
+    logEv = (double *) malloc( theta_db.Nind*sizeof(double) );
 
-    int n = nn/2;
-    for (int pp = 1; pp <= N_IND; pp++) {
-        int p = pp-1;
+
+    for( int p=0; p < theta_db.Nind; p++ ){
+        
         char filename[BUFLEN];
         FILE *fp;
 
 
-        snprintf(filename, BUFLEN, "%s/%s%03d%s", DATABASE, THETAFILE1,  ind_list[p], THETAFILE2);
+        snprintf(filename, BUFLEN, "%s/%s%03d%s", theta_db.folder, theta_db.theta_prefix,  theta_db.ind_list[p], theta_db.theta_suffix);
         fp = fopen(filename, "r");
         if (fp == NULL) {
             printf("\n %s  does not exist. Exiting...\n", filename);
             exit(1);
         }
 
-        // count the number of lines in file and check if less than NREC
-        char ch;
-        int lines = 0;
-
-        while (!feof(fp)) {
-            ch = fgetc(fp);
-            if (ch == '\n')
-                lines++;
-        }
-        rewind(fp);
-
-        if (lines < NREC) {
-            printf("\n\n Error: Number of samples less than %d in file %s. "
-                    "Exit... \n\n", NREC, filename);
-            exit(1);
+        if ( count_lines(fp) < theta_db.Nrec){
+            printf("\n\n Error: Number of samples less than %d in file %s.Exit... \n\n", theta_db.Nrec, filename);
+            exit(EXIT_FAILURE);
         }
 
-        ffdata[p] = (ffdata_t*)malloc(NREC*sizeof(ffdata_t));
-        for (int i = 0; i < NREC; i++)
-            ffdata[p][i].x = (double*)malloc(n*sizeof(double));
+        theta_data[p] = (theta_data_t*)malloc( theta_db.Nrec*sizeof(theta_data_t) );
+        for (int i = 0; i < theta_db.Nrec; i++)
+            theta_data[p][i].x = (double*)malloc( Npr*sizeof(double));
 
-        for (int i = 0; i < NREC; i++) {
-            for (int j = 0; j < n; j++)
-                fscanf(fp, "%lf", &(ffdata[p][i].x[j]));
+        for (int i = 0; i < theta_db.Nrec; i++) {
+            for (int j = 0; j < Npr; j++)
+                fscanf(fp, "%lf", &(theta_data[p][i].x[j]));
 
-            fscanf(fp, "%lf", &ffdata[p][i].loglik);
-            fscanf(fp, "%lf", &ffdata[p][i].logprior);
-
-            // ffdata[p][i] = exp(ffdata[p][i].logprior);
+            fscanf(fp, "%lf", &theta_data[p][i].loglik);
+            fscanf(fp, "%lf", &theta_data[p][i].logprior);
         }
+        
         fclose(fp);
 
-        snprintf(filename, BUFLEN, "%s/%s%03d%s", DATABASE, LOGEVFILE1,  ind_list[p], LOGEVFILE2);
+        snprintf(filename, BUFLEN, "%s/%s%03d%s", theta_db.folder, theta_db.logev_prefix,  theta_db.ind_list[p], theta_db.logev_suffix);
         fp = fopen(filename, "r");
         if (fp == NULL) {
             printf("\n %s  does not exist. Exiting...\n", filename);
@@ -99,14 +260,27 @@ void loglike_psi_initialize(int nn) {
 
 
 
+
+
+
+
+
+
+//=============================================================================
+//
+//
 void loglike_psi_finalize() {
-    for (int pp = 1; pp <= N_IND; pp++) {
-        int p = pp-1;
-        if (ffdata[p] != NULL) {
-            for (int i = 0; i < NREC; i++) free(ffdata[p][i].x);
-            free(ffdata[p]);
+
+    printf("\nFinilizing psi loglike...\n");fflush(NULL);
+
+    for( int p=0 ; p < theta_db.Nind;  p++ ){
+        if (theta_data[p] != NULL){
+            for (int i = 0; i < theta_db.Nrec; i++) free(theta_data[p][i].x);
+            free(theta_data[p]);
         }
     }
+
+    delete_prior( prior_theta, Npr );
 }
 
 
@@ -114,39 +288,72 @@ void loglike_psi_finalize() {
 
 
 
+
+
+//=============================================================================
+//
+//
 double loglike_psi(double *psi, int n, void *output, int *info) {
 
-	double out = 0;
+    double out = 0;
 
-	for (int pp = 1; pp <= N_IND; pp++) {
-		int p = pp-1;
-
-		if (ffdata[p] == NULL) {
-			printf("\n Pointer in %d file  is NULL. Exiting...\n", p);
-			exit(1);
-		}
-
-		double sum = 0;
-		for (int i = 0; i < NREC; i++) {
-
-			double log_pr_hb = log_priorHB(ffdata[p][i].x, psi, n);
-			double log_pri = ffdata[p][i].logprior;
-
-			sum += exp( log_pr_hb-log_pri ) ;
-		}
-
-		if (sum == 0 || isnan(sum) || isinf(sum)) {
-			out = -1e12;
-			return out;
-		}
-
-		out = out + logEv[p] - log(NREC) + log(sum);
-	}
-
-	if (isinf(out) || isnan(out)) out = -1e12;
+    //printf("Nind %d \n",theta_db.Nind);
+    //printf("psi: ");
+    //for(int i=0; i<n; i++)
+    //  printf("%lf ",psi[i]);
+    //printf("\n");
+    //printf("---------------\n");
 
 
-	int BUFLEN_TMP=64;
+    Density *prior_tmp=NULL;
+    new_prior_from_prior(&prior_tmp, prior_theta, Npr);
+    reassign_prior( prior_tmp, Npr, psi );
+    
+    //print_priors(prior_theta, Npr);
+
+    for( int p=0; p<theta_db.Nind; p++){
+
+
+        if( theta_data[p]==NULL ){
+            printf("\n Pointer in %d file  is NULL. Exit...\n", p);
+            exit(EXIT_FAILURE);
+        }
+
+        double sum = 0;
+        for( int i = 0; i < theta_db.Nrec; i++ ){
+    
+            double log_pr_hb = prior_log_pdf( prior_tmp, Npr, theta_data[p][i].x );
+
+            double log_pri = theta_data[p][i].logprior;
+
+            //printf("      --->  ");
+            //for(int j=0; j<Npr; j++)
+            //  printf(" %lf ", theta_data[p][i].x[j] );
+            //printf("  --- %lf ", log_pr_hb);
+            //printf("\n");
+
+            sum += exp( log_pr_hb-log_pri ) ;
+        }
+
+
+        //printf("%d -> %lf \n",p,sum);
+
+        if( sum == 0 || isnan(sum) || isinf(sum) ){
+            out = -1e12;
+            return out;
+        }
+
+        out = out + logEv[p] - log(theta_db.Nrec) + log(sum);
+    }
+
+    if (isinf(out) || isnan(out)) out = -1e12;
+
+
+    delete_prior(prior_tmp,Npr);
+
+
+    //XXX: what is this? delete?
+    int BUFLEN_TMP=64;
     char msg[BUFLEN], tmp[BUFLEN_TMP];
     snprintf(msg, BUFLEN, "task: ");
 
@@ -157,6 +364,25 @@ double loglike_psi(double *psi, int n, void *output, int *info) {
 
     snprintf(tmp, BUFLEN_TMP, "%lf\n", out);
     snprintf(msg, BUFLEN, "%s %s", msg, tmp);
+    //**********************************************
+
 
     return out;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

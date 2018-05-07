@@ -12,6 +12,27 @@
 //=============================================================================
 //
 //
+
+
+
+void delete_density( Density *d ){
+	free(d->par);
+}
+
+
+void delete_prior( Density *d, int N){
+    
+    if( d==NULL )
+        return;
+
+	for( int i=0; i<N; i++ )
+		delete_density( &d[i] );
+	
+	free(d);
+}
+
+
+
 double eval_density(Density d, double x){
 	return d.f(x,d.par);
 }
@@ -84,11 +105,11 @@ double prior_log_pdf( Density *d, int N, double *x){
 //=============================================================================
 //
 //
-void read_priors( Density **p_priors, int *p_N ){
+void read_priors( const char *file, Density **p_priors, int *p_N ){
 
-	FILE *fp = fopen("priors.par","r");
+	FILE *fp = fopen( file,"r");
 	if(fp==NULL){
-		printf("\npriors.par could not be opened. Exit...\n");
+		printf("\n%s could not be opened. Exit...\n", file );
 		exit(EXIT_FAILURE);
 	}
 
@@ -129,6 +150,7 @@ void read_priors( Density **p_priors, int *p_N ){
 
 
 				prior[cnt].par = (double*)malloc(2*sizeof(double));
+				prior[cnt].npar = 2;
 				pch = strtok (NULL, BLANKS );
 				prior[cnt].par[0] = atof(pch);
 				pch = strtok (NULL, BLANKS );
@@ -148,6 +170,7 @@ void read_priors( Density **p_priors, int *p_N ){
 
 
 				prior[cnt].par = (double*)malloc(2*sizeof(double));
+				prior[cnt].npar = 2;
 				pch = strtok (NULL, BLANKS );
 				prior[cnt].par[0] = atof(pch);
 				pch = strtok (NULL, BLANKS );
@@ -166,6 +189,7 @@ void read_priors( Density **p_priors, int *p_N ){
 
 
 				prior[cnt].par = (double*)malloc(1*sizeof(double));
+				prior[cnt].npar = 1;
 				pch = strtok (NULL, BLANKS );
 				prior[cnt].par[0] = atof(pch);
 				
@@ -182,6 +206,7 @@ void read_priors( Density **p_priors, int *p_N ){
 
 
 				prior[cnt].par = (double*)malloc(2*sizeof(double));
+				prior[cnt].npar = 2;
 				pch = strtok (NULL, BLANKS );
 				prior[cnt].par[0] = atof(pch);
 				pch = strtok (NULL, BLANKS );
@@ -200,10 +225,73 @@ void read_priors( Density **p_priors, int *p_N ){
 	}
 
 	fclose(fp);
+	free(buffer);
 
 	*p_priors = prior;
 	*p_N = N;
 }
+
+
+
+
+
+
+
+
+
+
+//=============================================================================
+//
+//
+void new_prior_from_prior( Density **new_prior, Density *from_prior, int Npr ){
+
+
+	Density *prior = (Density *) malloc( Npr*sizeof(Density) );
+
+	for( int i=0; i<Npr; i++ ){
+
+		prior[i].f  = from_prior[i].f;
+		prior[i].lf = from_prior[i].lf;
+		prior[i].r  = from_prior[i].r;
+
+		prior[i].npar = from_prior[i].npar;
+		prior[i].par  = (double*) malloc( sizeof(double)*prior[i].npar );
+
+		for( int j=0; j<prior[i].npar; j++)
+			prior[i].par[j] = from_prior[i].par[j];
+
+		strcpy( prior[i].name, from_prior[i].name );
+
+	}
+
+	*new_prior = prior;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//=============================================================================
+//
+//
+//	XXX: danger: the loop may go outside of psi. no length check. chould we pass the length of
+//	psi as argument? 
+void reassign_prior( Density *p, int Np, double *psi ){
+
+	int cnt = 0;
+	for( int i=0; i<Np; i++)
+		for( int j=0; j<p[i].npar; j++)
+				p[i].par[j] = psi[cnt++];
+
+}
+
 
 
 
@@ -214,7 +302,7 @@ void read_priors( Density **p_priors, int *p_N ){
 //
 void check_n( int N ){
 	if(N<=0){
-		puts("Check the prios.par file. Error with reading N. Exit...\n");
+		puts("Check the priors parameter file. Error with reading N. Exit...\n");
 		exit(EXIT_FAILURE);
 	}
 }

@@ -4,11 +4,16 @@ BASE_DIR="runs"
 DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
-EXEC_FILE="../source/sample_theta_fast"
-PAR_FILE="./posterior_theta.par"
+EXEC_FILE="../../../../build/sample_theta"
+PAR_FILE="./tmcmc.par"
+MODEL_FILE="model/my_model.py"
+MODEL_SCRIPT="model/doall.sh"
+LL_FILE="model/log_like.py"
 
-# Ilist=(1)
-Ilist=(1 2 3 4 5)
+
+PRIOR_FILE="./priors.par"
+
+Ilist=(1)
 
 
 
@@ -31,14 +36,22 @@ do
 
 	mkdir $RUN_DIR
 
+	MODEL_DIR="$RUN_DIR/model"
+	mkdir $MODEL_DIR
 
 	DATA_FILE="${DATA_DIR}/${DATA_PREFIX}${II}.dat"
 
 
 
-	cp ${DATA_FILE} "$RUN_DIR/data.txt"
+	cp ${DATA_FILE} "${MODEL_DIR}/data.txt"
 
 	cp ${EXEC_FILE}    ${RUN_DIR}
 	cp ${PAR_FILE}     ${RUN_DIR}/tmcmc.par
+	cp ${MODEL_FILE}   ${MODEL_DIR}
+	cp ${MODEL_SCRIPT} ${MODEL_DIR}
+	cp ${LL_FILE}      ${MODEL_DIR}
+
+	cp ${PRIOR_FILE}   ${RUN_DIR}/priors.par
+
 
 done

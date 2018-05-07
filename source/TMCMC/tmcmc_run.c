@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     data_init();
 
 	int Npr;
-	read_priors( &priors, &Npr );
+	read_priors( "priors.par", &priors, &Npr );
 	print_priors( priors, Npr);
 	//XXX: check that Nps==data.Nth
 

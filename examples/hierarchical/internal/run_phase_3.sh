@@ -5,8 +5,10 @@ BASE_DIR="runs"
 CURRENT_DIR=$(pwd)
 
 SAVE_DIR="${CURRENT_DIR}/data/posterior_theta"
+mkdir -p $SAVE_DIR
 
-export TORC_WORKERS=2
+
+export TORC_WORKERS=4
 
 
 # Ilist=(1)
@@ -24,6 +26,14 @@ do
 
         II="$(printf "%03d" ${I})"
 
+        echo
+        echo "============================================================"
+        echo "                        ${II}                               "
+        echo "============================================================"
+        echo
+
+
+
         RUN_DIR="${BASE_DIR}/posterior_run_${II}"
 
         if [ ! -d "$RUN_DIR" ]; then
@@ -35,12 +45,15 @@ do
 
         mpirun -np 1	./sample_posterior_theta_fast
 
-		FNAME="${SAVE_DIR}/theta_${II}.txt"
+        echo "------------------------------------------------------------------------------------------->"
+
+		FNAME="${SAVE_DIR}/post_theta_${II}.txt"
 		cp final.txt $FNAME
 
-		FNAME="${SAVE_DIR}//evidence_${II}.txt"
-		cp fitness.txt $FNAME
+		FNAME="${SAVE_DIR}/post_evidence_${II}.txt"
+		cp evidence.txt $FNAME
 
         cd $CURRENT_DIR
+
 
 done

@@ -1,0 +1,26 @@
+# TMCMC and SN-TMCMC configuration file
+
+#------------------------ GENERAL PARAMETERS ----------------------------------
+Nth		4
+MaxStages	40
+PopSize		40000
+TolCOV	0.6
+
+
+#------------------------------ MCMC OPTIONS ----------------------------------
+use_local_cov   0
+bbeta		    0.1
+burn_in 2
+
+#---------------------------- OTHER OPTIONS -----------------------------------
+seed		280675
+
+#---------------------------- Internal options --------------------------------
+opt.MaxIter	1000
+opt.Tol		1e-12
+opt.Display	0
+opt.Step	1e-4
+
+icdump		1
+ifdump		0
+

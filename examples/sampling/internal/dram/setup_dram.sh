@@ -4,11 +4,13 @@ BASE_DIR="runs"
 DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
-EXEC_FILE="../source/dram_theta_fast"
-PAR_FILE="./dram.par"
+EXEC_FILE="../../../../build/dram_theta_fast"
 
- Ilist=(1)
-#Ilist=(1 2 3 4 5)
+PAR_FILE="./dram.par"
+PRIOR_FILE="./priors.par"
+
+
+Ilist=(1)
 
 
 
@@ -40,5 +42,9 @@ do
 
 	cp ${EXEC_FILE}    ${RUN_DIR}
 	cp ${PAR_FILE}     ${RUN_DIR}/dram.par
+	cp ${PRIOR_FILE}  ${RUN_DIR}/priors.par
 
 done
+
+
+

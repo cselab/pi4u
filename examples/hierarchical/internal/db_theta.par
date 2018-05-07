@@ -1,0 +1,15 @@
+theta_folder .
+theta_file   theta.txt
+logev_file	evidence.txt
+
+Ntheta    1000
+Dtheta  4
+
+
+psi_folder .
+psi_file   psi.txt
+
+Npsi  1000
+Dpsi  8
+
+

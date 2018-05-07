@@ -1,0 +1,10 @@
+# This file has the priors.
+# First we define the number of priors to be read
+
+N 4
+
+uniform  0 5
+uniform  0 10 
+uniform -3.14 3.14
+uniform  0 5
+

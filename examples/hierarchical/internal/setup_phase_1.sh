@@ -4,8 +4,10 @@ BASE_DIR="runs"
 DATA_DIR="./data"
 DATA_FILE_PREFIX=
 
-EXEC_FILE="../source/sample_theta_fast"
-PAR_FILE="./posterior_theta.par"
+EXEC_FILE="../../../build/sample_theta_fast"
+PAR_FILE="./tmcmc_aux.par"
+
+PRIOR_FILE="./priors_aux.par"
 
 # Ilist=(1)
 Ilist=(1 2 3 4 5)
@@ -13,7 +15,7 @@ Ilist=(1 2 3 4 5)
 
 
 if [ ! -d "$BASE_DIR" ]; then
-	mkdir $BASE_DIR
+	mkdir -p $BASE_DIR
 fi
 
 
@@ -40,5 +42,6 @@ do
 
 	cp ${EXEC_FILE}    ${RUN_DIR}
 	cp ${PAR_FILE}     ${RUN_DIR}/tmcmc.par
+	cp ${PRIOR_FILE}   ${RUN_DIR}/priors.par
 
 done

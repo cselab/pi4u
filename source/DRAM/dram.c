@@ -187,7 +187,7 @@ void init_params()
 
 
 	int Ntmp;
-	read_priors( &params.prior, &Ntmp );
+	read_priors("priors.par", &params.prior, &Ntmp );
 	if( Ntmp  != options.Npar ){
 		printf("\nNumber of parameters in 'priors.par' is different than dram.par \n");
 		exit(1);
