@@ -4,7 +4,7 @@
 # Conventions
   TODO
 
-# Write youw own likelihood
+# Write your own likelihood
   TODO
 
 # Upcoming
