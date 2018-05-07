@@ -4,7 +4,7 @@
     
     <url>
      <loc>/</loc>
-     <lastmod>2018-05-03</lastmod>
+     <lastmod>2018-05-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,23 +12,43 @@
     
     <url>
      <loc>/installation/</loc>
-     <lastmod>2018-05-03</lastmod>
+     <lastmod>2018-05-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
+        
     <url>
-     <loc>/examples/</loc>
-     <lastmod>2018-05-03</lastmod>
+     <loc>/ex1/</loc>
+     <lastmod>2018-05-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
+        
+    <url>
+     <loc>/ex2/</loc>
+     <lastmod>2018-05-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ex3/</loc>
+     <lastmod>2018-05-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ex4/</loc>
+     <lastmod>2018-05-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
     
 
     
     <url>
      <loc>/developing/</loc>
-     <lastmod>2018-05-03</lastmod>
+     <lastmod>2018-05-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -36,7 +56,7 @@
     
     <url>
      <loc>/post/</loc>
-     <lastmod>2018-05-03</lastmod>
+     <lastmod>2018-05-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -44,7 +64,7 @@
     
     <url>
      <loc>/hpc/</loc>
-     <lastmod>2018-05-03</lastmod>
+     <lastmod>2018-05-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

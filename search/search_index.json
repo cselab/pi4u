@@ -106,27 +106,42 @@
             "title": "NOTES"
         }, 
         {
-            "location": "/examples/", 
-            "text": "Example 1\n\n\nTODO\n\n\nExample 2\n\n\nTODO\n\n\nExample 3\n\n\nTODO\n\n\nExample 4\n\n\nTODO", 
-            "title": "Examples"
+            "location": "/ex1/", 
+            "text": "Example 1\n\n\nExample equation:\n\n$$\n\\frac{n!}{k!(n-k)!} = \\binom{n}{k}\n$$", 
+            "title": "example 1"
         }, 
         {
-            "location": "/examples/#example-1", 
-            "text": "TODO", 
+            "location": "/ex1/#example-1", 
+            "text": "Example equation: \n$$\n\\frac{n!}{k!(n-k)!} = \\binom{n}{k}\n$$", 
             "title": "Example 1"
         }, 
         {
-            "location": "/examples/#example-2", 
+            "location": "/ex2/", 
+            "text": "Example 2\n\n\nTODO", 
+            "title": "example 2"
+        }, 
+        {
+            "location": "/ex2/#example-2", 
             "text": "TODO", 
             "title": "Example 2"
         }, 
         {
-            "location": "/examples/#example-3", 
+            "location": "/ex3/", 
+            "text": "Example 3\n\n\nTODO", 
+            "title": "example 3"
+        }, 
+        {
+            "location": "/ex3/#example-3", 
             "text": "TODO", 
             "title": "Example 3"
         }, 
         {
-            "location": "/examples/#example-4", 
+            "location": "/ex4/", 
+            "text": "Example 4\n\n\nTODO", 
+            "title": "example 4"
+        }, 
+        {
+            "location": "/ex4/#example-4", 
             "text": "TODO", 
             "title": "Example 4"
         }, 
