@@ -147,7 +147,7 @@
         }, 
         {
             "location": "/developing/", 
-            "text": "Repository Structure\n\n\nTODO\n\n\nConventions\n\n\nTODO\n\n\nWrite youw own likelihood\n\n\nTODO\n\n\nUpcoming\n\n\n\n\nABC-SubSim (xx/xx/2018)  \n\n\nAMaLGaM (xx/xx/2018)  \n\n\nMulti-objective optimization (xx/xx/2018)  \n\n\nManifold TMCMC (xx/xx/2018)  \n\n\n\n\nBeta\n\n\n\n\npython interface\n\n\nmatlab interface", 
+            "text": "Repository Structure\n\n\nTODO\n\n\nConventions\n\n\nTODO\n\n\nWrite your own likelihood\n\n\nTODO\n\n\nUpcoming\n\n\n\n\nABC-SubSim (xx/xx/2018)  \n\n\nAMaLGaM (xx/xx/2018)  \n\n\nMulti-objective optimization (xx/xx/2018)  \n\n\nManifold TMCMC (xx/xx/2018)  \n\n\n\n\nBeta\n\n\n\n\npython interface\n\n\nmatlab interface", 
             "title": "Developing"
         }, 
         {
@@ -161,9 +161,9 @@
             "title": "Conventions"
         }, 
         {
-            "location": "/developing/#write-youw-own-likelihood", 
+            "location": "/developing/#write-your-own-likelihood", 
             "text": "TODO", 
-            "title": "Write youw own likelihood"
+            "title": "Write your own likelihood"
         }, 
         {
             "location": "/developing/#upcoming", 
