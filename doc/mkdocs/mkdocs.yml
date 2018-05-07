@@ -2,11 +2,11 @@ site_name: Pi4U
 pages:
   - Home: index.md
   - Installation: installation.md
-  - EXAMPLES:
-      - example1: ex1.md
-      - example2: ex2.md
-      - example3: ex3.md
-      - example4: ex4.md
+  - Examples:
+      - example 1: ex1.md
+      - example 2: ex2.md
+      - example 3: ex3.md
+      - example 4: ex4.md
   - Developing: developing.md
   - Postprocessing: post.md
   - Performance and Scalability: hpc.md

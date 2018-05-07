@@ -1,8 +1,2 @@
-# Hello
-TODO
-
-# Mr
-TODO
-
-# Example
+# Example 3
 TODO
