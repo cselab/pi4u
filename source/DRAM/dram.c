@@ -128,28 +128,28 @@ void init_options()
 void init_params()
 {
 	/* DEFAULT VALUES */
-	params.par0 	= NULL;
 	params.sigma2 	= 1; 	// val.
 	params.n0 		= -1;	// val.
 	params.n 		= 0;	// val.
 
-	params.lbounds = NULL;
-	params.ubounds = NULL;
+	params.lbounds  = NULL;
+	params.ubounds  = NULL;
+	params.par0 	= NULL;
 
 	strcpy(params.filename, "chain.txt");
 
 
 	/* USER-DEFINED VALUES */
 
-	/* Read the lower and upper bounds for each parameter */
-    params.lbounds = (double *)malloc(options.Npar*sizeof(double));
-    params.ubounds = (double *)malloc(options.Npar*sizeof(double));
-
 	FILE *f = fopen("dram.par", "r");
     if (f == NULL) {
 		fprintf(stderr, "No dram.par file available.\n");
 		exit(1);
 	}
+
+	/* Read the lower and upper bounds for each parameter */
+	params.lbounds = (double *)malloc(options.Npar*sizeof(double));
+	params.ubounds = (double *)malloc(options.Npar*sizeof(double));
 
 	char line[256];
 	int line_no = 0;
@@ -173,17 +173,35 @@ void init_params()
 	    if (!found) print_error("Lower/Upper bounds 0");
 	}
 
-	//TODO: read initial point from file 'dram.par' 
+
+	/* Read the initial chain point for each parameter */
 	params.par0 = (double *)malloc(options.Npar*sizeof(double));
-	for (int i = 0; i < options.Npar; i++)
-		params.par0[i] = i+1;
-		//params.par0[i] = (params.lbounds[i]+params.ubounds[i])/2.; // initial value
+
+	line_no = 0;
+
+	for (int i = 0; i < options.Npar; i++) {
+	    found = 0;
+	    while (fgets(line, 256, f)!= NULL) {
+	        line_no++;
+
+	        if ((line[0] == '#')||(strlen(line)==0)) continue;
+
+	        char bound[16];
+	        sprintf(bound, "I%d", i);
+	        if (strstr(line, bound) != NULL) {
+	            sscanf(line, "%*s %lf", &params.par0[i]);
+	            found = 1;
+	            break;
+	        }
+	    }
+	    if (!found) print_error("Initial chain point");
+	}
 
 
 	/* Check if user has provided all necessary parameters */
     if (params.lbounds == NULL) 	print_error("Lower/Upper bounds 1");
     if (params.ubounds == NULL) 	print_error("Lower/Upper bounds 2");
-    if (params.par0 == NULL) 		print_error("Lower/Upper bounds 3");
+    if (params.par0 == NULL) 		print_error("Initial chain point");
 
 
 	int Ntmp;

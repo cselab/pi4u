@@ -1,9 +1,19 @@
 site_name: Pi4U
 pages:
   - Home: index.md
-  - Python: python.md
-  - Matlab: matlab.md
-  - R: rlib.md
-  - C/C++: hpc.md
-  - About: about.md
-theme: readthedocs
+  - Installation: installation.md
+  - Examples:
+      - example 1: ex1.md
+      - example 2: ex2.md
+      - example 3: ex3.md
+      - example 4: ex4.md
+  - Developing: developing.md
+  - Postprocessing: post.md
+  - Performance and Scalability: hpc.md
+theme:
+    name: material
+    palette:
+        primary: 'indigo'
+        accent: 'indigo'
+extra_javascript:
+  - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'

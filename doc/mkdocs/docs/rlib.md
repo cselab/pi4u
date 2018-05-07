@@ -1,2 +1,0 @@
-# R interface of TMCMC
-
