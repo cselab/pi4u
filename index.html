@@ -51,8 +51,8 @@
     
       <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
       
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
-        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,400i,700|Ubuntu+Mono">
+        <style>body,input{font-family:"Ubuntu","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
       
       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
@@ -62,11 +62,30 @@
   
     
     
-    <body dir="ltr" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-primary="light-blue" data-md-color-accent="blue">
   
     <svg class="md-svg">
       <defs>
         
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
         
       </defs>
     </svg>
@@ -85,7 +104,7 @@
       <div class="md-flex__cell md-flex__cell--shrink">
         <a href="." title="Π4U" class="md-header-nav__button md-logo">
           
-            <i class="md-icon"></i>
+            <i class="md-icon">pie_chart</i>
           
         </a>
       </div>
@@ -137,6 +156,30 @@
         
       </div>
       
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/cselab/pi4u/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      cselab/pi4u
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
     </div>
   </nav>
 </header>
@@ -157,11 +200,33 @@
   <label class="md-nav__title md-nav__title--site" for="drawer">
     <span class="md-nav__button md-logo">
       
-        <i class="md-icon"></i>
+        <i class="md-icon">pie_chart</i>
       
     </span>
     Π4U
   </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/cselab/pi4u/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      cselab/pi4u
+    </div>
+  </a>
+
+    </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
@@ -309,19 +374,41 @@
             <article class="md-content__inner md-typeset">
               
                 
+                  <a href="https://github.com/cselab/pi4u/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
                 
                 <h1 id="welcome-to-4u">Welcome to Π4U</h1>
-<p>Π4U is a high performance framework for Bayesian uncertainty quantification of large scale computational models.
-The software can be used for the following:</p>
-<div>
-<div class="MathJax_Preview">
-p(\vartheta | d) = \frac{p(d | \vartheta) p(\vartheta)}{p(d)}
+<p>Π4U is a high performance framework for optimization, sampling and Bayesian uncertainty quantification of large scale computational models.</p>
+<p>The framework is based on the <a href="references/#anchor_torc">TORC</a> task-parallel library for clusters, which is designed to provide unified programming and runtime support for computing platforms that range from single-core systems to hybrid multicore-GPU clusters and heterogenous Grid based supercomputers.</p>
+<p><br><br></p>
+<h1 id="what-4u-can-do-for-you">What Π4U can do for you</h1>
+<ol>
+<li>
+<p>Given a cost function <span><span class="MathJax_Preview">F(\vartheta)</span><script type="math/tex">F(\vartheta)</script></span> find
+    $$
+    \vartheta^\star = \mathop{\arg\min}\limits_{\vartheta} F(\vartheta) \,.
+    $$</p>
+</li>
+<li>
+<p>Given the density of a probability distribution <span><span class="MathJax_Preview">p_{\vartheta}</span><script type="math/tex">p_{\vartheta}</script></span> draw samples,
+    $$
+        \vartheta^{(k)} \sim p_\vartheta, \quad k=1,\ldots,N_s \, .
+    $$</p>
+</li>
+<li>
+<p>Given a set of data <span><span class="MathJax_Preview">d</span><script type="math/tex">d</script></span>, the output of the model <span><span class="MathJax_Preview">f(x;\vartheta)</span><script type="math/tex">f(x;\vartheta)</script></span> a likelihood function <span><span class="MathJax_Preview">p(d|\vartheta)</span><script type="math/tex">p(d|\vartheta)</script></span> and a prior proabablity density <span><span class="MathJax_Preview">p(\vartheta)</span><script type="math/tex">p(\vartheta)</script></span> sample the posterior distribution,
+    $$
+    p(\vartheta | d) = \frac{p(d | \vartheta) p(\vartheta)}{p(d)}\, .
+    $$
+The model output <span><span class="MathJax_Preview">f</span><script type="math/tex">f</script></span> depends on a set of input parameters <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span>.</p>
+</li>
+</ol>
+<p>After <a href="installation/">installing</a> the software have a look at the <a href="">examples</a> and learn how you can run your cases.</p>
+<p><br><br><br><br><br><br></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The software and the documentation page are under continuous development. New pages and new feature will be constantly added.</p>
 </div>
-<script type="math/tex; mode=display">
-p(\vartheta | d) = \frac{p(d | \vartheta) p(\vartheta)}{p(d)}
-</script>
-</div>
-<p>where <span><span class="MathJax_Preview">p(d | \vartheta)</span><script type="math/tex">p(d | \vartheta)</script></span> is the likelihood function</p>
 <!--
 # Additional documentation
 * Tutorial: [pdf](http://www.cse-lab.ethz.ch/images/software/Pi4Ututorial.pdf)
