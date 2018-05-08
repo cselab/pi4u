@@ -74,7 +74,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <a href="#software-components" tabindex="1" class="md-skip">
+      <a href="#installation" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -191,9 +191,79 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Installation
+      </label>
+    
     <a href="./" title="Installation" class="md-nav__link md-nav__link--active">
       Installation
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" title="PREREQUISITES" class="md-nav__link">
+    PREREQUISITES
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-steps" title="INSTALLATION STEPS" class="md-nav__link">
+    INSTALLATION STEPS
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-torc-library" title="1. Torc library" class="md-nav__link">
+    1. Torc library
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-uq-and-optimization-algorithms" title="2. UQ and Optimization Algorithms" class="md-nav__link">
+    2. UQ and Optimization Algorithms
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" title="TESTING" class="md-nav__link">
+    TESTING
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" title="NOTES" class="md-nav__link">
+    NOTES
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -299,6 +369,63 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" title="PREREQUISITES" class="md-nav__link">
+    PREREQUISITES
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-steps" title="INSTALLATION STEPS" class="md-nav__link">
+    INSTALLATION STEPS
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-torc-library" title="1. Torc library" class="md-nav__link">
+    1. Torc library
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-uq-and-optimization-algorithms" title="2. UQ and Optimization Algorithms" class="md-nav__link">
+    2. UQ and Optimization Algorithms
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" title="TESTING" class="md-nav__link">
+    TESTING
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" title="NOTES" class="md-nav__link">
+    NOTES
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -310,136 +437,48 @@
               
                 
                 
-                <h1 id="software-components">SOFTWARE COMPONENTS</h1>
-<p>You will find the following software packages:</p>
-<ul>
-<li>torc_lite: a tasking library that allows us to write platform-independent code</li>
-<li>pndl: parallel numerical differentiation library, built on top of torc_lite</li>
-<li>engines: the UQ framework built on top of torc_lite. </li>
-</ul>
-<h1 id="prerequisites">PREREQUISITES</h1>
+                <h1 id="installation">INSTALLATION</h1>
+<h2 id="prerequisites">PREREQUISITES</h2>
 <ul>
 <li>An MPI implementation must be installed on your system (preferably with full thread safety)</li>
-<li>GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system</li>
+<li>GSL-2.4 (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system</li>
 </ul>
-<h1 id="installation-steps">INSTALLATION STEPS</h1>
-<p>1) First we start with torc_lite. We assume that the MPI compiler is named mpicc.
-    cd torc_lite
-    ./configure CC=mpicc --prefix=<span><span class="MathJax_Preview">HOME/usr/torc
-    make; make install
-    export PATH=</span><script type="math/tex">HOME/usr/torc
-    make; make install
-    export PATH=</script></span>HOME/usr/torc/bin:$PATH</p>
-<p>If configure reports missing files, you will need to execute the autoreconf command (autoreconf) before executing ./configure </p>
-<p>In $HOME/usr/torc/bin there are two files (torc_cflags, torc_libs) that facilitate the development of torc-based programs.
-   That's why we have added this directory to the PATH environment variable using the export (bash) command. </p>
-<p>After finishing this step, you must be able to run successfully at least one of the demo examples, available in torc/examples</p>
-<p>2) We then proceed with the compilation of the various engines (algorithms) of our Uncertainty Quantification and Optimization framework.
-   For example, to build the code that implements the TMCMC algorithm:</p>
-<pre><code>cd inference/TMCMC
-make
+<h2 id="installation-steps">INSTALLATION STEPS</h2>
+<h3 id="1-torc-library">1. Torc library</h3>
+<p>A tasking library that allows to write platform-independent code.<br />
+We assume that the MPI compiler is named mpicc:</p>
+<pre><code>cd lib/torc_lite  
+autoreconf  
+./configure CC=mpicc --prefix=$HOME/usr/torc  
+make; make install  
+export PATH=$HOME/usr/torc/bin:$PATH
 </code></pre>
-<p>If there are compilation issues then some directories in Makefile might need to be revised.
-   For example, the exact location of the GSL library must be specificed.
-   Moreover on some platforms, the MPI compiler can be named differently (e.g. CC=cc on Piz Daint).</p>
-<p>The following compilation options are supported:
-    - make use_omp=1        # builds the OpenMP version
-    - make use_torc=1       # builds the TORC-based version 
-    - make use_omp=0 use_torc=0 # builds the serial version
-    - make              # default option is use_omp=1</p>
-<h1 id="testing">TESTING</h1>
-<p>1) inference/TMCMC</p>
-<p>The TMCMC sampling algorithm</p>
-<p>a) build engine_tmcmc</p>
-<pre><code>cd inference/TMCMC
-make
+<p>After installing torc, the following flags are available:<br />
+<code>torc_cflags</code><br />
+<code>torc_libs</code>  </p>
+<h3 id="2-uq-and-optimization-algorithms">2. UQ and Optimization Algorithms</h3>
+<p>Enter the <code>build</code> directory:  </p>
+<pre><code>cd build
 </code></pre>
-<p>b) Run the engine
-    ./engine_tmcmc</p>
-<p>By default, this runs TMCMC for the rosenbrock function in 2D, as defined in fitfun.c 
-   This is expected to run and produce some output files (curgen_db_000.txt, curgen_db_001.txt, ...)</p>
-<p>The output files can be visualized with the display_gen tool, available in the display directory, using the following command:
-    ./display_gen curgen_db 5 2
-    5: number of the last generation (curgen_db_000.txt to curgen_db_005.txt will be displayed)
-    2: problem dimension</p>
-<pre><code>The runtime options for this engine can be set in the configuration file tmcmc.par
+<p>Before compiling, the following need to be checked: 
+- Path to GSL-2.4 inside the <code>Makefile</code>.<br />
+- Name for the MPI compiler in the <code>Makefile</code>, since this can be named differently on different platforms (e.g. CC=cc on Piz Daint).  </p>
+<p><strong>Compilation options:</strong>  </p>
+<p>build the default option (uses use_torc=1):</p>
+<pre><code>make
 </code></pre>
-<p>2) singleopt/CMAES</p>
-<p>The CMAES stochastic optimization algorithm</p>
-<p>a) Build the engine_cmaes</p>
-<pre><code>cd singleopt/CMAES
-make
+<p>build the OpenMP version:</p>
+<pre><code>make use_omp=1
 </code></pre>
-<p>b) Run the engine
-    ./engine_cmaes</p>
-<p>Optimization of the rosenbrock function in 2D.
-   More information about the generated output files can be found in the documentation of CMAES.</p>
-<p>3) rare/subset</p>
-<p>Subset simulation </p>
-<p>a) Build the two engines</p>
-<pre><code>cd rare/subset
-make
+<p>build the TORC-based version:</p>
+<pre><code>make use_torc=1
 </code></pre>
-<p>b) Run engine_ss1
-    ./engine_ss1</p>
-<p>Subset simulation for predefined levels
-   This is expected to run and produce some output files (samples_000.txt etc)</p>
-<p>The output files can be displayed with the display_gen tool, using the following command:
-    ./display_gen samples 8 2
-    8: number of the last generation (samples_000.txt to samples_008.txt will be displayed)
-    2: problem dimension</p>
-<p>The runtime options for this engine can be set in the configuration file subset.par</p>
-<p>c) Run engine_ss2</p>
-<pre><code>./engine_ss2
+<p>build the serial version:</p>
+<pre><code>make use_omp=0 use_torc=0
 </code></pre>
-<p>Same as before but for subset simulation with adaptive levels</p>
-<p>4) Numerical differentiation</p>
-<p>a) Build the parallel numerical differentiation library (PNDL).</p>
-<pre><code>cd derivatives/pndl
-./configure CC=mpicc F90=mpif90 
-make
-</code></pre>
-<p>A README file with more detailed instructions is available along with the source code of PNDL. </p>
-<p>b) Build the tools </p>
-<pre><code>cd derivatives/tools
-make
-</code></pre>
-<p>c) Run the tools</p>
-<pre><code>./fd_grad
-./fd_deriv
-./sa_deriv
-</code></pre>
-<p>fd_grad: Calculation of the most suitable differentiation step per dimension using gradients and Romberg extrapolation <br />
-   fd_deriv: Calculation of the gradient vector and Hessian matrix using PNDL 
-   sa_deriv: Stochastic approximation of the Hessian matrix (experimental code)</p>
-<p>Configuration file for all tools: grad.par</p>
-<p>5) inference/abc-subsim</p>
-<p>ABC-SUBSIM</p>
-<p>Please check the README-ABC.txt file in the corresponding folder</p>
-<h1 id="visualization">VISUALIZATION</h1>
-<p>The display_gen tool, available in the display directority,  can visualize 2D slices of multidimensional data using gnuplot. </p>
-<p>To build it:
-    cd display
-    make</p>
-<p>The syntax can invoked as follows:
-    ./display_gen <datafile> <last gen> <dimension> [var1] [var2]</p>
-<pre><code>- The full name of the file is in the form: &lt;datafile&gt;_&lt;gen&gt;.txt, where gen = 000, 001, ..., &lt;last gen&gt;
-- &lt;dimension&gt; is the number of parameters. This means that the datafile has &lt;dimension&gt;+1 columns, the last containing the result of the function evaluation
-- [var1] and [var2] are optional arguments that specify the indices of the two parameters that will be displayed
-
-Example:
-./display_gen ../inference/TMCMC/curgen_db 4 2 1 2
-</code></pre>
-<h1 id="coupling-with-external-software">COUPLING WITH EXTERNAL SOFTWARE</h1>
-<p>The coupling/ folder includes examples that demonstrate how external software can be called within a fitness function (fitfun)
-   and coupled with any of the engines and tools available in the Pi4U framework.
-   External software can include any kind of sequential or parallel code (OpenMP, MPI), 
-   and be implemented in any possible programming language and environment (C/C++, Fortran, Python, Matlab). </p>
-<p>Currently the following examples are included:</p>
-<p>a) coupling/rosenbrock:
-    A simple example; the Rosenbrock function now runs within the external sequential software.
-    Passing of parameters is performed through the automatically created params.dat file</p>
-<h1 id="notes">NOTES</h1>
+<h2 id="testing">TESTING</h2>
+<p>TODO</p>
+<h2 id="notes">NOTES</h2>
 <p>Do not hesitate to ask for help and report any problems at:
 - chatzidp AT ethz.ch
 - garampat AT ethz.ch</p>
