@@ -26,6 +26,12 @@
     </url>
         
     <url>
+     <loc>/examples/external/</loc>
+     <lastmod>2018-05-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
      <loc>/examples/optimizing/</loc>
      <lastmod>2018-05-11</lastmod>
      <changefreq>daily</changefreq>

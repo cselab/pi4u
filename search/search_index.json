@@ -101,6 +101,16 @@
             "title": "Behind the scripts"
         },
         {
+            "location": "/examples/external/",
+            "text": "Coupling with external code\n\n\n  \ncd\n build\n  make tmcmc_theta_external \nuse_torc\n=\n1\n\n\n\n\n\n\nThis version creates intermediate folders of the form \ntmpdir.*.*.*.*\n where the external code is running on a set of parameters saved in \nparams.txt\n. After the execution the directory is deleted. If you want to keep the directories set \nREMOVEDIRS  0\n in \nsource/likelihoods/loglike_theta.c\n.\n\n\nTo run the an example:\n\n\n    \ncd\n examples/sampling/external/tmcmc\n    ./setup_tmcmc.sh\n    \ncd\n runs/run_001\n\n\n\n\n\nand then\n\n\n    mpirun -np \n4\n ./tmcmc_theta_external\n\n\n\n\n\nor\n\n\n    \nexport\n \nTORC_WORKERS\n=\n4\n\n    mpirun -np \n1\n ./tmcmc_theta_external",
+            "title": "External"
+        },
+        {
+            "location": "/examples/external/#coupling-with-external-code",
+            "text": "cd  build\n  make tmcmc_theta_external  use_torc = 1   This version creates intermediate folders of the form  tmpdir.*.*.*.*  where the external code is running on a set of parameters saved in  params.txt . After the execution the directory is deleted. If you want to keep the directories set  REMOVEDIRS  0  in  source/likelihoods/loglike_theta.c .  To run the an example:       cd  examples/sampling/external/tmcmc\n    ./setup_tmcmc.sh\n     cd  runs/run_001  and then      mpirun -np  4  ./tmcmc_theta_external  or       export   TORC_WORKERS = 4 \n    mpirun -np  1  ./tmcmc_theta_external",
+            "title": "Coupling with external code"
+        },
+        {
             "location": "/examples/optimizing/",
             "text": "Optimization",
             "title": "Optimizing"
