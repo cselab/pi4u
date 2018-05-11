@@ -378,6 +378,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../optimizing/" title="Optimizing" class="md-nav__link">
+      Optimizing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../post/" title="Postprocessing" class="md-nav__link">
       Postprocessing
     </a>
@@ -394,10 +406,94 @@
       
 
 
-  <li class="md-nav__item">
-    <a href="../../developing/" title="Developing" class="md-nav__link">
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
       Developing
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Developing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/structure/" title="Structure" class="md-nav__link">
+      Structure
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/conventions/" title="Conventions" class="md-nav__link">
+      Conventions
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/par_files/" title="Par files" class="md-nav__link">
+      Par files
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/likelihoods/" title="Likelihoods" class="md-nav__link">
+      Likelihoods
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/upcoming/" title="Upcoming" class="md-nav__link">
+      Upcoming
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/beta/" title="Beta" class="md-nav__link">
+      Beta
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -407,8 +503,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../../hpc/" title="Performance and Scalability" class="md-nav__link">
-      Performance and Scalability
+    <a href="../../hpc/" title="Performance" class="md-nav__link">
+      Performance
     </a>
   </li>
 
@@ -591,6 +687,13 @@ make tmcmc_theta_internal
 
 <p><img alt="" src="../fig_tmcmc.png" /></p>
 <h3 id="behind-the-scripts">Behind the scripts</h3>
+<p>The script <code>./setup_tmcmc.sh</code> makes a new running folder and copies inside the executable and the needed files:</p>
+<ol>
+<li>the data file data.txt,</li>
+<li>the file that contains the prior information, <a href="../../developing/par_files/#priors.par">priors.par</a>,</li>
+<li>the parameter file for tmcmc, <a href="../../developing/par_files/#tmcmc.par">tmcmc.par</a>.</li>
+</ol>
+<p>For this example, TMCMC has been linked to the likelihood function <code>loglike_theta_fast.c</code>. Inside this file the model <span><span class="MathJax_Preview">f</span><script type="math/tex">f</script></span> as well as the likelihood function <span><span class="MathJax_Preview">p(d | \vartheta)</span><script type="math/tex">p(d | \vartheta)</script></span> has beem implemented. More information on the the likelihood implementation and how to write your own likelihood you can find <a href="../../developing/likelihoods/">here</a>.</p>
 <h2 id="sampling-with-dram">Sampling with DRAM</h2>
 <h3 id="compile-and-run_1">Compile and run</h3>
 <p>From the base folder run</p>
@@ -621,6 +724,7 @@ tail -n +1000 chain.txt &gt; tmp
 <p>With this command <code>tail -n +1000 chain.txt</code> we discard the first <span><span class="MathJax_Preview">1000</span><script type="math/tex">1000</script></span> samples which we consider as the burn-in period.</p>
 <p><img alt="" src="../fig_dram.png" /></p>
 <h3 id="behind-the-scripts_1">Behind the scripts</h3>
+<p>Same as in the TMCMC example. The only difference is that instead of the tmcmc.par is substituted by <a href="../../developing/par_files/#dram.par">dram.par</a>.</p>
                 
                   
                 
@@ -656,13 +760,13 @@ tail -n +1000 chain.txt &gt; tmp
           </a>
         
         
-          <a href="../post/" title="Postprocessing" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../optimizing/" title="Optimizing" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Postprocessing
+                Optimizing
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

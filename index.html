@@ -300,6 +300,18 @@
 
 
   <li class="md-nav__item">
+    <a href="examples/optimizing/" title="Optimizing" class="md-nav__link">
+      Optimizing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="examples/post/" title="Postprocessing" class="md-nav__link">
       Postprocessing
     </a>
@@ -316,10 +328,94 @@
       
 
 
-  <li class="md-nav__item">
-    <a href="developing/" title="Developing" class="md-nav__link">
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
       Developing
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Developing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="developing/structure/" title="Structure" class="md-nav__link">
+      Structure
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="developing/conventions/" title="Conventions" class="md-nav__link">
+      Conventions
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="developing/par_files/" title="Par files" class="md-nav__link">
+      Par files
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="developing/likelihoods/" title="Likelihoods" class="md-nav__link">
+      Likelihoods
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="developing/upcoming/" title="Upcoming" class="md-nav__link">
+      Upcoming
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="developing/beta/" title="Beta" class="md-nav__link">
+      Beta
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -329,8 +425,8 @@
 
 
   <li class="md-nav__item">
-    <a href="hpc/" title="Performance and Scalability" class="md-nav__link">
-      Performance and Scalability
+    <a href="hpc/" title="Performance" class="md-nav__link">
+      Performance
     </a>
   </li>
 
@@ -384,26 +480,26 @@
 <h1 id="what-4u-can-do-for-you">What Π4U can do for you</h1>
 <ol>
 <li>
-<p>Given a cost function <span><span class="MathJax_Preview">F(\vartheta)</span><script type="math/tex">F(\vartheta)</script></span> find
+<p><strong>Optimize</strong>: given a cost function <span><span class="MathJax_Preview">F(\vartheta)</span><script type="math/tex">F(\vartheta)</script></span> find
     $$
     \vartheta^\star = \mathop{\arg\min}\limits_{\vartheta} F(\vartheta) \,.
     $$</p>
 </li>
 <li>
-<p>Given the density of a probability distribution <span><span class="MathJax_Preview">p_{\vartheta}</span><script type="math/tex">p_{\vartheta}</script></span> draw samples,
+<p><strong>Sample</strong>: given the density of a probability distribution <span><span class="MathJax_Preview">p_{\vartheta}</span><script type="math/tex">p_{\vartheta}</script></span> draw samples,
     $$
         \vartheta^{(k)} \sim p_\vartheta, \quad k=1,\ldots,N_s \, .
     $$</p>
 </li>
 <li>
-<p>Given a set of data <span><span class="MathJax_Preview">d</span><script type="math/tex">d</script></span>, the output of the model <span><span class="MathJax_Preview">f(x;\vartheta)</span><script type="math/tex">f(x;\vartheta)</script></span> a likelihood function <span><span class="MathJax_Preview">p(d|\vartheta)</span><script type="math/tex">p(d|\vartheta)</script></span> and a prior proabablity density <span><span class="MathJax_Preview">p(\vartheta)</span><script type="math/tex">p(\vartheta)</script></span> sample the posterior distribution,
+<p><strong>Uncertainty Quantification</strong>: given a set of data <span><span class="MathJax_Preview">d</span><script type="math/tex">d</script></span>, the output of the model <span><span class="MathJax_Preview">f(x;\vartheta)</span><script type="math/tex">f(x;\vartheta)</script></span> a likelihood function <span><span class="MathJax_Preview">p(d|\vartheta)</span><script type="math/tex">p(d|\vartheta)</script></span> and a prior probablity density <span><span class="MathJax_Preview">p(\vartheta)</span><script type="math/tex">p(\vartheta)</script></span> sample the posterior distribution,
     $$
     p(\vartheta | d) = \frac{p(d | \vartheta) p(\vartheta)}{p(d)}\, .
     $$
 The model output <span><span class="MathJax_Preview">f</span><script type="math/tex">f</script></span> depends on a set of input parameters <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span>.</p>
 </li>
 </ol>
-<p>After <a href="installation/">installing</a> the software have a look at the <a href="">examples</a> and learn how you can run your cases.</p>
+<p>After <a href="installation/">installing</a> the software have a look at the <a href="examples/sampling/">examples</a> and learn how you can run your cases.</p>
 <p><br><br><br><br><br><br></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
