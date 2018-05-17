@@ -494,14 +494,28 @@
 
 
 <p>This version creates intermediate folders of the form <code>tmpdir.*.*.*.*</code> where the external code is running on a set of parameters saved in <code>params.txt</code>. After the execution the directory is deleted. If you want to keep the directories set <code>REMOVEDIRS  0</code> in <code>source/likelihoods/loglike_theta.c</code>.</p>
-<p>To run the an example:</p>
+<p><strong>To setup the example:</strong></p>
 <div class="codehilite"><pre><span></span>    <span class="nb">cd</span> examples/sampling/external/tmcmc
     ./setup_tmcmc.sh
     <span class="nb">cd</span> runs/run_001
 </pre></div>
 
 
-<p>and then</p>
+<p><strong>Contents of <code>runs/run_001</code>:</strong>  </p>
+<ul>
+<li>The Π4U executable: <code>tmcmc_theta_external</code>  </li>
+<li>
+<p>The files <code>priors.par</code> and <code>tmcmc.par</code>. These files contain information about the choice of the prior distributions and the TMCMC parameters respectively.  </p>
+</li>
+<li>
+<p>A directory named <code>model</code>. Inside this directory, Π4U expects to find:  </p>
+<ul>
+<li>a file with the experimental data named <code>data.txt</code></li>
+<li>a user-provided script named <code>doall.sh</code>, which (i) runs the external simulation, (ii) compares the output with the experimental data, and (iii) saves the log-likelihood inside a file called <code>loglike.txt</code>. The value inside <code>loglike.txt</code> is then read from Π4U.</li>
+</ul>
+</li>
+</ul>
+<p><strong>To run the example:</strong> </p>
 <div class="codehilite"><pre><span></span>    mpirun -np <span class="m">4</span> ./tmcmc_theta_external
 </pre></div>
 

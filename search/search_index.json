@@ -1,208 +1,208 @@
 {
     "docs": [
         {
-            "location": "/",
-            "text": "Welcome to \u03a04U\n\n\n\u03a04U is a high performance framework for optimization, sampling and Bayesian uncertainty quantification of large scale computational models.\n\n\nThe framework is based on the \nTORC\n task-parallel library for clusters, which is designed to provide unified programming and runtime support for computing platforms that range from single-core systems to hybrid multicore-GPU clusters and heterogenous Grid based supercomputers.\n\n\n\n\nWhat \u03a04U can do for you\n\n\n\n\n\n\nOptimize\n: given a cost function \nF(\\vartheta)\nF(\\vartheta)\n find\n    $$\n    \\vartheta^\\star = \\mathop{\\arg\\min}\\limits_{\\vartheta} F(\\vartheta) \\,.\n    $$\n\n\n\n\n\n\nSample\n: given the density of a probability distribution \np_{\\vartheta}\np_{\\vartheta}\n draw samples,\n    $$\n        \\vartheta^{(k)} \\sim p_\\vartheta, \\quad k=1,\\ldots,N_s \\, .\n    $$\n\n\n\n\n\n\nUncertainty Quantification\n: given a set of data \nd\nd\n, the output of the model \nf(x;\\vartheta)\nf(x;\\vartheta)\n a likelihood function \np(d|\\vartheta)\np(d|\\vartheta)\n and a prior probablity density \np(\\vartheta)\np(\\vartheta)\n sample the posterior distribution,\n    $$\n    p(\\vartheta | d) = \\frac{p(d | \\vartheta) p(\\vartheta)}{p(d)}\\, .\n    $$\nThe model output \nf\nf\n depends on a set of input parameters \nx\nx\n.\n\n\n\n\n\n\nAfter \ninstalling\n the software have a look at the \nexamples\n and learn how you can run your cases.\n\n\n\n\n\n\nWarning\n\n\nThe software and the documentation page are under continuous development. New pages and new feature will be constantly added.",
+            "location": "/", 
+            "text": "Welcome to \u03a04U\n\n\n\u03a04U is a high performance framework for optimization, sampling and Bayesian uncertainty quantification of large scale computational models.\n\n\nThe framework is based on the \nTORC\n task-parallel library for clusters, which is designed to provide unified programming and runtime support for computing platforms that range from single-core systems to hybrid multicore-GPU clusters and heterogenous Grid based supercomputers.\n\n\n\n\nWhat \u03a04U can do for you\n\n\n\n\n\n\nOptimize\n: given a cost function \nF(\\vartheta)\nF(\\vartheta)\n find\n    $$\n    \\vartheta^\\star = \\mathop{\\arg\\min}\\limits_{\\vartheta} F(\\vartheta) \\,.\n    $$\n\n\n\n\n\n\nSample\n: given the density of a probability distribution \np_{\\vartheta}\np_{\\vartheta}\n draw samples,\n    $$\n        \\vartheta^{(k)} \\sim p_\\vartheta, \\quad k=1,\\ldots,N_s \\, .\n    $$\n\n\n\n\n\n\nUncertainty Quantification\n: given a set of data \nd\nd\n, the output of the model \nf(x;\\vartheta)\nf(x;\\vartheta)\n a likelihood function \np(d|\\vartheta)\np(d|\\vartheta)\n and a prior probablity density \np(\\vartheta)\np(\\vartheta)\n sample the posterior distribution,\n    $$\n    p(\\vartheta | d) = \\frac{p(d | \\vartheta) p(\\vartheta)}{p(d)}\\, .\n    $$\nThe model output \nf\nf\n depends on a set of input parameters \nx\nx\n.\n\n\n\n\n\n\nAfter \ninstalling\n the software have a look at the \nexamples\n and learn how you can run your cases.\n\n\n\n\n\n\nWarning\n\n\nThe software and the documentation page are under continuous development. New pages and new feature will be constantly added.", 
             "title": "Home"
-        },
+        }, 
         {
-            "location": "/#welcome-to-4u",
-            "text": "\u03a04U is a high performance framework for optimization, sampling and Bayesian uncertainty quantification of large scale computational models.  The framework is based on the  TORC  task-parallel library for clusters, which is designed to provide unified programming and runtime support for computing platforms that range from single-core systems to hybrid multicore-GPU clusters and heterogenous Grid based supercomputers.",
+            "location": "/#welcome-to-4u", 
+            "text": "\u03a04U is a high performance framework for optimization, sampling and Bayesian uncertainty quantification of large scale computational models.  The framework is based on the  TORC  task-parallel library for clusters, which is designed to provide unified programming and runtime support for computing platforms that range from single-core systems to hybrid multicore-GPU clusters and heterogenous Grid based supercomputers.", 
             "title": "Welcome to \u03a04U"
-        },
+        }, 
         {
-            "location": "/#what-4u-can-do-for-you",
-            "text": "Optimize : given a cost function  F(\\vartheta) F(\\vartheta)  find\n    $$\n    \\vartheta^\\star = \\mathop{\\arg\\min}\\limits_{\\vartheta} F(\\vartheta) \\,.\n    $$    Sample : given the density of a probability distribution  p_{\\vartheta} p_{\\vartheta}  draw samples,\n    $$\n        \\vartheta^{(k)} \\sim p_\\vartheta, \\quad k=1,\\ldots,N_s \\, .\n    $$    Uncertainty Quantification : given a set of data  d d , the output of the model  f(x;\\vartheta) f(x;\\vartheta)  a likelihood function  p(d|\\vartheta) p(d|\\vartheta)  and a prior probablity density  p(\\vartheta) p(\\vartheta)  sample the posterior distribution,\n    $$\n    p(\\vartheta | d) = \\frac{p(d | \\vartheta) p(\\vartheta)}{p(d)}\\, .\n    $$\nThe model output  f f  depends on a set of input parameters  x x .    After  installing  the software have a look at the  examples  and learn how you can run your cases.    Warning  The software and the documentation page are under continuous development. New pages and new feature will be constantly added.",
+            "location": "/#what-4u-can-do-for-you", 
+            "text": "Optimize : given a cost function  F(\\vartheta) F(\\vartheta)  find\n    $$\n    \\vartheta^\\star = \\mathop{\\arg\\min}\\limits_{\\vartheta} F(\\vartheta) \\,.\n    $$    Sample : given the density of a probability distribution  p_{\\vartheta} p_{\\vartheta}  draw samples,\n    $$\n        \\vartheta^{(k)} \\sim p_\\vartheta, \\quad k=1,\\ldots,N_s \\, .\n    $$    Uncertainty Quantification : given a set of data  d d , the output of the model  f(x;\\vartheta) f(x;\\vartheta)  a likelihood function  p(d|\\vartheta) p(d|\\vartheta)  and a prior probablity density  p(\\vartheta) p(\\vartheta)  sample the posterior distribution,\n    $$\n    p(\\vartheta | d) = \\frac{p(d | \\vartheta) p(\\vartheta)}{p(d)}\\, .\n    $$\nThe model output  f f  depends on a set of input parameters  x x .    After  installing  the software have a look at the  examples  and learn how you can run your cases.    Warning  The software and the documentation page are under continuous development. New pages and new feature will be constantly added.", 
             "title": "What \u03a04U can do for you"
-        },
+        }, 
         {
-            "location": "/installation/",
-            "text": "Installation\n\n\nPrerequisities\n\n\n\n\nAn MPI implementation must be installed on your system, preferably with full thread safety, e.g., \nMPICH\n.\n\n\nGSL-2.4\n or later must be installed on your system.\n\n\n\n\nInstallation steps\n\n\n1. Torc library\n\n\nA tasking library that allows to write platform-independent code. We assume that the MPI compiler is named mpicc:\n\n\n    \ncd\n lib/torc_lite  \n    autoreconf  \n    ./configure \nCC\n=\nmpicc --prefix\n=\n$HOME\n/usr/torc  \n    make\n;\n make install  \n    \nexport\n \nPATH\n=\n$HOME\n/usr/torc/bin:\n$PATH\n  \n\n\n\n\n\nAfter installing torc, the following flags are available:\n\n\ntorc_cflags\n\n\ntorc_libs\n  \n\n\n2. GSL library\n\n\nThe GNU Scientific Library (GSL) is a numerical library for C and C++ programmers.\n\n\n\n\nDownload the latest version of GSL. In a terminal write\n\n\n\n\n    wget http://mirror.switch.ch/ftp/mirror/gnu/gsl/gsl-latest.tar.gz\n    tar -xvzf gsl-latest.tar.gz\n\n\n\n\n\n\n\nConfigure. Set the install folder to be \n/$HOME/usr\n. If you want to install in the default diretcory, \n/usr/local\n, delete the  \n--prefix=/$HOME/usr\n.\n\n\n\n\n    ./configure   --prefix\n=\n/\n$HOME\n/usr\n\n\n\n\n\n\n\nCompile and install\n\n\n\n\n    make -j2\n    make install\n\n\n\n\n\nThis step will take some time. If you have more available cores, change the 2 in the -j2 to a bigger number.\n\n\n3. Sampling and Optimization Algorithms\n\n\nEnter the \nbuild\n directory:  \n\n\n    \ncd\n build  \n\n\n\n\n\nBefore compiling, the following need to be checked:\n\n\n\n\nPath to GSL-2.4 inside the \nMakefile\n.  \n\n\nName for the MPI compiler in the \nMakefile\n, since this can be named differently on different platforms (e.g. CC=cc on Piz Daint).  \n\n\n\n\nCompilation options:\n  \n\n\nbuild the default option (uses use_torc=0):\n\n\n    make\n\n\n\n\n\nbuild the OpenMP version:\n\n\n    make \nuse_omp\n=\n1\n\n\n\n\n\n\nbuild the TORC-based version:\n\n\n    make \nuse_torc\n=\n1\n\n\n\n\n\n\nbuild the serial version:\n\n\n    make  \nuse_omp\n=\n0\n  \nuse_torc\n=\n0\n\n\n\n\n\n\nTest\n\n\ncoming soon\n\n\nNotes\n\n\nPlease send your questions to:\n\n\n\n\nchatzidp AT ethz.ch\n\n\ngarampat AT ethz.ch",
+            "location": "/installation/", 
+            "text": "Installation\n\n\nPrerequisities\n\n\n\n\nAn MPI implementation must be installed on your system, preferably with full thread safety, e.g., \nMPICH\n.\n\n\nGSL-2.4\n or later must be installed on your system.\n\n\n\n\nInstallation steps\n\n\n1. Torc library\n\n\nA tasking library that allows to write platform-independent code. We assume that the MPI compiler is named mpicc:\n\n\n    \ncd\n lib/torc_lite  \n    autoreconf  \n    ./configure \nCC\n=\nmpicc --prefix\n=\n$HOME\n/usr/torc  \n    make\n;\n make install  \n    \nexport\n \nPATH\n=\n$HOME\n/usr/torc/bin:\n$PATH\n  \n\n\n\n\n\nAfter installing torc, the following flags are available:\n\n\ntorc_cflags\n\n\ntorc_libs\n  \n\n\n2. GSL library\n\n\nThe GNU Scientific Library (GSL) is a numerical library for C and C++ programmers.\n\n\n\n\nDownload the latest version of GSL. In a terminal write\n\n\n\n\n    wget http://mirror.switch.ch/ftp/mirror/gnu/gsl/gsl-latest.tar.gz\n    tar -xvzf gsl-latest.tar.gz\n\n\n\n\n\n\n\nConfigure. Set the install folder to be \n/$HOME/usr\n. If you want to install in the default diretcory, \n/usr/local\n, delete the  \n--prefix=/$HOME/usr\n.\n\n\n\n\n    ./configure   --prefix\n=\n/\n$HOME\n/usr\n\n\n\n\n\n\n\nCompile and install\n\n\n\n\n    make -j2\n    make install\n\n\n\n\n\nThis step will take some time. If you have more available cores, change the 2 in the -j2 to a bigger number.\n\n\n3. Sampling and Optimization Algorithms\n\n\nEnter the \nbuild\n directory:  \n\n\n    \ncd\n build  \n\n\n\n\n\nBefore compiling, the following need to be checked:\n\n\n\n\nPath to GSL-2.4 inside the \nMakefile\n.  \n\n\nName for the MPI compiler in the \nMakefile\n, since this can be named differently on different platforms (e.g. CC=cc on Piz Daint).  \n\n\n\n\nCompilation options:\n  \n\n\nbuild the default option (uses use_torc=0):\n\n\n    make\n\n\n\n\n\nbuild the OpenMP version:\n\n\n    make \nuse_omp\n=\n1\n\n\n\n\n\n\nbuild the TORC-based version:\n\n\n    make \nuse_torc\n=\n1\n\n\n\n\n\n\nbuild the serial version:\n\n\n    make  \nuse_omp\n=\n0\n  \nuse_torc\n=\n0\n\n\n\n\n\n\nTest\n\n\ncoming soon\n\n\nNotes\n\n\nPlease send your questions to:\n\n\n\n\nchatzidp AT ethz.ch\n\n\ngarampat AT ethz.ch", 
             "title": "Installation"
-        },
+        }, 
         {
-            "location": "/installation/#installation",
-            "text": "",
+            "location": "/installation/#installation", 
+            "text": "", 
             "title": "Installation"
-        },
+        }, 
         {
-            "location": "/installation/#prerequisities",
-            "text": "An MPI implementation must be installed on your system, preferably with full thread safety, e.g.,  MPICH .  GSL-2.4  or later must be installed on your system.",
+            "location": "/installation/#prerequisities", 
+            "text": "An MPI implementation must be installed on your system, preferably with full thread safety, e.g.,  MPICH .  GSL-2.4  or later must be installed on your system.", 
             "title": "Prerequisities"
-        },
+        }, 
         {
-            "location": "/installation/#installation-steps",
-            "text": "",
+            "location": "/installation/#installation-steps", 
+            "text": "", 
             "title": "Installation steps"
-        },
+        }, 
         {
-            "location": "/installation/#1-torc-library",
-            "text": "A tasking library that allows to write platform-independent code. We assume that the MPI compiler is named mpicc:       cd  lib/torc_lite  \n    autoreconf  \n    ./configure  CC = mpicc --prefix = $HOME /usr/torc  \n    make ;  make install  \n     export   PATH = $HOME /usr/torc/bin: $PATH     After installing torc, the following flags are available:  torc_cflags  torc_libs",
+            "location": "/installation/#1-torc-library", 
+            "text": "A tasking library that allows to write platform-independent code. We assume that the MPI compiler is named mpicc:       cd  lib/torc_lite  \n    autoreconf  \n    ./configure  CC = mpicc --prefix = $HOME /usr/torc  \n    make ;  make install  \n     export   PATH = $HOME /usr/torc/bin: $PATH     After installing torc, the following flags are available:  torc_cflags  torc_libs", 
             "title": "1. Torc library"
-        },
+        }, 
         {
-            "location": "/installation/#2-gsl-library",
-            "text": "The GNU Scientific Library (GSL) is a numerical library for C and C++ programmers.   Download the latest version of GSL. In a terminal write       wget http://mirror.switch.ch/ftp/mirror/gnu/gsl/gsl-latest.tar.gz\n    tar -xvzf gsl-latest.tar.gz   Configure. Set the install folder to be  /$HOME/usr . If you want to install in the default diretcory,  /usr/local , delete the   --prefix=/$HOME/usr .       ./configure   --prefix = / $HOME /usr   Compile and install       make -j2\n    make install  This step will take some time. If you have more available cores, change the 2 in the -j2 to a bigger number.",
+            "location": "/installation/#2-gsl-library", 
+            "text": "The GNU Scientific Library (GSL) is a numerical library for C and C++ programmers.   Download the latest version of GSL. In a terminal write       wget http://mirror.switch.ch/ftp/mirror/gnu/gsl/gsl-latest.tar.gz\n    tar -xvzf gsl-latest.tar.gz   Configure. Set the install folder to be  /$HOME/usr . If you want to install in the default diretcory,  /usr/local , delete the   --prefix=/$HOME/usr .       ./configure   --prefix = / $HOME /usr   Compile and install       make -j2\n    make install  This step will take some time. If you have more available cores, change the 2 in the -j2 to a bigger number.", 
             "title": "2. GSL library"
-        },
+        }, 
         {
-            "location": "/installation/#3-sampling-and-optimization-algorithms",
-            "text": "Enter the  build  directory:         cd  build    Before compiling, the following need to be checked:   Path to GSL-2.4 inside the  Makefile .    Name for the MPI compiler in the  Makefile , since this can be named differently on different platforms (e.g. CC=cc on Piz Daint).     Compilation options:     build the default option (uses use_torc=0):      make  build the OpenMP version:      make  use_omp = 1   build the TORC-based version:      make  use_torc = 1   build the serial version:      make   use_omp = 0    use_torc = 0",
+            "location": "/installation/#3-sampling-and-optimization-algorithms", 
+            "text": "Enter the  build  directory:         cd  build    Before compiling, the following need to be checked:   Path to GSL-2.4 inside the  Makefile .    Name for the MPI compiler in the  Makefile , since this can be named differently on different platforms (e.g. CC=cc on Piz Daint).     Compilation options:     build the default option (uses use_torc=0):      make  build the OpenMP version:      make  use_omp = 1   build the TORC-based version:      make  use_torc = 1   build the serial version:      make   use_omp = 0    use_torc = 0", 
             "title": "3. Sampling and Optimization Algorithms"
-        },
+        }, 
         {
-            "location": "/installation/#test",
-            "text": "coming soon",
+            "location": "/installation/#test", 
+            "text": "coming soon", 
             "title": "Test"
-        },
+        }, 
         {
-            "location": "/installation/#notes",
-            "text": "Please send your questions to:   chatzidp AT ethz.ch  garampat AT ethz.ch",
+            "location": "/installation/#notes", 
+            "text": "Please send your questions to:   chatzidp AT ethz.ch  garampat AT ethz.ch", 
             "title": "Notes"
-        },
+        }, 
         {
-            "location": "/examples/sampling/",
-            "text": "Sampling a posterior distribution\n\n\nIn this example we will show how to sample the posterior distribution in an uncertainty quantification problem. First, we will create synthetic data using the model,\n\n\n\n\n\nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )\n\n\n\n\nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )\n\n\n\n\n\nWe fix \n\\varphi^* = (2,3,1)\n\\varphi^* = (2,3,1)\n and create \n100\n100\n data point using the equation,\n\n\n\n\n\nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,\n\n\n\n\nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,\n\n\n\n\n\nwhere \nx_i = 0.02 i,\\; i=1,\\ldots,100\nx_i = 0.02 i,\\; i=1,\\ldots,100\n and \n\\sigma=0.3\n\\sigma=0.3\n. We will sample the posterior distribution of \n\\vartheta=(\\varphi,\\sigma)\n\\vartheta=(\\varphi,\\sigma)\n conditioned on the data \nd\nd\n. The prior distribution is uniform for each parameter,\n\n\n\n\n\\begin{align}\n    p(\\vartheta_1) &= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) &= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) &= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) &= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}\n\n\n\\begin{align}\n    p(\\vartheta_1) &= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) &= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) &= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) &= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}\n\n\n\n\nand the likelihood function in given by,\n\n\n\n\n\\begin{align}\n    p(d | \\vartheta) & = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     &=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}\n\n\n\\begin{align}\n    p(d | \\vartheta) & = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     &=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}\n\n\n\n\nSampling with TMCMC\n\n\nCompile and run\n\n\nFrom the base folder run\n\n\ncd\n build\nmake tmcmc_theta_internal\n\n\n\n\n\nMake sure that \nuse_torc=0\n and \nuse_omp=0\n in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run\n\n\ncd\n ../examples/sampling/internal/tmcmc/\n./setup_tmcmc.sh\n\ncd\n runs/run_001/\n\n\n\n\n\nRun the TMCMC sampling algorithm:\n\n\n./tmcmc_theta_internal\n\n\n\n\n\nFinally, visualize the samples:\n\n\ncp ../../../../../../source/tools/display/plotmatrix_hist.py .\n./plotmatrix_hist.py final.txt\n\n\n\n\n\n\n\nBehind the scripts\n\n\nThe script \n./setup_tmcmc.sh\n makes a new running folder and copies inside the executable and the needed files:\n\n\n\n\nthe data file data.txt,\n\n\nthe file that contains the prior information, \npriors.par\n,\n\n\nthe parameter file for tmcmc, \ntmcmc.par\n.\n\n\n\n\nFor this example, TMCMC has been linked to the likelihood function \nloglike_theta_fast.c\n. Inside this file the model \nf\nf\n as well as the likelihood function \np(d | \\vartheta)\np(d | \\vartheta)\n has beem implemented. More information on the the likelihood implementation and how to write your own likelihood you can find \nhere\n.\n\n\nSampling with DRAM\n\n\nCompile and run\n\n\nFrom the base folder run\n\n\ncd\n build\nmake dram_theta_internal\n\n\n\n\n\nMake sure that \nuse_torc=0\n and \nuse_omp=0\n in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run\n\n\ncd\n ../examples/sampling/internal/dram/\n./setup_dram.sh\n\ncd\n runs/run_001/\n\n\n\n\n\nRun the TMCMC sampling algorithm:\n\n\n./tmcmc_dram_internal\n\n\n\n\n\nFinally, visualize the samples:\n\n\ncp ../../../../../../source/tools/display/plotmatrix_hist.py .\ntail -n +1000 chain.txt > tmp\n./plotmatrix_hist.py tmp\n\n\n\n\n\nWith this command \ntail -n +1000 chain.txt\n we discard the first \n1000\n1000\n samples which we consider as the burn-in period.\n\n\n\n\nBehind the scripts\n\n\nSame as in the TMCMC example. The only difference is that instead of the tmcmc.par is substituted by \ndram.par\n.",
+            "location": "/examples/sampling/", 
+            "text": "Sampling a posterior distribution\n\n\nIn this example we will show how to sample the posterior distribution in an uncertainty quantification problem. First, we will create synthetic data using the model,\n\n\n\n\n\nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )\n\n\n\n\nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )\n\n\n\n\n\nWe fix \n\\varphi^* = (2,3,1)\n\\varphi^* = (2,3,1)\n and create \n100\n100\n data point using the equation,\n\n\n\n\n\nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,\n\n\n\n\nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,\n\n\n\n\n\nwhere \nx_i = 0.02 i,\\; i=1,\\ldots,100\nx_i = 0.02 i,\\; i=1,\\ldots,100\n and \n\\sigma=0.3\n\\sigma=0.3\n. We will sample the posterior distribution of \n\\vartheta=(\\varphi,\\sigma)\n\\vartheta=(\\varphi,\\sigma)\n conditioned on the data \nd\nd\n. The prior distribution is uniform for each parameter,\n\n\n\n\n\\begin{align}\n    p(\\vartheta_1) \n= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) \n= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) \n= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) \n= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}\n\n\n\\begin{align}\n    p(\\vartheta_1) &= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) &= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) &= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) &= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}\n\n\n\n\nand the likelihood function in given by,\n\n\n\n\n\\begin{align}\n    p(d | \\vartheta) \n = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     \n=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}\n\n\n\\begin{align}\n    p(d | \\vartheta) & = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     &=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}\n\n\n\n\nSampling with TMCMC\n\n\nCompile and run\n\n\nFrom the base folder run\n\n\ncd\n build\nmake tmcmc_theta_internal\n\n\n\n\n\nMake sure that \nuse_torc=0\n and \nuse_omp=0\n in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run\n\n\ncd\n ../examples/sampling/internal/tmcmc/\n./setup_tmcmc.sh\n\ncd\n runs/run_001/\n\n\n\n\n\nRun the TMCMC sampling algorithm:\n\n\n./tmcmc_theta_internal\n\n\n\n\n\nFinally, visualize the samples:\n\n\ncp ../../../../../../source/tools/display/plotmatrix_hist.py .\n./plotmatrix_hist.py final.txt\n\n\n\n\n\n\n\nBehind the scripts\n\n\nThe script \n./setup_tmcmc.sh\n makes a new running folder and copies inside the executable and the needed files:\n\n\n\n\nthe data file data.txt,\n\n\nthe file that contains the prior information, \npriors.par\n,\n\n\nthe parameter file for tmcmc, \ntmcmc.par\n.\n\n\n\n\nFor this example, TMCMC has been linked to the likelihood function \nloglike_theta_fast.c\n. Inside this file the model \nf\nf\n as well as the likelihood function \np(d | \\vartheta)\np(d | \\vartheta)\n has beem implemented. More information on the the likelihood implementation and how to write your own likelihood you can find \nhere\n.\n\n\nSampling with DRAM\n\n\nCompile and run\n\n\nFrom the base folder run\n\n\ncd\n build\nmake dram_theta_internal\n\n\n\n\n\nMake sure that \nuse_torc=0\n and \nuse_omp=0\n in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run\n\n\ncd\n ../examples/sampling/internal/dram/\n./setup_dram.sh\n\ncd\n runs/run_001/\n\n\n\n\n\nRun the TMCMC sampling algorithm:\n\n\n./tmcmc_dram_internal\n\n\n\n\n\nFinally, visualize the samples:\n\n\ncp ../../../../../../source/tools/display/plotmatrix_hist.py .\ntail -n +1000 chain.txt \n tmp\n./plotmatrix_hist.py tmp\n\n\n\n\n\nWith this command \ntail -n +1000 chain.txt\n we discard the first \n1000\n1000\n samples which we consider as the burn-in period.\n\n\n\n\nBehind the scripts\n\n\nSame as in the TMCMC example. The only difference is that instead of the tmcmc.par is substituted by \ndram.par\n.", 
             "title": "Sampling"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#sampling-a-posterior-distribution",
-            "text": "In this example we will show how to sample the posterior distribution in an uncertainty quantification problem. First, we will create synthetic data using the model,   \nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )  \nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )   We fix  \\varphi^* = (2,3,1) \\varphi^* = (2,3,1)  and create  100 100  data point using the equation,   \nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,  \nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,   where  x_i = 0.02 i,\\; i=1,\\ldots,100 x_i = 0.02 i,\\; i=1,\\ldots,100  and  \\sigma=0.3 \\sigma=0.3 . We will sample the posterior distribution of  \\vartheta=(\\varphi,\\sigma) \\vartheta=(\\varphi,\\sigma)  conditioned on the data  d d . The prior distribution is uniform for each parameter,   \\begin{align}\n    p(\\vartheta_1) &= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) &= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) &= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) &= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}  \\begin{align}\n    p(\\vartheta_1) &= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) &= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) &= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) &= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}   and the likelihood function in given by,   \\begin{align}\n    p(d | \\vartheta) & = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     &=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}  \\begin{align}\n    p(d | \\vartheta) & = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     &=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}",
+            "location": "/examples/sampling/#sampling-a-posterior-distribution", 
+            "text": "In this example we will show how to sample the posterior distribution in an uncertainty quantification problem. First, we will create synthetic data using the model,   \nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )  \nf(t;\\varphi) = \\varphi_1 \\sin(\\varphi_2  x + \\varphi_3 )   We fix  \\varphi^* = (2,3,1) \\varphi^* = (2,3,1)  and create  100 100  data point using the equation,   \nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,  \nd_i = f(x_i,\\varphi^{\\star}) + \\sigma \\epsilon, \\quad \\epsilon \\sim \\mathcal{N}(0,1) \\, ,   where  x_i = 0.02 i,\\; i=1,\\ldots,100 x_i = 0.02 i,\\; i=1,\\ldots,100  and  \\sigma=0.3 \\sigma=0.3 . We will sample the posterior distribution of  \\vartheta=(\\varphi,\\sigma) \\vartheta=(\\varphi,\\sigma)  conditioned on the data  d d . The prior distribution is uniform for each parameter,   \\begin{align}\n    p(\\vartheta_1)  = \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2)  = \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3)  = \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4)  = \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}  \\begin{align}\n    p(\\vartheta_1) &= \\mathcal{U}( \\vartheta_1 | 0,5) \\\\\n    p(\\vartheta_2) &= \\mathcal{U}( \\vartheta_2 | 0,10) \\\\\n    p(\\vartheta_3) &= \\mathcal{U}( \\vartheta_3 | -3.14,3.14) \\\\\n    p(\\vartheta_4) &= \\mathcal{U}( \\vartheta_4 | 0,5)  \\, ,\n\\end{align}   and the likelihood function in given by,   \\begin{align}\n    p(d | \\vartheta)   = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                      =  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}  \\begin{align}\n    p(d | \\vartheta) & = \\prod_{i=1}^4 p(d_i | \\vartheta) \\\\\n                     &=  \\prod_{i=1}^4 \\mathcal{N}( d_i | f(x;\\varphi),\\sigma ) \\, .\n\\end{align}", 
             "title": "Sampling a posterior distribution"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#sampling-with-tmcmc",
-            "text": "",
+            "location": "/examples/sampling/#sampling-with-tmcmc", 
+            "text": "", 
             "title": "Sampling with TMCMC"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#compile-and-run",
-            "text": "From the base folder run  cd  build\nmake tmcmc_theta_internal  Make sure that  use_torc=0  and  use_omp=0  in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run  cd  ../examples/sampling/internal/tmcmc/\n./setup_tmcmc.sh cd  runs/run_001/  Run the TMCMC sampling algorithm:  ./tmcmc_theta_internal  Finally, visualize the samples:  cp ../../../../../../source/tools/display/plotmatrix_hist.py .\n./plotmatrix_hist.py final.txt",
+            "location": "/examples/sampling/#compile-and-run", 
+            "text": "From the base folder run  cd  build\nmake tmcmc_theta_internal  Make sure that  use_torc=0  and  use_omp=0  in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run  cd  ../examples/sampling/internal/tmcmc/\n./setup_tmcmc.sh cd  runs/run_001/  Run the TMCMC sampling algorithm:  ./tmcmc_theta_internal  Finally, visualize the samples:  cp ../../../../../../source/tools/display/plotmatrix_hist.py .\n./plotmatrix_hist.py final.txt", 
             "title": "Compile and run"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#behind-the-scripts",
-            "text": "The script  ./setup_tmcmc.sh  makes a new running folder and copies inside the executable and the needed files:   the data file data.txt,  the file that contains the prior information,  priors.par ,  the parameter file for tmcmc,  tmcmc.par .   For this example, TMCMC has been linked to the likelihood function  loglike_theta_fast.c . Inside this file the model  f f  as well as the likelihood function  p(d | \\vartheta) p(d | \\vartheta)  has beem implemented. More information on the the likelihood implementation and how to write your own likelihood you can find  here .",
+            "location": "/examples/sampling/#behind-the-scripts", 
+            "text": "The script  ./setup_tmcmc.sh  makes a new running folder and copies inside the executable and the needed files:   the data file data.txt,  the file that contains the prior information,  priors.par ,  the parameter file for tmcmc,  tmcmc.par .   For this example, TMCMC has been linked to the likelihood function  loglike_theta_fast.c . Inside this file the model  f f  as well as the likelihood function  p(d | \\vartheta) p(d | \\vartheta)  has beem implemented. More information on the the likelihood implementation and how to write your own likelihood you can find  here .", 
             "title": "Behind the scripts"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#sampling-with-dram",
-            "text": "",
+            "location": "/examples/sampling/#sampling-with-dram", 
+            "text": "", 
             "title": "Sampling with DRAM"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#compile-and-run_1",
-            "text": "From the base folder run  cd  build\nmake dram_theta_internal  Make sure that  use_torc=0  and  use_omp=0  in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run  cd  ../examples/sampling/internal/dram/\n./setup_dram.sh cd  runs/run_001/  Run the TMCMC sampling algorithm:  ./tmcmc_dram_internal  Finally, visualize the samples:  cp ../../../../../../source/tools/display/plotmatrix_hist.py .\ntail -n +1000 chain.txt > tmp\n./plotmatrix_hist.py tmp  With this command  tail -n +1000 chain.txt  we discard the first  1000 1000  samples which we consider as the burn-in period.",
+            "location": "/examples/sampling/#compile-and-run_1", 
+            "text": "From the base folder run  cd  build\nmake dram_theta_internal  Make sure that  use_torc=0  and  use_omp=0  in the Makefile since we don't want to run parallel in this example. Go back to the the base folder and run  cd  ../examples/sampling/internal/dram/\n./setup_dram.sh cd  runs/run_001/  Run the TMCMC sampling algorithm:  ./tmcmc_dram_internal  Finally, visualize the samples:  cp ../../../../../../source/tools/display/plotmatrix_hist.py .\ntail -n +1000 chain.txt   tmp\n./plotmatrix_hist.py tmp  With this command  tail -n +1000 chain.txt  we discard the first  1000 1000  samples which we consider as the burn-in period.", 
             "title": "Compile and run"
-        },
+        }, 
         {
-            "location": "/examples/sampling/#behind-the-scripts_1",
-            "text": "Same as in the TMCMC example. The only difference is that instead of the tmcmc.par is substituted by  dram.par .",
+            "location": "/examples/sampling/#behind-the-scripts_1", 
+            "text": "Same as in the TMCMC example. The only difference is that instead of the tmcmc.par is substituted by  dram.par .", 
             "title": "Behind the scripts"
-        },
+        }, 
         {
-            "location": "/examples/external/",
-            "text": "Coupling with external code\n\n\n  \ncd\n build\n  make tmcmc_theta_external \nuse_torc\n=\n1\n\n\n\n\n\n\nThis version creates intermediate folders of the form \ntmpdir.*.*.*.*\n where the external code is running on a set of parameters saved in \nparams.txt\n. After the execution the directory is deleted. If you want to keep the directories set \nREMOVEDIRS  0\n in \nsource/likelihoods/loglike_theta.c\n.\n\n\nTo run the an example:\n\n\n    \ncd\n examples/sampling/external/tmcmc\n    ./setup_tmcmc.sh\n    \ncd\n runs/run_001\n\n\n\n\n\nand then\n\n\n    mpirun -np \n4\n ./tmcmc_theta_external\n\n\n\n\n\nor\n\n\n    \nexport\n \nTORC_WORKERS\n=\n4\n\n    mpirun -np \n1\n ./tmcmc_theta_external",
+            "location": "/examples/external/", 
+            "text": "Coupling with external code\n\n\n  \ncd\n build\n  make tmcmc_theta_external \nuse_torc\n=\n1\n\n\n\n\n\n\nThis version creates intermediate folders of the form \ntmpdir.*.*.*.*\n where the external code is running on a set of parameters saved in \nparams.txt\n. After the execution the directory is deleted. If you want to keep the directories set \nREMOVEDIRS  0\n in \nsource/likelihoods/loglike_theta.c\n.\n\n\nTo setup the example:\n\n\n    \ncd\n examples/sampling/external/tmcmc\n    ./setup_tmcmc.sh\n    \ncd\n runs/run_001\n\n\n\n\n\nContents of \nruns/run_001\n:\n  \n\n\n\n\nThe \u03a04U executable: \ntmcmc_theta_external\n  \n\n\n\n\nThe files \npriors.par\n and \ntmcmc.par\n. These files contain information about the choice of the prior distributions and the TMCMC parameters respectively.  \n\n\n\n\n\n\nA directory named \nmodel\n. Inside this directory, \u03a04U expects to find:  \n\n\n\n\na file with the experimental data named \ndata.txt\n\n\na user-provided script named \ndoall.sh\n, which (i) runs the external simulation, (ii) compares the output with the experimental data, and (iii) saves the log-likelihood inside a file called \nloglike.txt\n. The value inside \nloglike.txt\n is then read from \u03a04U.\n\n\n\n\n\n\n\n\nTo run the example:\n \n\n\n    mpirun -np \n4\n ./tmcmc_theta_external\n\n\n\n\n\nor\n\n\n    \nexport\n \nTORC_WORKERS\n=\n4\n\n    mpirun -np \n1\n ./tmcmc_theta_external", 
             "title": "External"
-        },
+        }, 
         {
-            "location": "/examples/external/#coupling-with-external-code",
-            "text": "cd  build\n  make tmcmc_theta_external  use_torc = 1   This version creates intermediate folders of the form  tmpdir.*.*.*.*  where the external code is running on a set of parameters saved in  params.txt . After the execution the directory is deleted. If you want to keep the directories set  REMOVEDIRS  0  in  source/likelihoods/loglike_theta.c .  To run the an example:       cd  examples/sampling/external/tmcmc\n    ./setup_tmcmc.sh\n     cd  runs/run_001  and then      mpirun -np  4  ./tmcmc_theta_external  or       export   TORC_WORKERS = 4 \n    mpirun -np  1  ./tmcmc_theta_external",
+            "location": "/examples/external/#coupling-with-external-code", 
+            "text": "cd  build\n  make tmcmc_theta_external  use_torc = 1   This version creates intermediate folders of the form  tmpdir.*.*.*.*  where the external code is running on a set of parameters saved in  params.txt . After the execution the directory is deleted. If you want to keep the directories set  REMOVEDIRS  0  in  source/likelihoods/loglike_theta.c .  To setup the example:       cd  examples/sampling/external/tmcmc\n    ./setup_tmcmc.sh\n     cd  runs/run_001  Contents of  runs/run_001 :      The \u03a04U executable:  tmcmc_theta_external      The files  priors.par  and  tmcmc.par . These files contain information about the choice of the prior distributions and the TMCMC parameters respectively.      A directory named  model . Inside this directory, \u03a04U expects to find:     a file with the experimental data named  data.txt  a user-provided script named  doall.sh , which (i) runs the external simulation, (ii) compares the output with the experimental data, and (iii) saves the log-likelihood inside a file called  loglike.txt . The value inside  loglike.txt  is then read from \u03a04U.     To run the example:        mpirun -np  4  ./tmcmc_theta_external  or       export   TORC_WORKERS = 4 \n    mpirun -np  1  ./tmcmc_theta_external", 
             "title": "Coupling with external code"
-        },
+        }, 
         {
-            "location": "/examples/optimizing/",
-            "text": "Optimization",
+            "location": "/examples/optimizing/", 
+            "text": "Optimization", 
             "title": "Optimizing"
-        },
+        }, 
         {
-            "location": "/examples/optimizing/#optimization",
-            "text": "",
+            "location": "/examples/optimizing/#optimization", 
+            "text": "", 
             "title": "Optimization"
-        },
+        }, 
         {
-            "location": "/examples/post/",
-            "text": "Bayesian UQ plots\n\n\n\n\nmaltab  \n\n\npython  \n\n\n\n\nOptimization plots\n\n\n\n\nmaltab  \n\n\npython",
+            "location": "/examples/post/", 
+            "text": "Bayesian UQ plots\n\n\n\n\nmaltab  \n\n\npython  \n\n\n\n\nOptimization plots\n\n\n\n\nmaltab  \n\n\npython", 
             "title": "Postprocessing"
-        },
+        }, 
         {
-            "location": "/examples/post/#bayesian-uq-plots",
-            "text": "maltab    python",
+            "location": "/examples/post/#bayesian-uq-plots", 
+            "text": "maltab    python", 
             "title": "Bayesian UQ plots"
-        },
+        }, 
         {
-            "location": "/examples/post/#optimization-plots",
-            "text": "maltab    python",
+            "location": "/examples/post/#optimization-plots", 
+            "text": "maltab    python", 
             "title": "Optimization plots"
-        },
+        }, 
         {
-            "location": "/developing/structure/",
-            "text": "coming soon",
+            "location": "/developing/structure/", 
+            "text": "coming soon", 
             "title": "Structure"
-        },
+        }, 
         {
-            "location": "/developing/conventions/",
-            "text": "coming soon",
+            "location": "/developing/conventions/", 
+            "text": "coming soon", 
             "title": "Conventions"
-        },
+        }, 
         {
-            "location": "/developing/par_files/",
-            "text": "priors.par\n\n\ntmcmc.par\n\n\ndram.par\n\n\ndram parameter file generator",
+            "location": "/developing/par_files/", 
+            "text": "priors.par\n\n\ntmcmc.par\n\n\ndram.par\n\n\ndram parameter file generator", 
             "title": "Par files"
-        },
+        }, 
         {
-            "location": "/developing/par_files/#priorspar",
-            "text": "",
+            "location": "/developing/par_files/#priorspar", 
+            "text": "", 
             "title": "priors.par"
-        },
+        }, 
         {
-            "location": "/developing/par_files/#tmcmcpar",
-            "text": "",
+            "location": "/developing/par_files/#tmcmcpar", 
+            "text": "", 
             "title": "tmcmc.par"
-        },
+        }, 
         {
-            "location": "/developing/par_files/#drampar",
-            "text": "dram parameter file generator",
+            "location": "/developing/par_files/#drampar", 
+            "text": "dram parameter file generator", 
             "title": "dram.par"
-        },
+        }, 
         {
-            "location": "/developing/likelihoods/",
-            "text": "coming soon",
+            "location": "/developing/likelihoods/", 
+            "text": "coming soon", 
             "title": "Likelihoods"
-        },
+        }, 
         {
-            "location": "/developing/upcoming/",
-            "text": "ABC-SubSim (xx/xx/2018)  \n\n\nAMaLGaM (xx/xx/2018)  \n\n\nMulti-objective optimization (xx/xx/2018)  \n\n\nManifold TMCMC (xx/xx/2018)",
+            "location": "/developing/upcoming/", 
+            "text": "ABC-SubSim (xx/xx/2018)  \n\n\nAMaLGaM (xx/xx/2018)  \n\n\nMulti-objective optimization (xx/xx/2018)  \n\n\nManifold TMCMC (xx/xx/2018)", 
             "title": "Upcoming"
-        },
+        }, 
         {
-            "location": "/developing/beta/",
-            "text": "coming soon",
+            "location": "/developing/beta/", 
+            "text": "coming soon", 
             "title": "Beta"
-        },
+        }, 
         {
-            "location": "/hpc/",
-            "text": "TODO",
+            "location": "/hpc/", 
+            "text": "TODO", 
             "title": "Performance"
-        },
+        }, 
         {
-            "location": "/references/",
-            "text": "Related publications\n\n\nPi4U framework\n\n\n\n\nHadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015\n(\ndoi\n,\npdf\n)\n\n\nHadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532\n(\ndoi\n,\npdf\n)\n\n\n\n\nApplications\n\n\n\n\n\n\nKulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016\n(\ndoi\n, \npdf\n)\n\n\n\n\n\n\nHadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014\n(\ndoi\n,\npdf\n)\n\n\n\n\n\n\nTORC: Task-Based Runtime Library\n\n\n\n\nHadjidoukas P.E., Lappas E., Dimakopoulos V.V: A Runtime Library for Platform-Independent Task Parallelism. PDP 2012: 229-236\n(\ndoi\n)",
+            "location": "/references/", 
+            "text": "Related publications\n\n\nPi4U framework\n\n\n\n\nHadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015\n(\ndoi\n,\npdf\n)\n\n\nHadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532\n(\ndoi\n,\npdf\n)\n\n\n\n\nApplications\n\n\n\n\n\n\nKulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016\n(\ndoi\n, \npdf\n)\n\n\n\n\n\n\nHadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014\n(\ndoi\n,\npdf\n)\n\n\n\n\n\n\nTORC: Task-Based Runtime Library\n\n\n\n\nHadjidoukas P.E., Lappas E., Dimakopoulos V.V: A Runtime Library for Platform-Independent Task Parallelism. PDP 2012: 229-236\n(\ndoi\n)", 
             "title": "References"
-        },
+        }, 
         {
-            "location": "/references/#related-publications",
-            "text": "",
+            "location": "/references/#related-publications", 
+            "text": "", 
             "title": "Related publications"
-        },
+        }, 
         {
-            "location": "/references/#pi4u-framework",
-            "text": "Hadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015\n( doi , pdf )  Hadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532\n( doi , pdf )",
+            "location": "/references/#pi4u-framework", 
+            "text": "Hadjidoukas P.E., Angelikopoulos P., Papadimitriou C., Koumoutsakos P., Pi4U: A high performance computing framework for Bayesian uncertainty quantification of complex models. J. Comput. Phys., 284:1-21, 2015\n( doi , pdf )  Hadjidoukas P.E., Angelikopoulos P., Kulakova L., Papadimitriou C., Koumoutsakos P., Exploiting Task-Based Parallelism in Bayesian Uncertainty Quantification. EuroPar 2015, LLCS 2015, 9233, 532\n( doi , pdf )", 
             "title": "Pi4U framework"
-        },
+        }, 
         {
-            "location": "/references/#applications",
-            "text": "Kulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016\n( doi ,  pdf )    Hadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014\n( doi , pdf )",
+            "location": "/references/#applications", 
+            "text": "Kulakova L., Angelikopoulos P., Hadjidoukas P. E., Papadimitriou C., Koumoutsakos P., Approximate Bayesian Computation for Granular and Molecular Dynamics Simulations. Proceedings of the Platform for Advanced Scientific Computing Conference PASC'16, 2016\n( doi ,  pdf )    Hadjidoukas P.E, Angelikopoulos P., Rossinelli D., Alexeev D., Papadimitriou C., Koumoutsakos P., Bayesian uncertainty quantification and propagation for discrete element simulations of granular materials. Comput. Methods Appl. Mech. Engrg., 282:218-238, 2014\n( doi , pdf )", 
             "title": "Applications"
         }
     ]
